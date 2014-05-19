@@ -50,7 +50,7 @@
 // version information
 var $ = unsafeWindow.$;
 var jQuery = unsafeWindow.jQuery;
-var version = "82";
+var version = 81;
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateURL = "https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js";
 
@@ -1657,8 +1657,8 @@ function patchNDownloadGPX(gccString, filename) {
 
 	// remove emojis
 	if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-		result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "")
-				.replace(/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
+		result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
+				/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
 	}
 
 	// remove empty lines
@@ -4653,14 +4653,14 @@ function unescapeXML(escaped) {
 }
 
 function updateAvailable(oChanges) {
-	log("info", "current version: " + version + " latest version: " + serverVersion);
+	log("info", "current version: " + version + " latest version: " + oChanges.latestVersion);
 	var updateInfo = document.createElement('div');
 	updateInfo.setAttribute('id', 'gccupdateinfo');
 	var updatelnk = document.createElement('a');
-	updatelnk.setAttribute('href', updateurl);
+	updatelnk.setAttribute('href', updateURL);
 	updatelnk.innerHTML = lang.update_clickToUpdate;
-	updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}", serverVersion)
-			.replace("{{version}}", version)
+	updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
+			oChanges.latestVersion).replace("{{version}}", version)
 			+ " "));
 	updateInfo.appendChild(updatelnk);
 	updateInfo.appendChild(document.createElement('br'));
@@ -4695,7 +4695,7 @@ function checkforupdates() {
 	var currentDate = new Date();
 
 	// in ms. equals 1 day
-	if (currentDate - updateDate > 86400000) {
+	if (currentDate - updateDate > 8) {// 6400000) {
 
 		GM_xmlhttpRequest({
 			method : 'GET',
@@ -4712,7 +4712,7 @@ function checkforupdates() {
 						updateAvailable(oChanges);
 					}
 				} catch (JSONException) {
-					log("error", "Could not load update info: " + responseDetails.responseText);
+					log("error", "Could not load update info: " + JSONException);
 				}
 			},
 			onerror : function(responseDetails) {
