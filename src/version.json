@@ -1,7 +1,12 @@
 {
-	"latestVersion":82,
+	"latestVersion":83,
 	"changes":[{
+		"version": 83,
+		"date": "2014-05-19",
+		"change": "<ul><li>change host to github</li></ul>"
+	},{
 		"version":82,
+		"date": "2014-05-16",
 		"change":"<ul><li>fix: script include to run also on https links to gs.com</li> <li>fix: remove another emoji when patching GPX</li> <li>new: import/export as JSON</li> </ul>","date":"2014-05-16"
 	},
 	{
