@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="GCComment"
+	version="69"
+>
+	<name>GCComment</name>
+	<description>Create, manage and print your personal comments for
+		geocaches on geocaching.com. Move caches to their correct final
+		location. (Opera version thanks to skywakler90)</description>
+	<author href="http://www.geoclub.de/viewtopic.php?t=44631">Birnbaum2001</author>
+	<icon src="icons/icon-64.png" />
+	<icon src="icons/icon-16.png" />
+	<!-- sync with Birnbaum's server -->
+	<access origin="http://kay.kicks-ass.org:18080" subdomains="true" />
+	<!-- check for updates & changes -->
+	<access origin="http://userscripts.org" subdomains="true" />
+	<access origin="https://gccomment.svn.sourceforge.net"
+		subdomains="true" />
+	<!-- jQuery datatables.js -->
+	<access origin="http://ajax.aspnetcdn.com" subdomains="true" />
+	<!-- dropbox.js -->
+	<access origin="http://cdnjs.cloudflare.com" subdomains="true" />
+	<!-- sync with dropbox -->
+	<access origin="https://dropbox.com" subdomains="true" />
+</widget>
