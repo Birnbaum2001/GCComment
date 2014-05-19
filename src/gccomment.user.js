@@ -50,7 +50,7 @@
 // version information
 var $ = unsafeWindow.$;
 var jQuery = unsafeWindow.jQuery;
-var version = 82;
+var version = 81;
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateURL = "https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js";
 
@@ -4695,7 +4695,7 @@ function checkforupdates() {
 	var currentDate = new Date();
 
 	// in ms. equals 1 day
-	if (currentDate - updateDate > 86400000) {
+	if (currentDate - updateDate > 8) {// 6400000) {
 
 		GM_xmlhttpRequest({
 			method : 'GET',

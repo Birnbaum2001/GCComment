@@ -198,8 +198,5 @@
 		"version":43,
 		"date":"2010-08-13",
 		"change":"<ul><li>server storage available (see documentation above)</li><li>delete-all button</li><li>tooltip with some stats on GCComment-icon</li></ul>"
-	},
-
-
-	]
+	}]
 }
