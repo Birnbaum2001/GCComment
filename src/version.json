@@ -1,9 +1,1 @@
-{
-	latestVersion: 82,
-	changes: [ {
-		version: 82,
-		change: "&lt;ul&gt; &lt;li&gt;fix: script include to run also on https links to gs.com&lt;/li&gt; &lt;li&gt;fix: remove another emoji when patching GPX&lt;/li&gt; &lt;li&gt;new: import/export as JSON&lt;/li&gt; &lt;/ul&gt;",
-		date: "2014-05-16"
-	}
-	]
-}
+{"latestVersion":82,"changes":[{"version":82,"change":"&lt;ul&gt; &lt;li&gt;fix: script include to run also on https links to gs.com&lt;/li&gt; &lt;li&gt;fix: remove another emoji when patching GPX&lt;/li&gt; &lt;li&gt;new: import/export as JSON&lt;/li&gt; &lt;/ul&gt;","date":"2014-05-16"}]}
