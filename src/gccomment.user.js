@@ -43,16 +43,16 @@
  - 2010-07-31 cleaner code style (comment as object), waiting for gctour to finish before inserting comments
  - 2010-08-05 comments can be categorized and filtered on overview table
  - 2010-08-13 stats on gccomment-icon, server storage available, delete all button
- - further comments and changelog on http://userscripts.org/scripts/show/75959
+ - further comments and changelog on http://userscripts.org/scripts/show/75959 ... not anymore. 
+ Visit github
  */
 
 // version information
 var $ = unsafeWindow.$;
 var jQuery = unsafeWindow.jQuery;
 var version = "82";
-var updatechangesurl = 'https://svn.code.sf.net/p/gccomment/code/trunk/gccomment/src/version.xml';
-var updateMetaURL = 'http://userscripts.org:8080/scripts/source/75959.meta.js';
-var updateURL = "https://svn.code.sf.net/p/gccomment/code/trunk/gccomment/src/gccomment.user.js";
+var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
+var updateURL = "https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js";
 
 // thanks to Geggi
 // Check for Scriptish bug in Fennec browser
@@ -268,7 +268,7 @@ languages[SETTINGS_LANGUAGE_EN] = {
 	ov_lastex : "Last export",
 	ov_lastim : "Last import",
 	ov_lastup : "Last check for updates",
-	settings_intro : "Thanks for using GCComment. Visit <a href='http://userscripts.org:8080/scripts/show/75959' target='blank'>userscripts.org</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact me at <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
+	settings_intro : "Thanks for using GCComment. Visit <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact me at <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
 	settings_feelfree : "Feel free to show your appreciation :)",
 	settings_enterUUID : "UUID for server synchronisation",
 	settings_enterServer : "Server for server synchronisation",
@@ -410,7 +410,7 @@ languages[SETTINGS_LANGUAGE_DE] = {
 	ov_lastex : "Letzter Export",
 	ov_lastim : "Letzter Import",
 	ov_lastup : "Letzte Prüfung auf Aktualisierung",
-	settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='http://userscripts.org:8080/scripts/show/75959' target='blank'>userscripts.org</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du mich über <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
+	settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du mich über <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
 	settings_feelfree : "Zögere nicht, deiner Wertschätzung Ausdruck zu verleihen :)",
 	settings_enterUUID : "UUID zur Serversynchronisierung",
 	settings_enterServer : "Server zur Serversynchronisierung",
@@ -558,16 +558,15 @@ function main() {
 	}
 
 	// register own CSS styles
-	appendCSS("text",
-			"a.gccselect {padding-bottom:5px;background-color:#EBECED;outline:1px solid #D7D7D7}", null);
+	appendCSS("text", "a.gccselect {padding-bottom:5px;background-color:#EBECED;outline:1px solid #D7D7D7}",
+			null);
 
 	homelat = GM_getValue('HOMELAT');
 	homelng = GM_getValue('HOMELNG');
 
 	// starting the GCC
 	log('debug', 'found URL: ' + document.URL);
-	if ((document.URL.search("cache_details\.aspx") >= 0)
-			|| (document.URL.search("\/geocache\/GC") >= 0)) {
+	if ((document.URL.search("cache_details\.aspx") >= 0) || (document.URL.search("\/geocache\/GC") >= 0)) {
 		log('debug', 'matched gccommentOnDetailpage');
 		gccommentOnDetailpage();
 	} else if ((document.URL.search("\/my\/logs\.aspx") >= 0)
@@ -580,9 +579,8 @@ function main() {
 	} else if (document.URL.search("cdpf\.aspx") >= 0) {
 		log('debug', 'matched gccommentOnPrintPage');
 		gccommentOnPrintPage();
-	} else if ((document.URL.search("\/my\/default\.aspx") >= 0)
-			|| (document.URL.search("\/my\/$") >= 0) || (document.URL.search("\/my\/\#") >= 0)
-			|| (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
+	} else if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
+			|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
 		log('debug', 'matched gccommentOnProfilePage');
 		gccommentOnProfilePage();
 	} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
@@ -636,8 +634,7 @@ function doMaintenance() {
 	// repair needed because until 76, only the guid (the actual comment) was
 	// deleted, but not the gccode-guid mapping
 	if (indexRepaired < 77) {
-		log(
-				'info',
+		log('info',
 				'Performing maintenance of version 77. Removing dangling gccode-guid mappings from the GreaseMonkey storage');
 		var oComments = {};
 		var aGCCodes = [];
@@ -688,8 +685,7 @@ function gccommentOnProfilePage() {
 	checkforupdates();
 
 	appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.js');
-	appendCSS('src',
-			'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
+	appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
 	appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 			+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
 			+ '.haveFinalIcon{margin-left:3px;width:14px}');
@@ -719,8 +715,7 @@ function gccommentOnProfilePage() {
 		root.parentNode.insertBefore(gccRoot, root.nextSibling);
 
 		var gcclink = document.createElement('a');
-		gcclink.setAttribute('style',
-				'cursor:pointer;padding-left:5px;padding-right:5px;margin-left:5px');
+		gcclink.setAttribute('style', 'cursor:pointer;padding-left:5px;padding-right:5px;margin-left:5px');
 		gcclink.setAttribute('id', 'configDivButton');
 		gcclink.setAttribute('title', lang.menu_options);
 		var icon = document.createElement('img');
@@ -731,11 +726,10 @@ function gccommentOnProfilePage() {
 
 		gcclink.addEventListener('mouseover', function(evt) {
 			var stats = "<u><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
-					+ getNumberOfComments() + " (" + GM_getValue('countWhite') + " " + lang.type_untyped
-					+ ", " + GM_getValue('countRed') + " " + lang.type_unsolved + ", "
-					+ GM_getValue('countGreen') + " " + lang.type_solved + ", " + lang.and + " "
-					+ GM_getValue('countGray') + " " + lang.type_found + ")<br/><b>" + lang.ov_amountarchive
-					+ "</b> " + GM_getValue('countArchive');
+					+ getNumberOfComments() + " (" + GM_getValue('countWhite') + " " + lang.type_untyped + ", "
+					+ GM_getValue('countRed') + " " + lang.type_unsolved + ", " + GM_getValue('countGreen') + " "
+					+ lang.type_solved + ", " + lang.and + " " + GM_getValue('countGray') + " " + lang.type_found
+					+ ")<br/><b>" + lang.ov_amountarchive + "</b> " + GM_getValue('countArchive');
 			stats = stats + "<br/><b>" + lang.ov_lastim + ": </b>";
 			var lastim = GM_getValue(LAST_IMPORT);
 			if (lastim)
@@ -864,8 +858,7 @@ function gccommentOnProfilePage() {
 		archivedSelector.appendChild(optionNoArchived);
 
 		var optionIncludeArchived = document.createElement("option");
-		optionIncludeArchived.appendChild(document
-				.createTextNode(lang.archived_filter_include_archived));
+		optionIncludeArchived.appendChild(document.createTextNode(lang.archived_filter_include_archived));
 		archivedSelector.appendChild(optionIncludeArchived);
 
 		var optionOnlyArchived = document.createElement("option");
@@ -907,8 +900,8 @@ function gccommentOnProfilePage() {
 		importLink.addEventListener('mouseup', function() {
 			toggleTabOnProfile('importDiv');
 		}, false);
-		importLink.setAttribute('style',
-				'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+		importLink
+				.setAttribute('style', 'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
 		gccRoot.appendChild(importLink);
 
 		gccRoot.appendChild(document.createTextNode(' | '));
@@ -940,9 +933,8 @@ function gccommentOnProfilePage() {
 
 			patchDiv = document.createElement('div');
 			patchDiv.setAttribute('id', 'patchDiv');
-			patchDiv
-					.setAttribute('style',
-							'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+			patchDiv.setAttribute('style',
+					'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
 			patchDiv.style.display = 'none';
 			gccRoot.appendChild(patchDiv);
 
@@ -954,10 +946,8 @@ function gccommentOnProfilePage() {
 			removeUnusedDiv.setAttribute('id', 'removeUnusedDiv');
 			removeUnusedDiv.setAttribute('style', 'margin-left:20px');
 			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_OTHERS, lang.patchgpx_filter_nogcc);
-			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_DEFAULTTYPE,
-					lang.patchgpx_filter_markeddefaulttype);
-			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_UNSOLVED,
-					lang.patchgpx_filter_markednotsolved);
+			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_DEFAULTTYPE, lang.patchgpx_filter_markeddefaulttype);
+			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_UNSOLVED, lang.patchgpx_filter_markednotsolved);
 			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_SOLVED, lang.patchgpx_filter_markedsolved);
 			appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_FOUND, lang.patchgpx_filter_markfound);
 
@@ -1011,9 +1001,8 @@ function gccommentOnProfilePage() {
 		//
 		configDiv = document.createElement('div');
 		configDiv.setAttribute('id', 'configDiv');
-		configDiv
-				.setAttribute('style',
-						'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+		configDiv.setAttribute('style',
+				'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
 		configDiv.style.display = 'none';
 
 		var gccintro = document.createElement('p');
@@ -1088,9 +1077,8 @@ function gccommentOnProfilePage() {
 		//
 		exportDiv = document.createElement('div');
 		exportDiv.setAttribute('id', 'exportDiv');
-		exportDiv
-				.setAttribute('style',
-						'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+		exportDiv.setAttribute('style',
+				'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
 		exportDiv.style.display = 'none';
 
 		exportDiv.appendChild(document.createTextNode(lang.export_step1));
@@ -1178,9 +1166,8 @@ function gccommentOnProfilePage() {
 		//
 		importDiv = document.createElement('div');
 		importDiv.setAttribute('id', 'importDiv');
-		importDiv
-				.setAttribute('style',
-						'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+		importDiv.setAttribute('style',
+				'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
 		importDiv.style.display = 'none';
 		gccRoot.appendChild(importDiv);
 		var importDivExplanation = document.createElement('p');
@@ -1261,9 +1248,8 @@ function gccommentOnProfilePage() {
 		//
 		deleteAllDiv = document.createElement('div');
 		deleteAllDiv.setAttribute('id', 'deleteAllDiv');
-		deleteAllDiv
-				.setAttribute('style',
-						'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+		deleteAllDiv.setAttribute('style',
+				'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
 		deleteAllDiv.style.display = 'none';
 		deleteAllDiv.appendChild(document.createTextNode(lang.delete_select));
 		deleteAllDiv.appendChild(document.createElement('br'));
@@ -1496,8 +1482,8 @@ function performFilteredDeleteAll() {
 							+ " ("
 							+ comment.gccode
 							+ ")</a>. "
-							+ lang.tmpl_commentremoved.replace("{{1}}", Base64.encode(removeTooltip)).replace(
-									"{{2}}", encodeURIComponent(removeTooltip)) + "</li>";
+							+ lang.tmpl_commentremoved.replace("{{1}}", Base64.encode(removeTooltip)).replace("{{2}}",
+									encodeURIComponent(removeTooltip)) + "</li>";
 					removedCount++;
 
 					log("info", "deleted: " + key + "(" + GM_getValue(key) + ")");
@@ -1505,8 +1491,7 @@ function performFilteredDeleteAll() {
 				}
 			}
 		}
-		deleteAllResult.innerHTML = "<h4>" + lang.delete_result + ": " + removedCount + "</h4>"
-				+ resultRemoved;
+		deleteAllResult.innerHTML = "<h4>" + lang.delete_result + ": " + removedCount + "</h4>" + resultRemoved;
 	}
 }
 
@@ -1664,9 +1649,9 @@ function patchNDownloadGPX(gccString, filename) {
 	var serializer = new XMLSerializer();
 	var result = serializer.serializeToString(xmlDoc);
 	var patchResult = document.createElement('p');
-	patchResult.innerHTML = lang.tmpl_patchresult.replace("{{countWPTRemoved}}", countWPTRemoved)
-			.replace("{{countWPTAdded}}", countWPTAdded).replace("{{countCoordChanged}}",
-					countCoordChanged).replace("{{total}}", xmlDoc.getElementsByTagName('wpt').length);
+	patchResult.innerHTML = lang.tmpl_patchresult.replace("{{countWPTRemoved}}", countWPTRemoved).replace(
+			"{{countWPTAdded}}", countWPTAdded).replace("{{countCoordChanged}}", countCoordChanged).replace(
+			"{{total}}", xmlDoc.getElementsByTagName('wpt').length);
 
 	unsafeWindow.$('#patchResultDiv').append(patchResult);
 
@@ -1694,8 +1679,8 @@ function handleGPXFileSelected(filename, gccString) {
 	var xmlDoc = parser.parseFromString(gccString, "text/xml");
 
 	var parseStatus = document.createElement('p');
-	parseStatus.innerHTML = 'The file ' + filename + " contains "
-			+ xmlDoc.getElementsByTagName('wpt').length + " waypoints.";
+	parseStatus.innerHTML = 'The file ' + filename + " contains " + xmlDoc.getElementsByTagName('wpt').length
+			+ " waypoints.";
 	unsafeWindow.$('#patchResultDiv').append(parseStatus);
 	download.removeAttribute('disabled');
 	if (oldhandler)
@@ -1710,8 +1695,8 @@ function gccommentOnLogPage() {
 	if (("" + window.location).indexOf('LUID=') >= 0) {
 		// do something if we watch the user log.
 	} else {
-		var guid = document.getElementById('ctl00_ContentBody_LogBookPanel1_WaypointLink')
-				.getAttribute('href').split("guid=")[1];
+		var guid = document.getElementById('ctl00_ContentBody_LogBookPanel1_WaypointLink').getAttribute('href')
+				.split("guid=")[1];
 		if (guid) {
 			var comment = doLoadCommentFromGUID(guid);
 			if (comment) {
@@ -1724,23 +1709,21 @@ function gccommentOnLogPage() {
 				submitButton.before(gccActionDiv);
 				var actionDiv = $(gccActionDiv).css('padding', '5px').css('border', 'solid 1px lightgray');
 				submitButton.appendTo(actionDiv);
-				document
-						.getElementById('ctl00_ContentBody_LogBookPanel1_btnSubmitLog')
-						.addEventListener(
-								"click",
-								function(event) {
-									var input = document.getElementById('ctl00_ContentBody_LogBookPanel1_ddLogType');
+				document.getElementById('ctl00_ContentBody_LogBookPanel1_btnSubmitLog').addEventListener(
+						"click",
+						function(event) {
+							var input = document.getElementById('ctl00_ContentBody_LogBookPanel1_ddLogType');
 
-									var c = doLoadCommentFromGUID(guid);
-									var markFoundState = (input.value == 2) && GM_getValue(AUTOMARKFOUND) ? stateOptions[3]
-											: c.state;
-									var markArchiveState = GM_getValue(AUTOMARKARCHIVE) ? ARCHIVED : c.archived;
+							var c = doLoadCommentFromGUID(guid);
+							var markFoundState = (input.value == 2) && GM_getValue(AUTOMARKFOUND) ? stateOptions[3]
+									: c.state;
+							var markArchiveState = GM_getValue(AUTOMARKARCHIVE) ? ARCHIVED : c.archived;
 
-									c.state = markFoundState;
-									c.archived = markArchiveState;
+							c.state = markFoundState;
+							c.archived = markArchiveState;
 
-									doSaveCommentToGUID(c);
-								}, false);
+							doSaveCommentToGUID(c);
+						}, false);
 
 				var input = document.getElementById('ctl00_ContentBody_LogBookPanel1_ddLogType');
 				if (input.value == 2)
@@ -1795,8 +1778,7 @@ function toggleTabOnProfile(tabid) {
 		$('#patchDiv').slideToggle('slow');
 		$('#patchDivButton').removeClass('gccselect');
 	}
-	if ((tabid != 'gccommenttablediv') && commentTable
-			&& ($('#gccommenttablediv').css('display') != 'none')) {
+	if ((tabid != 'gccommenttablediv') && commentTable && ($('#gccommenttablediv').css('display') != 'none')) {
 		$('#gccommenttablediv').slideToggle('slow');
 		$('#gccommenttabledivButton').removeClass('gccselect');
 		displayFilters.style.display = "none";
@@ -1915,37 +1897,34 @@ function gccommentOnDetailpage() {
 		imgDelete.title = lang.detail_delete;
 		imgDelete.setAttribute('style', 'cursor:pointer');
 		DeleteComment.appendChild(imgDelete);
-		DeleteComment
-				.addEventListener(
-						'mouseup',
-						function() {
-							var check = confirm(lang.detail_deleteconfirmation);
-							if (check) {
-								deleteComment(currentComment.guid, currentComment.gccode);
-								currentComment = null;
+		DeleteComment.addEventListener('mouseup', function() {
+			var check = confirm(lang.detail_deleteconfirmation);
+			if (check) {
+				deleteComment(currentComment.guid, currentComment.gccode);
+				currentComment = null;
 
-								$('.customWaypointRow').remove();
-								var $table = $('#ctl00_ContentBody_Waypoints');
-								if ($table.find('tbody').children().length === 0) {
-									$table.remove();
-								}
-								detailCommentCacheState.setAttribute('disabled', '');
-								detailFinalCacheState.options.selectedIndex = detailCommentCacheState.options.selectedIndex = 0;
-								detailCommentTextArea.value = "";
-								detailCommentTextPane.innerHTML = "";
-								detailCommentTextArea.style.display = 'none';
-								detailCommentTextPane.style.display = 'none';
-								AddComment.style.display = 'inline';
-								EditComment.style.display = 'none';
-								SaveComment.style.display = 'none';
-								DeleteComment.style.display = 'none';
-								EditCancelComment.style.display = 'none';
-								detailCommentInputLatLng.setAttribute('disabled', '');
-								detailCommentInputLatLng.value = DEFAULTCOORDS;
-								detailFinalInputLatLng.value = DEFAULTCOORDS;
-								updateSaveTime(-1);
-							}
-						}, false);
+				$('.customWaypointRow').remove();
+				var $table = $('#ctl00_ContentBody_Waypoints');
+				if ($table.find('tbody').children().length === 0) {
+					$table.remove();
+				}
+				detailCommentCacheState.setAttribute('disabled', '');
+				detailFinalCacheState.options.selectedIndex = detailCommentCacheState.options.selectedIndex = 0;
+				detailCommentTextArea.value = "";
+				detailCommentTextPane.innerHTML = "";
+				detailCommentTextArea.style.display = 'none';
+				detailCommentTextPane.style.display = 'none';
+				AddComment.style.display = 'inline';
+				EditComment.style.display = 'none';
+				SaveComment.style.display = 'none';
+				DeleteComment.style.display = 'none';
+				EditCancelComment.style.display = 'none';
+				detailCommentInputLatLng.setAttribute('disabled', '');
+				detailCommentInputLatLng.value = DEFAULTCOORDS;
+				detailFinalInputLatLng.value = DEFAULTCOORDS;
+				updateSaveTime(-1);
+			}
+		}, false);
 
 		var url = document.getElementById('ctl00_ContentBody_lnkPrintFriendly').getAttribute('href');
 		var guidIndex = url.indexOf('guid=');
@@ -2151,66 +2130,63 @@ function gccommentOnDetailpage() {
 				var map = new unsafeWindow.L.OrigMap(id, params);
 
 				if (id === 'map_canvas' || id === 'map_canvas2' || id === 'map_preview_canvas')
-					setTimeout(
-							function() {
-								var bounds = new unsafeWindow.L.LatLngBounds();
-								var aWaypoints = [];
+					setTimeout(function() {
+						var bounds = new unsafeWindow.L.LatLngBounds();
+						var aWaypoints = [];
 
-								var latlngHome = null;
-								if (currentComment.origlat && currentComment.origlng) {
-									latlngHome = new unsafeWindow.L.LatLng(currentComment.origlat,
-											currentComment.origlng);
-									aWaypoints.push(latlngHome);
-									bounds.extend(latlngHome);
-								}
+						var latlngHome = null;
+						if (currentComment.origlat && currentComment.origlng) {
+							latlngHome = new unsafeWindow.L.LatLng(currentComment.origlat, currentComment.origlng);
+							aWaypoints.push(latlngHome);
+							bounds.extend(latlngHome);
+						}
 
-								for (var m = 0; currentComment.waypoints && (m < currentComment.waypoints.length); m++) {
-									var coords = parseCoordinates(currentComment.waypoints[m].coordinate);
-									if (coords.length === 2) {
-										var latlngWaypoint = new unsafeWindow.L.LatLng(coords[0], coords[1]);
-										var markerWaypoint = new unsafeWindow.L.Marker(latlngWaypoint, {
-											icon : new unsafeWindow.L.Icon({
-												iconSize : new unsafeWindow.L.Point(16, 16),
-												iconAnchor : new unsafeWindow.L.Point(8, 8),
-												iconUrl : waypointIcon
-											}),
-											title : currentComment.waypoints[m].name,
-											clickable : false
-										});
-										map.addLayer(markerWaypoint);
-										aWaypoints.push(latlngWaypoint);
-										bounds.extend(latlngWaypoint);
-									}
-								}
+						for (var m = 0; currentComment.waypoints && (m < currentComment.waypoints.length); m++) {
+							var coords = parseCoordinates(currentComment.waypoints[m].coordinate);
+							if (coords.length === 2) {
+								var latlngWaypoint = new unsafeWindow.L.LatLng(coords[0], coords[1]);
+								var markerWaypoint = new unsafeWindow.L.Marker(latlngWaypoint, {
+									icon : new unsafeWindow.L.Icon({
+										iconSize : new unsafeWindow.L.Point(16, 16),
+										iconAnchor : new unsafeWindow.L.Point(8, 8),
+										iconUrl : waypointIcon
+									}),
+									title : currentComment.waypoints[m].name,
+									clickable : false
+								});
+								map.addLayer(markerWaypoint);
+								aWaypoints.push(latlngWaypoint);
+								bounds.extend(latlngWaypoint);
+							}
+						}
 
-								if (currentComment.lat && currentComment.lng) {
-									var latlngFinal = new unsafeWindow.L.LatLng(currentComment.lat,
-											currentComment.lng);
-									var markerFinal = new unsafeWindow.L.Marker(latlngFinal, {
-										icon : new unsafeWindow.L.Icon({
-											iconSize : new unsafeWindow.L.Point(22, 22),
-											iconAnchor : new unsafeWindow.L.Point(11, 11),
-											iconUrl : finalIcon
-										}),
-										title : lang.finale,
-										clickable : false
-									});
-									map.addLayer(markerFinal);
-									bounds.extend(latlngFinal);
-									aWaypoints.push(latlngFinal);
-								}
+						if (currentComment.lat && currentComment.lng) {
+							var latlngFinal = new unsafeWindow.L.LatLng(currentComment.lat, currentComment.lng);
+							var markerFinal = new unsafeWindow.L.Marker(latlngFinal, {
+								icon : new unsafeWindow.L.Icon({
+									iconSize : new unsafeWindow.L.Point(22, 22),
+									iconAnchor : new unsafeWindow.L.Point(11, 11),
+									iconUrl : finalIcon
+								}),
+								title : lang.finale,
+								clickable : false
+							});
+							map.addLayer(markerFinal);
+							bounds.extend(latlngFinal);
+							aWaypoints.push(latlngFinal);
+						}
 
-								// add line between waypoints
-								map.addLayer(new unsafeWindow.L.Polyline(aWaypoints, {
-									color : "#000000",
-									weight : 1,
-									clickable : false,
-									opacity : 1,
-									fillOpacity : 1
-								}));
+						// add line between waypoints
+						map.addLayer(new unsafeWindow.L.Polyline(aWaypoints, {
+							color : "#000000",
+							weight : 1,
+							clickable : false,
+							opacity : 1,
+							fillOpacity : 1
+						}));
 
-								map.fitBounds(bounds);
-							}, 1000);
+						map.fitBounds(bounds);
+					}, 1000);
 
 				return map;
 			};
@@ -2368,8 +2344,7 @@ function gccommentOnDetailpage() {
 			var link = items[index].getElementsByTagName('a')[0];
 			if (link.getAttribute('href').search('maps.google.com') > -1) {
 				newlink = link.getAttribute('href') + " to: "
-						+ convertDec2DMS(currentComment.lat, currentComment.lng) + " (" + lang.final_coordinate
-						+ ")";
+						+ convertDec2DMS(currentComment.lat, currentComment.lng) + " (" + lang.final_coordinate + ")";
 			} else if (link.getAttribute('href').search('mapquest.com') > -1) {
 				var chunks = link.getAttribute('href').split('&');
 				for (var i = 0; i < chunks.length; i++) {
@@ -2381,8 +2356,8 @@ function gccommentOnDetailpage() {
 						maplng = chunk.split('=')[1];
 					}
 				}
-				newlink = "http://www.mapquest.com/?saddr=" + maplat + "," + maplng + "&daddr="
-						+ currentComment.lat + "," + currentComment.lng + "&zoom=10";
+				newlink = "http://www.mapquest.com/?saddr=" + maplat + "," + maplng + "&daddr=" + currentComment.lat
+						+ "," + currentComment.lng + "&zoom=10";
 			} else
 				continue;
 
@@ -2655,13 +2630,10 @@ function gccommentOnPrintPage() {
 				commentDiv.appendChild(contentDiv);
 
 				contentGroup.insertBefore(commentDiv, contentGroup.firstChild);
-				$("#gccommentwidget").click(
-						function() {
-							unsafeWindow.$(this).toggleClass("ui-icon-minusthick").toggleClass(
-									"ui-icon-plusthick");
-							unsafeWindow.$(this).parents(".item:first").toggleClass("no-print").find(
-									".item-content").toggle();
-						});
+				$("#gccommentwidget").click(function() {
+					unsafeWindow.$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+					unsafeWindow.$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
+				});
 
 				if (comment.waypoints && (comment.waypoints.length > 0)) {
 					// we have some waypoints to display
@@ -2721,9 +2693,8 @@ function refreshTable(show) {
 	}
 	commentTable = document.createElement('table');
 	commentTable.setAttribute('id', 'gccommentoverviewtable');
-	commentTable
-			.setAttribute('style',
-					'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#EBECED');
+	commentTable.setAttribute('style',
+			'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#EBECED');
 	// commentTable.setAttribute('class', 'Table');
 	var thead = document.createElement('thead');
 	commentTable.appendChild(thead);
@@ -2934,8 +2905,7 @@ function refreshTable(show) {
 		editimg.title = lang.table_editondetail;
 		action_edit.appendChild(editimg);
 		action_edit.setAttribute('style', 'margin-right:3px');
-		action_edit.href = "http://www.geocaching.com/seek/cache_details.aspx?guid=" + guid
-				+ "#mycomments";
+		action_edit.href = "http://www.geocaching.com/seek/cache_details.aspx?guid=" + guid + "#mycomments";
 		td_action.appendChild(action_edit);
 
 		if (comment.archived === ARCHIVED) {
@@ -2999,8 +2969,8 @@ function refreshTable(show) {
 			$('#gccommentoverviewtable_filter > label').css('margin', '10px')).css('padding', '5px').css(
 			'font-weight', '500').append($('#gccommentoverviewtable_paginate')).append(
 			$('#gccommentoverviewtable_info')).append(
-			"<span>" + lang.table_filtered_by + " " + filteredByString + "</span>").children().css(
-			'float', 'left').css('margin', '0px 10px 5px 10px');
+			"<span>" + lang.table_filtered_by + " " + filteredByString + "</span>").children().css('float', 'left')
+			.css('margin', '0px 10px 5px 10px');
 
 	$('#gccommentoverviewtable').css('margin-bottom', '0px');
 
@@ -3016,11 +2986,10 @@ function createCachePrintout(comment) {
 	var finalP = "", commentP = "", wptP = "";
 
 	if (comment.lat && comment.lng) {
-		finalP += "<p class='tableFinal'>" + lang.table_finalat
-				+ convertDec2DMS(comment.lat, comment.lng);
+		finalP += "<p class='tableFinal'>" + lang.table_finalat + convertDec2DMS(comment.lat, comment.lng);
 		if (homelat && homelng) {
-			finalP += " (" + calculateDistance(homelat, homelng, comment.lat, comment.lng).toFixed(2)
-					+ "km " + lang.table_fromhome + ")";
+			finalP += " (" + calculateDistance(homelat, homelng, comment.lat, comment.lng).toFixed(2) + "km "
+					+ lang.table_fromhome + ")";
 		}
 		finalP += "</p>";
 	}
@@ -3031,8 +3000,8 @@ function createCachePrintout(comment) {
 		wptP += "<table class='tableWaypoints'";
 		for (var i = 0; i < comment.waypoints.length; i++) {
 			var wp = comment.waypoints[i];
-			wptP += "<tr><td>" + wp.prefix + "</td><td>" + wp.lookup + "</td><td>" + wp.name
-					+ "</td><td>" + wp.coordinate + "</td></tr>";
+			wptP += "<tr><td>" + wp.prefix + "</td><td>" + wp.lookup + "</td><td>" + wp.name + "</td><td>"
+					+ wp.coordinate + "</td></tr>";
 		}
 		wptP += "</table>";
 	}
@@ -3078,36 +3047,32 @@ function gcTourPrintPage() {
 // Tooltips werden hier eingewebt.
 function addCommentBubblesToPage() {
 	log("info", "weaving comments into table...");
-	appendScript('text', "var tooltip = function(){	" + "var id = 'tt';	" + "var top = 3;	"
-			+ "var left = 3;	" + "var maxw = 500;	" + "var speed = 10;	" + "var timer = 20;	"
-			+ "var endalpha = 95;	" + "var alpha = 0;	" + "var tt,t,c,b,h;	"
-			+ "var ie = document.all ? true : false;	" + "return {		" + "show:function(v,w) {			"
-			+ "if(tt == null) {				" + "tt = document.createElement('div');				"
+	appendScript('text', "var tooltip = function(){	" + "var id = 'tt';	" + "var top = 3;	" + "var left = 3;	"
+			+ "var maxw = 500;	" + "var speed = 10;	" + "var timer = 20;	" + "var endalpha = 95;	"
+			+ "var alpha = 0;	" + "var tt,t,c,b,h;	" + "var ie = document.all ? true : false;	" + "return {		"
+			+ "show:function(v,w) {			" + "if(tt == null) {				" + "tt = document.createElement('div');				"
 			+ "tt.setAttribute('id',id);				" + "t = document.createElement('div');				"
 			+ "t.setAttribute('id',id + 'top');				" + "c = document.createElement('div');				"
 			+ "c.setAttribute('id',id + 'cont');				" + "b = document.createElement('div');				"
-			+ "b.setAttribute('id',id + 'bot');				" + "tt.appendChild(t);				"
-			+ "tt.appendChild(c);				" + "tt.appendChild(b);				" + "document.body.appendChild(tt);				"
-			+ "tt.style.opacity = 0;				" + "tt.style.filter = 'alpha(opacity=0)';				"
-			+ "document.onmousemove = this.pos;			" + "}			" + "tt.style.display = 'block';			"
-			+ "c.innerHTML = v;			" + "tt.style.width = w ? w + 'px' : 'auto';			" + "if(!w && ie){				"
-			+ "t.style.display = 'none';				" + "b.style.display = 'none';				"
-			+ "tt.style.width = tt.offsetWidth;				" + "t.style.display = 'block';				"
-			+ "b.style.display = 'block';			" + "}			" + "if(tt.offsetWidth > maxw){"
-			+ "tt.style.width = maxw + 'px'" + "}			" + "h = parseInt(tt.offsetHeight) + top;			"
-			+ "clearInterval(tt.timer);			"
-			+ "tt.timer = setInterval(function(){tooltip.fade(1)},timer);" + "},		"
-			+ "pos:function(e){			"
+			+ "b.setAttribute('id',id + 'bot');				" + "tt.appendChild(t);				" + "tt.appendChild(c);				"
+			+ "tt.appendChild(b);				" + "document.body.appendChild(tt);				" + "tt.style.opacity = 0;				"
+			+ "tt.style.filter = 'alpha(opacity=0)';				" + "document.onmousemove = this.pos;			" + "}			"
+			+ "tt.style.display = 'block';			" + "c.innerHTML = v;			"
+			+ "tt.style.width = w ? w + 'px' : 'auto';			" + "if(!w && ie){				" + "t.style.display = 'none';				"
+			+ "b.style.display = 'none';				" + "tt.style.width = tt.offsetWidth;				"
+			+ "t.style.display = 'block';				" + "b.style.display = 'block';			" + "}			"
+			+ "if(tt.offsetWidth > maxw){" + "tt.style.width = maxw + 'px'" + "}			"
+			+ "h = parseInt(tt.offsetHeight) + top;			" + "clearInterval(tt.timer);			"
+			+ "tt.timer = setInterval(function(){tooltip.fade(1)},timer);" + "},		" + "pos:function(e){			"
 			+ "var u = ie ? event.clientY + document.documentElement.scrollTop : e.pageY;			"
 			+ "var l = ie ? event.clientX + document.documentElement.scrollLeft : e.pageX;			"
 			+ "tt.style.top = (u - h) + 'px';			" + "tt.style.left = (l + left) + 'px';		" + "},		"
 			+ "fade:function(d){			" + "var a = alpha;			"
 			+ "if((a != endalpha && d == 1) || (a != 0 && d == -1)){				" + "var i = speed;				"
 			+ "if(endalpha - a < speed && d == 1){					" + "i = endalpha - a;				"
-			+ "}else if(alpha < speed && d == -1){					" + "i = a;				" + "}				"
-			+ "alpha = a + (i * d);				" + "tt.style.opacity = alpha * .01;				"
-			+ "tt.style.filter = 'alpha(opacity=' + alpha + ')';			" + "}else{				"
-			+ "clearInterval(tt.timer);				" + "if(d == -1){tt.style.display = 'none'}			" + "}		"
+			+ "}else if(alpha < speed && d == -1){					" + "i = a;				" + "}				" + "alpha = a + (i * d);				"
+			+ "tt.style.opacity = alpha * .01;				" + "tt.style.filter = 'alpha(opacity=' + alpha + ')';			"
+			+ "}else{				" + "clearInterval(tt.timer);				" + "if(d == -1){tt.style.display = 'none'}			" + "}		"
 			+ "},		" + "hide:function(){			" + "clearInterval(tt.timer);			"
 			+ "tt.timer = setInterval(function(){tooltip.fade(-1)},timer);		" + "}	};}();", null);
 
@@ -3209,7 +3174,8 @@ function addCommentBubblesToPage() {
 	}
 }
 
-// helper detailpage. formatiert die Zeit des letzten Speicherns und fügt es ein
+// helper detailpage. formatiert die Zeit des letzten Speicherns und fügt es
+// ein
 function updateSaveTime(time) {
 	var txt = lang.detail_lastsaved + ": " + createTimeString(time);
 	var newNode = document.createTextNode(txt);
@@ -3231,8 +3197,8 @@ function prepareTextPane(value) {
 	return result;
 }
 
-function doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, saveTime, state, lat, lng,
-		origlat, origlng, archived) {
+function doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, saveTime, state, lat, lng, origlat,
+		origlng, archived) {
 	var key = "";
 	var value = "";
 	var actualGUID = "";
@@ -3245,8 +3211,8 @@ function doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, saveTime, st
 		actualGCCode = guid.gccode;
 	} else {
 		key = COMPREFIX + guid;
-		value = gccode + DELIM + name + DELIM + commentValue + DELIM + saveTime + DELIM + state + DELIM
-				+ lat + DELIM + lng + DELIM + origlat + DELIM + origlng + DELIM + archived;
+		value = gccode + DELIM + name + DELIM + commentValue + DELIM + saveTime + DELIM + state + DELIM + lat
+				+ DELIM + lng + DELIM + origlat + DELIM + origlng + DELIM + archived;
 		actualGUID = guid;
 		actualGCCode = gccode;
 	}
@@ -3259,20 +3225,19 @@ function doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, saveTime, st
 		var keyIndex = COMGCPREFIX + actualGCCode;
 		GM_setValue(keyIndex, actualGUID);
 	} else {
-		log('debug', 'Error saving ' + guid + ". key=" + key + " value=" + value + " actualGUID="
-				+ actualGUID + " actualGCCode=" + actualGCCode);
+		log('debug', 'Error saving ' + guid + ". key=" + key + " value=" + value + " actualGUID=" + actualGUID
+				+ " actualGCCode=" + actualGCCode);
 	}
 }
 
-function doSaveCommentToGUID(guid, gccode, name, commentValue, state, lat, lng, origlat, origlng,
-		archived) {
+function doSaveCommentToGUID(guid, gccode, name, commentValue, state, lat, lng, origlat, origlng, archived) {
 	var now = new Date();
 	if (typeof guid === "object") { // we got a JSON Object (hopefully)
 		guid.saveTime = (now - 0);
 		doSaveCommentWTimeToGUID(guid);
 	} else {
-		doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, (now - 0), state, lat, lng, origlat,
-				origlng, archived);
+		doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, (now - 0), state, lat, lng, origlat, origlng,
+				archived);
 	}
 }
 
@@ -3594,8 +3559,7 @@ function mysteryMoverOnMapPage() {
 		mmDiv.setAttribute('style', 'width:98%;border:1px solid lightgrey');
 		$(stm_myCaches).after(mmDiv);
 
-		var optiondiv = appendCheckBox(mmDiv, AUTOMOVEMYSTERIESBETA, lang.map_enablemm,
-				toggleMoveMysteries);
+		var optiondiv = appendCheckBox(mmDiv, AUTOMOVEMYSTERIESBETA, lang.map_enablemm, toggleMoveMysteries);
 		optiondiv.setAttribute('style', 'font-weight: bold;');
 
 		if (!unsafeWindow.L) {
@@ -3614,12 +3578,12 @@ function mysteryMoverOnMapPage() {
 		mmSubCacheOptions.setAttribute('id', 'mmSubCacheOptions');
 		mmSub.appendChild(mmSubCacheOptions);
 
-		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETASOLVED, lang.type_solved,
-				moveMysteriesBeta, true, state_solved);
-		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETAFOUND, lang.type_found,
-				moveMysteriesBeta, true, state_found);
-		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETAUNSOLVED, lang.type_unsolved,
-				moveMysteriesBeta, false, state_unsolved);
+		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETASOLVED, lang.type_solved, moveMysteriesBeta, true,
+				state_solved);
+		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETAFOUND, lang.type_found, moveMysteriesBeta, true,
+				state_found);
+		appendCheckBox(mmSubCacheOptions, AUTOMOVEMYSTERIESBETAUNSOLVED, lang.type_unsolved, moveMysteriesBeta,
+				false, state_unsolved);
 
 		appendCheckBox(mmSub, AUTOMOVEMYSTERIESBETAHOME, lang.map_home, moveMysteriesBeta);
 		appendCheckBox(mmSub, AUTOMOVEMYSTERIESBETAAREA, lang.map_area, moveMysteriesBeta);
@@ -3693,8 +3657,8 @@ function drawMarker(lat, lng, type, state, gccode) {
 			popup.setContent(h);
 			popup.setLatLng(marker.getLatLng());
 			unsafeWindow.MapSettings.Map.openPopup(popup);
-			$('#map_canvas').find("#" + b).link(a, "#cachePopupTemplate").delegate("a.prev-item",
-					"click", function(a) {
+			$('#map_canvas').find("#" + b).link(a, "#cachePopupTemplate").delegate("a.prev-item", "click",
+					function(a) {
 						a.preventDefault();
 						$(this).parents("div.map-item").hide().prev().show();
 						return false;
@@ -3784,8 +3748,7 @@ function removeMarkers(type) {
 	markers = new Array();
 }
 
-function createMovedFinal(finallat, finallng, name, origlat, origlng, guid, state, home, newid,
-		gccode) {
+function createMovedFinal(finallat, finallng, name, origlat, origlng, guid, state, home, newid, gccode) {
 	// log('debug', 'drawing ' + guid + " lat: " + finallat + " lng: " +
 	// finallng
 	// + " origlat: " + origlat + " origlng: " + origlng);
@@ -3993,16 +3956,13 @@ function getComments(filtered) {
 				if ((GM_getValue(EXPORT_FILTER_ALL) && includeArchive))
 					filteredInclude = true;
 
-				if (GM_getValue(EXPORT_FILTER_UNTYPED) && comment.state === stateOptions[0]
-						&& includeArchive)
+				if (GM_getValue(EXPORT_FILTER_UNTYPED) && comment.state === stateOptions[0] && includeArchive)
 					filteredInclude = true;
 
-				if (GM_getValue(EXPORT_FILTER_UNSOLVED) && comment.state === stateOptions[1]
-						&& includeArchive)
+				if (GM_getValue(EXPORT_FILTER_UNSOLVED) && comment.state === stateOptions[1] && includeArchive)
 					filteredInclude = true;
 
-				if (GM_getValue(EXPORT_FILTER_SOLVED) && comment.state === stateOptions[2]
-						&& includeArchive)
+				if (GM_getValue(EXPORT_FILTER_SOLVED) && comment.state === stateOptions[2] && includeArchive)
 					filteredInclude = true;
 
 				if (GM_getValue(EXPORT_FILTER_FOUND) && comment.state === stateOptions[3] && includeArchive)
@@ -4027,12 +3987,11 @@ function exportToKML() {
 	for (var i = 0; i < filteredComments.length; i++) {
 		var comment = filteredComments[i];
 		if (comment.lat && comment.lng) {
-			var newwpt = "			<Placemark>\n" + "				<name>" + escapeXML(comment.name) + "("
-					+ comment.gccode + ")" + "</name>\n"
-					+ "				<description><![CDATA[(<a href=\"http://www.coord.info/" + comment.gccode + "\">"
-					+ comment.gccode + "</a>)" + comment.commentValue + "]]></description>\n"
-					+ "				<Point>\n" + "					<coordinates>" + comment.lng + ", " + comment.lat
-					+ "</coordinates>\n" + "				</Point>\n" + "			</Placemark>\n";
+			var newwpt = "			<Placemark>\n" + "				<name>" + escapeXML(comment.name) + "(" + comment.gccode + ")"
+					+ "</name>\n" + "				<description><![CDATA[(<a href=\"http://www.coord.info/" + comment.gccode
+					+ "\">" + comment.gccode + "</a>)" + comment.commentValue + "]]></description>\n" + "				<Point>\n"
+					+ "					<coordinates>" + comment.lng + ", " + comment.lat + "</coordinates>\n" + "				</Point>\n"
+					+ "			</Placemark>\n";
 
 			result = result + newwpt;
 		}
@@ -4070,13 +4029,12 @@ function exportToGPX() {
 	for (var i = 0; i < filteredComments.length; i++) {
 		var comment = filteredComments[i];
 		if (comment.lat && comment.lng) {
-			var newwpt = "  <wpt lat=\"" + comment.lat + "\" lon=\"" + comment.lng + "\">\n"
-					+ "    <time>" + isoTime(comment.saveTime) + "</time>\n" + "    <name>" + comment.gccode
-					+ "</name>\n" + "    <cmt>GCComment: " + escapeXML(comment.commentValue) + "</cmt>\n"
-					+ "    <desc>" + escapeXML(comment.name) + "</desc>\n"
-					+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + comment.guid
-					+ "</url>\n" + "    <urlname>GCComment Final</urlname>\n"
-					+ "    <sym>Final Location</sym>\n"
+			var newwpt = "  <wpt lat=\"" + comment.lat + "\" lon=\"" + comment.lng + "\">\n" + "    <time>"
+					+ isoTime(comment.saveTime) + "</time>\n" + "    <name>" + comment.gccode + "</name>\n"
+					+ "    <cmt>GCComment: " + escapeXML(comment.commentValue) + "</cmt>\n" + "    <desc>"
+					+ escapeXML(comment.name) + "</desc>\n"
+					+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + comment.guid + "</url>\n"
+					+ "    <urlname>GCComment Final</urlname>\n" + "    <sym>Final Location</sym>\n"
 					// alternativ
 					// <sym>Flag,
 					// Green</sym>
@@ -4250,8 +4208,7 @@ function performImport() {
 				aNew.push(element);
 			}
 		});
-		var sHTML = "<h4>" + lang.import_resultimported + " (" + (aNew.length + aExisted.length)
-				+ ")</h4>";
+		var sHTML = "<h4>" + lang.import_resultimported + " (" + (aNew.length + aExisted.length) + ")</h4>";
 
 		if ((aNew.length + aExisted.length) > 0) {
 			sHTML += "<table border='1' style='table-layout:fixed; width: 100%;"
@@ -4262,17 +4219,16 @@ function performImport() {
 				var importTooltip = createCachePrintout(element);
 				var oldTooltip = createCachePrintout(doLoadCommentFromGUID(element.guid));
 				sHTML += "<tr><td><a target='blank' href='http://www."
-						+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name
-						+ " (" + element.gccode + ")</a></td><td>" + importTooltip + "</td><td>" + oldTooltip
-						+ "</td></tr>";
+						+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name + " ("
+						+ element.gccode + ")</a></td><td>" + importTooltip + "</td><td>" + oldTooltip + "</td></tr>";
 				doSaveCommentWTimeToGUID(element);
 			});
 
 			aNew.forEach(function(element) {
 				var importTooltip = createCachePrintout(element);
 				sHTML += "<tr><td><a target='blank' href='http://www."
-						+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name
-						+ " (" + element.gccode + ")</a></td><td>" + importTooltip + "</td><td></td></tr>";
+						+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name + " ("
+						+ element.gccode + ")</a></td><td>" + importTooltip + "</td><td></td></tr>";
 				doSaveCommentWTimeToGUID(element);
 			});
 
@@ -4377,8 +4333,8 @@ function parseXMLImport() {
 			if ((existing.saveTime != null) && (existing.saveTime >= imSave)) {
 				// newer or equal old comment exists, do not import
 				resultNotImported = resultNotImported
-						+ "<a target='blank' href='http://www.geocaching.com/seek/cache_details.aspx?guid="
-						+ imID + "'>" + imName + " (" + imCode + ")</a>, ";
+						+ "<a target='blank' href='http://www.geocaching.com/seek/cache_details.aspx?guid=" + imID + "'>"
+						+ imName + " (" + imCode + ")</a>, ";
 				notImportedCount++;
 			} else {
 				var comment = {
@@ -4425,9 +4381,8 @@ function parseXMLImport() {
 			doSaveCommentWTimeToGUID(comment);
 			var importTooltip = createCachePrintout(comment);
 			resultImported = resultImported
-					+ "<tr><td><a target='blank' href='http://www.geocaching.com/seek/cache_details.aspx?guid="
-					+ imID + "'>" + imName + " (" + imCode + ")</a></td><td colspan='2'>" + importTooltip
-					+ "</td></tr>";
+					+ "<tr><td><a target='blank' href='http://www.geocaching.com/seek/cache_details.aspx?guid=" + imID
+					+ "'>" + imName + " (" + imCode + ")</a></td><td colspan='2'>" + importTooltip + "</td></tr>";
 			importedCount++;
 		}
 	}
@@ -4439,8 +4394,8 @@ function parseXMLImport() {
 				+ "<tr><th style='width: 17%'>Name</th><th>New comment</th><th>Old comment (if available)</th></tr>"
 				+ resultImported + "</table>";
 	}
-	importresult.innerHTML += "<h4>" + lang.import_resultnotimported + " (" + notImportedCount
-			+ ")</h4>" + resultNotImported.substring(0, nil - 2);
+	importresult.innerHTML += "<h4>" + lang.import_resultnotimported + " (" + notImportedCount + ")</h4>"
+			+ resultNotImported.substring(0, nil - 2);
 	importresult.style.display = 'inline';
 
 	$('.gcccomment').hover(function(event) {
@@ -4477,8 +4432,7 @@ function sendToGPS() {
 		var laenge = 'a5493497-70a7-4e07-946c-6d79c7a59994'.length + 5;
 		var currentCacheGUID = gpx.substring(anfang + 5, anfang + laenge);
 		currentComment = doLoadCommentFromGUID(currentCacheGUID);
-		if (currentComment
-				&& (currentComment.commentValue || (currentComment.lat && currentComment.lng))) {
+		if (currentComment && (currentComment.commentValue || (currentComment.lat && currentComment.lng))) {
 			// build special config
 			var writebox = document.getElementById('writeBox');
 			var configdiv = document.createElement('div');
@@ -4589,12 +4543,12 @@ function sendToGPS() {
 }
 
 function buildGPXWPT(commentObject) {
-	var newwpt = "<wpt lat='" + commentObject.lat + "' lon='" + commentObject.lng + "'>"
-			+ "    <time>" + isoTime(commentObject.saveTime) + "</time>" + "    <name>"
-			+ commentObject.gccode + "</name>" + "    <cmt>GCComment: " + commentObject.commentValue
-			+ "</cmt>" + "    <desc>" + lang.gpxexportwpttitle + "</desc>"
-			+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + commentObject.guid
-			+ "</url>" + "    <urlname>GCComment Final</urlname>" + "    <sym>Final Location</sym>"
+	var newwpt = "<wpt lat='" + commentObject.lat + "' lon='" + commentObject.lng + "'>" + "    <time>"
+			+ isoTime(commentObject.saveTime) + "</time>" + "    <name>" + commentObject.gccode + "</name>"
+			+ "    <cmt>GCComment: " + commentObject.commentValue + "</cmt>" + "    <desc>"
+			+ lang.gpxexportwpttitle + "</desc>"
+			+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + commentObject.guid + "</url>"
+			+ "    <urlname>GCComment Final</urlname>" + "    <sym>Final Location</sym>"
 			// alternativ
 			// <sym>Flag,
 			// Green</sym>
@@ -4698,67 +4652,34 @@ function unescapeXML(escaped) {
 	return result;
 }
 
-function updateAvailable(serverVersion) {
-	GM_xmlhttpRequest({
-		method : 'GET',
-		header : {
-			'Cache-Control' : 'max-age=3600, must-revalidate'
-		},
-		url : updatechangesurl,
-		onload : function(responseDetails) {
-			handleChangesReply(responseDetails.responseText);
-		},
-		onerror : function(responseDetails) {
-			log("info", "Unable to get changes from Sourceforge! Errorcode " + responseDetails.status);
-		}
-	});
-
+function updateAvailable(oChanges) {
 	log("info", "current version: " + version + " latest version: " + serverVersion);
 	var updateInfo = document.createElement('div');
 	updateInfo.setAttribute('id', 'gccupdateinfo');
 	var updatelnk = document.createElement('a');
-	updatelnk.setAttribute('href', 'http://userscripts.org:8080/scripts/source/75959.user.js');
+	updatelnk.setAttribute('href', updateurl);
 	updatelnk.innerHTML = lang.update_clickToUpdate;
-	updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
-			serverVersion).replace("{{version}}", version)
+	updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}", serverVersion)
+			.replace("{{version}}", version)
 			+ " "));
 	updateInfo.appendChild(updatelnk);
 	updateInfo.appendChild(document.createElement('br'));
 	updateInfo.appendChild(document.createElement('br'));
 	gccRoot.insertBefore(updateInfo, gccRoot.firstChild);
-}
 
-function handleChangesReply(xmlString) {
-	var updateInfo = document.getElementById('gccupdateinfo');
-	var parser = new DOMParser();
-	var xmlDoc = parser.parseFromString(xmlString, "text/xml");
-	var changes = xmlDoc.getElementsByTagName("change");
-	if (changes) {
-		for (var chindex = 0; chindex < changes.length; chindex++) {
-			var change = changes[chindex];
-			var vversion, date, content;
-			for (var elems = 0; elems < change.childNodes.length; elems++) {
-				var elem = change.childNodes[elems];
-				if (elem.nodeName == "version")
-					vversion = elem.firstChild.nodeValue;
-				else if (elem.nodeName == "date")
-					date = elem.firstChild.nodeValue;
-				else if (elem.nodeName == "content")
-					content = elem.firstChild.nodeValue;
-			}
-			if (vversion <= version)
-				break;
-			updateInfo.appendChild(document.createTextNode(lang.update_changes + vversion + " (" + date
-					+ ")"));
-			updateInfo.appendChild(document.createElement('br'));
+	var aNewChanges = oChanges.changes.filter(function(oChange) {
+		return oChange.version > version;
+	});
 
-			var divv = document.createElement('div');
-			divv.innerHTML = content;
-			updateInfo.appendChild(divv);
-		}
-
+	aNewChanges.forEach(function(oChange) {
+		updateInfo.appendChild(document.createTextNode(lang.update_changes + oChange.version + " ("
+				+ oChange.date + ")"));
 		updateInfo.appendChild(document.createElement('br'));
-	}
+
+		var divv = document.createElement('div');
+		divv.innerHTML = oChange.change;
+		updateInfo.appendChild(divv);
+	});
 }
 
 function checkforupdates() {
@@ -4781,22 +4702,21 @@ function checkforupdates() {
 			header : {
 				'Cache-Control' : 'max-age=3600, must-revalidate'
 			},
-			url : updateMetaURL,
+			url : updatechangesurl,
 			onload : function(responseDetails) {
-				// handleChangesReply(responseDetails.responseText);
-				var content = responseDetails.responseText;
-				var parseResult = /@version\s+([.\d]+)[\r\n]/.exec(content);
-				if (parseResult) {
-					var serverVersion = parseInt(parseResult[1]);
-					log('info', 'updatecheck: installed version=' + version + ", server version="
-							+ serverVersion);
-					if (serverVersion > version)
-						updateAvailable(serverVersion);
+				try {
+					var oChanges = JSON.parse(responseDetails.responseText);
+					var serverVersion = oChanges.latestVersion;
+					log('info', 'updatecheck: installed version=' + version + ", server version=" + serverVersion);
+					if (serverVersion > version) {
+						updateAvailable(oChanges);
+					}
+				} catch (JSONException) {
+					log("error", "Could not load update info: " + responseDetails.responseText);
 				}
 			},
 			onerror : function(responseDetails) {
-				log("info", "Unable to get version from Userscripts.org! Errorcode "
-						+ responseDetails.status);
+				log("info", "Unable to get version from Github! Errorcode " + responseDetails.status);
 			}
 		});
 		GM_setValue('updateDate', "" + (currentDate - 0));
@@ -4833,8 +4753,7 @@ function createTimeString(time, simple) {
 		if (simple)
 			return lastSave.getFullYear() + "-" + month + "-" + day;
 		else
-			return lastSave.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + minute + ":"
-					+ sec;
+			return lastSave.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + sec;
 	}
 }
 
@@ -5043,8 +4962,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 	var lat1 = lat1dec.toRad();
 	var lat2 = lat2dec.toRad();
 
-	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2)
-			* Math.cos(lat1) * Math.cos(lat2);
+	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1)
+			* Math.cos(lat2);
 	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	var d = R * c;
 	return d;
@@ -5181,8 +5100,8 @@ var Base64 = {
 				enc4 = 64;
 			}
 
-			output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2)
-					+ this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+			output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3)
+					+ this._keyStr.charAt(enc4);
 
 		}
 
@@ -5301,8 +5220,7 @@ function GC2DBId(gcCode) {
 	var rightPart = gcCode.substring(2).toUpperCase();
 
 	var base = 31;
-	if ((rightPart.length < 4)
-			|| ((rightPart.length == 4) && (sequence.indexOf(rightPart.charAt(0)) < 16))) {
+	if ((rightPart.length < 4) || ((rightPart.length == 4) && (sequence.indexOf(rightPart.charAt(0)) < 16))) {
 		base = 16;
 	}
 
