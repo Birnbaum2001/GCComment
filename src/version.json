@@ -2,6 +2,204 @@
 	"latestVersion":82,
 	"changes":[{
 		"version":82,
-		"change":"<ul> <li>fix: script include to run also on https links to gs.com</li> <li>fix: remove another emoji when patching GPX</li> <li>new: import/export as JSON</li> </ul>","date":"2014-05-16"
-	}]
+		"change":"<ul><li>fix: script include to run also on https links to gs.com</li> <li>fix: remove another emoji when patching GPX</li> <li>new: import/export as JSON</li> </ul>","date":"2014-05-16"
+	},
+	{
+		"version":81,
+		"date":"2013-10-22",
+		"change":"<ul> <li>fix: fixed typo that prevent to show up on profile page</li> <li>new: table keeps number of rows when changing filter</li> </ul>"
+	},
+	{
+		"version":80,
+		"date":"2013-10-18",
+		"change":"<ul><li>fix: Fixed display of GCComment bubbles on cache lists indicating that there is a comment</li><li>fix: reworked archive selector in GCC overview table</li><li>fix: fix urls for set and reset user coordinates when letting GCC auto sync the final coordinates with GS</li></ul>"
+	},
+	{
+		"version":79,
+		"date":"2013-06-28",
+		"change":"<ul><li>fix: update of dropbox.js to 0.9.2 to be compatible with FF22 update</li></ul>"
+	},
+	{
+		"version":78,
+		"date":"2013-06-23",
+		"change":"<ul><li>new: direct export (no separate click needed</li><li>new: internal storage is now based on JSON instead of crappy own format, import/export in JSON will come later</li><li>fix: hopefully sufficient check for empty escaped/unescaped string</li><li>fix: updated changelog url</li></ul>"
+	},
+	{
+		"version":77,
+		"date":"2013-06-07",
+		"change":"<ul><li>new: custom waypoints can be added to a cache. they can be enabled on maps, export to GPX will come later</li><li>new: internal storage is now based on JSON instead of crappy own format, import/export in JSON will come later</li><li>new: option to remove emojis when patching GPX, since they cause problems on some GPSr</li><li>fix: setting update date hopefully once and for all, so that automatic update notifications work again</li><li>fix: selecting found filter now works</li><li>fix: internal mapping gccode-guid was not deleted on comment delete. maintenance method added to remove unused mappings</li><li>fix: downloading for export/patch now works again, even in FF21</li><li>fix: display of gccomment options when logging a cache</li><li>fix: removing table row when state is changed</li><li>fix: GCC works now on new detail page</li></ul>"
+	},
+	{
+		"version":76,
+		"date":"2013-04-28",
+		"change":"<ul><li>As announced, I removed the GCComment Server synchronization code. Dropbox is now only option to sync remotely.</li><li>fix: move mystery mover block below search field to allow search to work properly (thanks to GS)</li><li>reworked layout on map</li><li>improved styling on overview page</li><li>removed GC Note import code</li></ul>"
+	},
+	{
+		"version":75,
+		"date":"2013-04-19",
+		"change":"<ul><li>new: Export to KML (Thanks to Lars Major</li><li>fix: handling &amp; display of the &quot;last update check&quot; date</li><li>new: more verbose import result</li><li>fix: GCC on Maps (thanks to removal of jquery mobile by GS)</li></ul>"
+	},
+	{
+		"version":74,
+		"date":"2013-03-05",
+		"change":"<ul><li>fix: final marker in map on detail page also without geocaching map enhancements</li><li>fix: fix of language fix</li></ul>"
+	},
+	{
+		"version":73,
+		"date":"2013-02-09",
+		"change":"<ul><li>fix: update string creation to show update notification</li><li>fix: fine tuning of element distances on detail page</li><li>fix: language determination in general and on send-to-gps page</li></ul>"
+	},
+	{
+		"version":72,
+		"date":"2013-01-13",
+		"change":"<ul><li>fix: added xmlversion to export all to dropbox</li><li>fix: added separate text for delete confirmation from overview table</li><li>fix: write comment after deletion to log</li><li>fix: final marker on bottom map on detail page</li><li>fix: fixed regex for triggering gcc onprofile</li><li>fix: changed submitbutton event registration on logpage</li></ul>"
+	},
+	{
+		"version":71,
+		"date":"2012-10-28",
+		"change":"<ul><li>fix: removed duplicate xml-tag</li><li>fix: removed &quot; in gpxextension</li><li>fix: patchgpx function did not work correctly</li><li>fix: dropbox: show only .gcc files and the most recent on top</li></ul>"
+	},
+	{
+		"version":70,
+		"date":"2012-10-15",
+		"change":"<ul><li>fix: GCC only on profile page, no other sub menus</li><li>fix: reworked export and deleteall to include the archive attribute properly</li><li>fix: included original coordinates in GSAK notation (using gsak:LatBeforeCorrect)</li></ul>"
+	},
+	{
+		"version":69,
+		"date":"2012-10-06",
+		"change":"<ul><li>new: Sync via Dropbox. You can now export and import using Dropbox.</li><li>fix: month when creating ISO time string</li><li>fix: removed all getTime and setTime for Chrome compatibility</li><li>fix: image url</li><li>fix: storing home coordinates based on JS object, not HTML content, since that might be changed</li><li>fix: inserted trigger(&#39;create&#39;) to trigger widget creation on Chrome</li><li>fix: updated encoding to UTF-8</li><li>fix: unsolved and area buttons are not set when reloading</li></ul>"
+	},
+	{
+		"version":68,
+		"date":"2012-08-02",
+		"change":"<ul><li>new: Internationalization. You can choose between English and German</li><li>new: &quot;archived&quot; as option in export und delete menus</li><li>new: delete all with comprehensive information about the outcome</li><li>new: checkboxes for GCComment update when submitting a log for a cache</li><li>fix: time of exported GPX is now the current time</li><li>fix: comment bubbels also on my/recentlyviewedcaches.aspx</li><li>fix: fixed bug when changing state in table</li></ul>"
+	},
+	{
+		"version":67,
+		"date":"2012-06-26",
+		"change":"<ul><li>new: table rows are directly removed and not by rebuilding the table</li><li>fix: archived caches are not shown on map</li><li>fix: order of entries in CSV</li><li>new: move to archive button on log page</li></ul>"
+	},
+	{
+		"version":66,
+		"date":"2012-06-09",
+		"change":"<ul><li>new: more feedback when importing caches</li><li>new option: when setting final coordinates using the upper textbox, they are also synched to GS</li><li>new: caches can put into archive from table. This means they are not loaded in the normal table, but still accessible via the archive filter</li><li>new option: lazy table update. You can choose not to update the overview table when changing the state or deleting a comment.</li><li>new: the map shows optionally 161m circles around finals</li><li>some minor bugfixes</li></ul>"
+	},
+	{
+		"version":65,
+		"date":"2012-05-08",
+		"change":"<ul><li>fix: export to GPX</li><li>fix: some explanation for import file extension</li><li>new: comment overview table is enhanced by datatables (sorting, filtering)</li></ul>"
+	},
+	{
+		"version":64,
+		"date":"2012-04-02",
+		"change":"<b>Today is GCComment&#39;s 2nd anniversary. Exactly two years ago, I started hacking a bit and now I have over 4000 lines of mostly self-written code, 57 server users, and lots of people reporting bugs :) Therefore, I would like to say a big thank you to all users, testers, feature requesters and donators :) Without all of you, this tool would not be as it is today.<br/>Therefore and as a little birthday present, I cleaned up a little bit on the UI and make the main menu more usable. I hope you like it :)</b><ul><li>new: export and delete by filters</li><li>new: compatible with Firefox mobile on Android (thanks to geggi)</li><li>new: unsolved caches are shown on map in red if coords present, since they are unsolved :)</li><li>improved: layout of main menu on profile page</li><li>fix: mystery mover on detailpage is working again</li><li>fix: umlauts are handled correctly when storing on server</li><li>fix: eventlisteners are correctly called (thanks to geggi)</li></ul>"
+	},
+	{
+		"version":63,
+		"date":"2012-03-04",
+		"change":"<ul><li>fix: mysterymover on maps are working again</li><li>fix: state selector on detailpage (thanks to different handling in Firefox 10)</li></ul>"
+	},
+	{
+		"version":62,
+		"date":"2012-01-19",
+		"change":"<ul><li>fix after site update</li></ul>"
+	},
+	{
+		"version":61,
+		"date":"2011-11-09",
+		"change":"<ul><li>fix after site update</li></ul>"
+	},
+	{
+		"version":60,
+		"date":"2011-10-27",
+		"change":"<ul><li>new: preference page, reachable via the GCC icon on the left, you can now choose, if other scripts should have access to your comments. Necessary only for GC-Tour.</li><li>new: button on log page to mark as found when logging &quot;Found it&quot; and GCComment is present for cache</li><li>improved: patch GPX dialog, clearer structure, should be more intuitive :)</li><li>refactored, cleaned, consolidated methods, small bug fixes</li></ul>"
+	},
+	{
+		"version":59,
+		"date":"2011-10-06",
+		"change":"<ul><li>hotfix: siteupdate for detailpage</li></ul>"
+	},
+	{
+		"version":58,
+		"date":"2011-10-06",
+		"change":"<ul><li>new: stats contain count per solution state</li><li>fix: state when deleting on detail page</li><li>new: coordinate input on detail page also supports decimal (e.g., 51.123, 13.123) </li><li>new: import reads from file. Extension .gcc required!</li><li>new: patch a GPX file. Include new WPTs for finals, remove all other caches, change coords of original waypoints can be done. !This is quite untested and may not work as expected!</li><li>fix: escape characters of username</li><li>new: saving on top of detail page works now with state without coodinates</li><li>fix: changed download encoding to base64, allowing # to appear in the content</li></ul>"
+	},
+	{
+		"version":57,
+		"date":"2011-08-18",
+		"change":"<ul><li>hotfix: Import &amp; Export with Firefox 6.</li></ul>"
+	},
+	{
+		"version":56,
+		"date":"2011-08-14",
+		"change":"<ul><li>fix: GCComment on top of printarea</li><li>new: original popup is shown when final marker on beta map is clicked</li><li>new: monospace font for displaying comment</li><li>new: state input also on top of detail page</li><li>new: table on profile page contains distance to home</li></ul>"
+	},
+	{
+		"version":55,
+		"date":"2011-06-05",
+		"change":"<ul><li>bugfix: automove mystery</li><li>new: link between mystery and original optionally deselectable</li><li>bugfix: static and dynamic map fixed on detail page</li><li>changed: export method for other scripts now returns the complete comment data</li></ul>"
+	},
+	{
+		"version":54,
+		"date":"2011-05-05",
+		"change":"<ul><li>bugfix: link to final on google maps on detail page</li><li>new: moving mysteries works on beta map, including filter for solved and found caches, visual link between mystery and home coordinate and popup on final marker with GCComment (in order to have the home coordinate link working, you must re-save your stuff on the cache detail page)</li><li>bugfix: fix after GC.com update</li></ul>"
+	},
+	{
+		"version":53,
+		"date":"2011-03-31",
+		"change":"<ul><li>bugfix: move mysteries did not work on FF4</li></ul>"
+	},
+	{
+		"version":52,
+		"date":"2011-03-27",
+		"change":"<ul><li>bugfix: compatibility with FF4</li><li>bugfix: sendtogps bugfixes</li></ul>"
+	},
+	{
+		"version":51,
+		"date":"2011-02-28",
+		"change":"<ul><li>new: cleaned up the import &amp; export menus</li><li>new: added exports in GCC (GCComment), CSV, GPX, HTML</li><li>new: sendToGPS is configurable (add comment, add waypoint, change orig coordinates</li></ul>"
+	},
+	{
+		"version":50,
+		"date":"2011-02-12",
+		"change":"<ul><li>bug fix: convertDec2DMS fixed (negative, layout)</li><li>bug fix: improved performance (removed 1x refreshTable)</li><li>bug fix: missing leading 0 in ISO timestring in sendtogps</li><li>bug fix: bugfix in converter</li><li>bug fix: bug fix on map with cross-hovering of map and table</li><li>new: added final marker to link on standard minimap</li><li>new: two links to external map pages with finals added </li></ul>"
+	},
+	{
+		"version":49,
+		"date":"2011-02-02",
+		"change":"<ul><li>bug fix: saving without final not possible</li><li>bug fix: parsing with leading zeros leads to wrong coordinates</li><li>bug fix: saving only coordinates in upper field not possible</li><li>bug fix: sendToGPS works on detail and search page. includes comment in additional waypoint. The time of this waypoint is the last save time of the comment</li><li>new: if there are additional waypoints and a final coordinate, it is integrated in the table</li></ul>"
+	},
+	{
+		"version":48,
+		"date":"2011-02-01",
+		"change":"<ul><li>bug fix: comment bubbles also for caches with final coordinates and without comment</li><li>new: Integration of comments and final coordinates in SendToGPS page (please test, I cannot do that)</li><li>bug fix: smaller text area for comments to better fit smaller screens</li><li>new: content of a comment is parsed for hyperlinks when displayed</li><li>new: integration in GC Tidy maps on cache detail page</li><li>new: final input also in format xx xx.xxx xx xx.xxx allowed</li><li>bug fix: both final coordinate input fields are better synched and saving a comment is not possible with wrong coordinates in bottom input field</li></ul>"
+	},
+	{
+		"version":47,
+		"date":"2010-12-29",
+		"change":"<ul><li>bug fix: final coordinates also on gctour print page</li><li>bug fix: regex for coordinate parsing also allows missing degree symbol</li><li>bug fix: comments on regular print page</li><li>new: final marker on print view map</li><li>bug fix: import of empty comments (have only final coordinates)</li><li>new: starting with next update, the update notification will contain a changelog</li></ul>"
+	},
+	{
+		"version":46,
+		"date":"2010-12-23",
+		"change":"<ul><li>new feature: <b>Mystery Mover</b>. You can now enter final coordinates. An additional icon is shown on the detail page minimap. On the search map, the caches can be moved to their final location. </li><li>bug fix: import button behaviour</li></ul>"
+	},
+	{
+		"version":45,
+		"date":"2010-11-12",
+		"change":"<ul><li>bug fix: comments included in regular &amp; GC-Tour print page</li><li>bug fix: comment bubbles in tables where not shown occasionally</li></ul>"
+	},
+	{
+		"version":44,
+		"date":"2010-09-27",
+		"change":"<ul><li>bug fix: double icon after gc.com update</li><li>bug fix: month in ministats was one less than correct</li><li>bug fix: double icon after gc.com update</li><li>bug fix: import can handle empty gccode (however this may occur)</li><li>new: comment icons also on watchlist and bookmark list</li></ul>"
+	},
+	{
+		"version":43,
+		"date":"2010-08-13",
+		"change":"<ul><li>server storage available (see documentation above)</li><li>delete-all button</li><li>tooltip with some stats on GCComment-icon</li></ul>"
+	},
+
+
+	]
 }
