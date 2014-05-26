@@ -48,11 +48,95 @@
  */
 
 // version information
-var $ = unsafeWindow.$;
-var jQuery = unsafeWindow.jQuery;
-var version = 83;
-var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
-var updateURL = "https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js";
+var $ = $||null;
+var jQuery = jQuery||null;
+
+if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
+    $ = unsafeWindow.$;
+}
+else if(typeof(window.$) !== "undefined"){
+    $ = window.$;
+}
+
+if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
+    jQuery = unsafeWindow.jQuery;
+}
+else if(typeof(window.$) !== "undefined"){
+    jQuery = window.jQuery;
+}
+
+if(typeof(GM_setValue) === "undefined" && typeof(localStorage) !== "undefined"){
+    GM_setValue = function(key, value){
+        localStorage.setItem('###gcc_' + key, value);
+    };
+}
+
+if(typeof(GM_getValue) === "undefined" && typeof(localStorage) !== "undefined"){
+    GM_getValue = function(key, defaultValue){
+        return localStorage.getItem('###gcc_' + key, defaultValue);
+    };
+}
+
+if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
+    GM_log = function(message){
+        return console.log(message);
+    };
+}
+
+if(typeof(GM_listValues) === "undefined" && typeof(localStorage) !== "undefined"){
+    GM_listValues = function(message){
+        var result = [];
+        var allKeys = Object.keys(localStorage);
+        for(var i=0; i<allKeys.length; i++){
+            if(allKeys[i].indexOf('###gcc_') == 0){
+                result.push(allKeys[i].substring(7));
+            }
+        }
+        return result;
+    };
+}
+
+if(typeof(GM_xmlhttpRequest) === "undefined" || (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1)) {
+	GM_xmlhttpRequest = function(rdata){
+		var request = new XMLrequestuest();
+		request.onreadystatechange = function(data) { 
+			if (request.readyState == 4) {
+				if (request.status == 200){
+					if(rdata.onload){
+						rdata.onload(request);
+					}
+				}
+				else
+				{
+					if(rdata.onerror){
+						rdata.onerror(request);
+					}
+				}
+			}                
+		};
+		
+		request.open(rdata.method, rdata.url);
+
+		if (rdata.headers) {
+			for (var header in rdata.headers) {
+				if(header == "User-Agent" || header == "Origin" ||header == "Cookie" ||header == "Cookie2" ||header == "Referer"){
+					continue;
+				}
+				request.setRequestHeader(header, rdata.headers[header]);
+			}
+		}
+		
+		request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
+	};
+}
+
+if(typeof(unsafeWindow) === "undefined"){
+    unsafeWindow = window;
+}
+
+var version = "81";
+var updatechangesurl = 'https://svn.code.sf.net/p/gccomment/code/trunk/gccomment/src/version.xml';
+var updateurl = 'http://userscripts.org/scripts/source/75959.meta.js';
 
 // thanks to Geggi
 // Check for Scriptish bug in Fennec browser
@@ -525,9 +609,6 @@ var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 var lang = languages[SETTINGS_LANGUAGE_EN];
 
 function main() {
-	$ = unsafeWindow.$;
-	jQuery = unsafeWindow.jQuery;
-	$ = $ || jQuery;
 	if (!$) {
 		log('error', 'No jQuery found. Stopping GCComment: ' + $);
 		return;
@@ -683,9 +764,14 @@ function doMaintenance() {
 // GCComment auf der Profilseite
 function gccommentOnProfilePage() {
 	checkforupdates();
-
-	appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.js');
-	appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
+    
+    if(browser === "Chrome"){
+        appendCSS('table.dataTable{clear:both;width:100%;margin:0 auto}table.dataTable thead th{border-bottom:1px solid #000;font-weight:700;cursor:hand;padding:3px 18px 3px 10px}table.dataTable tfoot th{border-top:1px solid #000;font-weight:700;padding:3px 18px 3px 10px}table.dataTable td{padding:3px 10px}table.dataTable td.center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable tr.odd{background-color:#E2E4FF}table.dataTable tr.even{background-color:#FFF}table.dataTable tr.odd td.sorting_1{background-color:#D3D6FF}table.dataTable tr.odd td.sorting_2{background-color:#DADCFF}table.dataTable tr.odd td.sorting_3{background-color:#E0E2FF}table.dataTable tr.even td.sorting_1{background-color:#EAEBFF}table.dataTable tr.even td.sorting_2{background-color:#F2F3FF}table.dataTable tr.even td.sorting_3{background-color:#F9F9FF}.dataTables_wrapper{position:relative;clear:both;zoom:1}.dataTables_length{float:left}.dataTables_info{clear:both;float:left}.paginate_disabled_previous,.paginate_enabled_previous,.paginate_disabled_next,.paginate_enabled_next{height:19px;float:left;cursor:hand;color:#111!important}.paginate_disabled_previous:hover,.paginate_enabled_previous:hover,.paginate_disabled_next:hover,.paginate_enabled_next:hover{text-decoration:none!important}.paginate_disabled_previous,.paginate_disabled_next{color:#666!important}.paginate_disabled_previous,.paginate_enabled_previous{padding-left:23px}.paginate_disabled_next,.paginate_enabled_next{padding-right:23px;margin-left:10px}.paginate_enabled_previous{background:url(../images/back_enabled.png) no-repeat top left}.paginate_enabled_previous:hover{background:url(../images/back_enabled_hover.png) no-repeat top left}.paginate_disabled_previous{background:url(../images/back_disabled.png) no-repeat top left}.paginate_enabled_next{background:url(../images/forward_enabled.png) no-repeat top right}.paginate_enabled_next:hover{background:url(../images/forward_enabled_hover.png) no-repeat top right}.paginate_disabled_next{background:url(../images/forward_disabled.png) no-repeat top right}.paging_full_numbers{height:22px;line-height:22px}.paging_full_numbers a:hover{text-decoration:none}.paging_full_numbers a.paginate_button,.paging_full_numbers a.paginate_active{border:1px solid #aaa;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;cursor:hand;color:#333!important;margin:0 3px;padding:2px 5px}.paging_full_numbers a.paginate_button{background-color:#ddd}.paging_full_numbers a.paginate_button:hover{background-color:#ccc;text-decoration:none!important}.paging_full_numbers a.paginate_active{background-color:#99B3FF}.dataTables_processing{position:absolute;top:50%;left:50%;width:250px;height:30px;margin-left:-125px;margin-top:-15px;border:1px solid #ddd;text-align:center;color:#999;font-size:14px;background-color:#FFF;padding:14px 0 2px}.sorting{background:url(../images/sort_both.png) no-repeat center right}.sorting_asc{background:url(../images/sort_asc.png) no-repeat center right}.sorting_desc{background:url(../images/sort_desc.png) no-repeat center right}.sorting_asc_disabled{background:url(../images/sort_asc_disabled.png) no-repeat center right}.sorting_desc_disabled{background:url(../images/sort_desc_disabled.png) no-repeat center right}.dataTables_scroll{clear:both}.dataTables_scrollBody{margin-top:-1px}.dataTables_filter,.dataTables_paginate{float:right;text-align:right}.paginate_disabled_previous:active,.paginate_enabled_previous:active,.paginate_disabled_next:active,.paginate_enabled_next:active,.paging_full_numbers a:active,table.dataTable th:active{outline:none}');
+    }
+    else{
+		appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.js');
+		appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
+	}
 	appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 			+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
 			+ '.haveFinalIcon{margin-left:3px;width:14px}');
@@ -1657,8 +1743,8 @@ function patchNDownloadGPX(gccString, filename) {
 
 	// remove emojis
 	if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-		result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
-				/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
+		result = result.replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(
+				/?/g, "").replace(/?/g, "").replace(/?/g, "");
 	}
 
 	// remove empty lines
@@ -2124,7 +2210,8 @@ function gccommentOnDetailpage() {
 		}
 
 		if (currentComment
-				&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))) {
+				&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))
+				&& typeof(unsafeWindow.L)!=="undefined") {
 			unsafeWindow.L.OrigMap = unsafeWindow.L.Map;
 			unsafeWindow.L.Map = function(id, params) {
 				var map = new unsafeWindow.L.OrigMap(id, params);
@@ -4682,7 +4769,7 @@ function updateAvailable(oChanges) {
 	});
 }
 
-function checkforupdates() {
+function checkforupdates() {	
 	var updateDateString = GM_getValue('updateDate');
 	var updateDate = null;
 	if (updateDateString && (updateDateString != "NaN")) {
@@ -5269,20 +5356,11 @@ function showSuccessIcon(toNode) {
 
 }
 
-if (typeof (opera) != "undefined") {
-	// Opera detected
-	browser = "Opera";
-
-	// Start the mainpart, if the site is loaded
-	window.addEventListener('DOMContentLoaded', main, true);
+if (typeof (chrome) !== "undefined") {
+	// Chrome detected
+	browser = "Chrome";
+	main();	
 } else {
 	browser = "FireFox";
 	main();
 }
-
-//
-//
-// filling lots of end content so that it works in opera
-// filling lots of end content so that it works in opera
-// filling lots of end content so that it works in opera
-//
