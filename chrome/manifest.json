@@ -12,6 +12,7 @@
         "https://www.dropbox.com/",
         "https://api.dropbox.com/",
         "https://api-content.dropbox.com/",
+		"https://raw.githubusercontent.com/",
         "storage"
 	],
    "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js"],
