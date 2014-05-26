@@ -1,0 +1,22 @@
+{
+ "manifest_version": 2,
+   "content_scripts": [ {
+      "exclude_globs": [ ],
+      "exclude_matches": [ ],
+      "include_globs": [ ],
+      "js": [ "jquery-1.9.1.min.js", "jquery.dataTables.js", "dropbox.min.js", "gccomment.js"],
+      "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*"],
+      "run_at": "document_idle"
+   } ],
+   "permissions": [ 
+        "https://www.dropbox.com/",
+        "https://api.dropbox.com/",
+        "https://api-content.dropbox.com/",
+        "storage"
+    ],   
+   "icons": { "128": "icon128.png" },
+   "description": "Add comments to your geocaches on geocaching.com.", 
+   "homepage_url": "https://userscripts.org/scripts/show/75959",
+   "name": "GCComment",
+   "version": "8.3"
+}
