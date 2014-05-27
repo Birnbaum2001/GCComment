@@ -81,7 +81,16 @@ var mainCode = function(){
 
 	if(typeof(GM_getValue) === "undefined" && typeof(localStorage) !== "undefined"){
 		GM_getValue = function(key, defaultValue){
-			return localStorage.getItem('###gcc_' + key, defaultValue);
+			var value = localStorage.getItem('###gcc_' + key, defaultValue);
+			if(value === "false"){
+				return false;
+			}
+			else if(value === "true"){
+				return true;
+			}
+			else{
+				return value;
+			}
 		};
 	}
 
@@ -5298,7 +5307,16 @@ if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\
 	
 	if(typeof(GM_getValue) === "undefined" && typeof(localStorage) !== "undefined"){
 		GM_getValue = function(key, defaultValue){
-			return localStorage.getItem('###gcc_' + key, defaultValue);
+			var value = localStorage.getItem('###gcc_' + key, defaultValue);
+			if(value === "false"){
+				return false;
+			}
+			else if(value === "true"){
+				return true;
+			}
+			else{
+				return value;
+			}
 		};
 	}
 	
