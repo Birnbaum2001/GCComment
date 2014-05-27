@@ -73,13 +73,7 @@ var mainCode = function(){
 		jQuery = window.jQuery;
 	}
 
-	if(typeof(GM_setValue) === "undefined" && typeof(localStorage) !== "undefined"){
-		GM_setValue = function(key, value){
-			localStorage.setItem('###gcc_' + key, value);
-		};
-	}
-
-	if(typeof(GM_getValue) === "undefined" && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_getValue = function(key, defaultValue){
 			var value = localStorage.getItem('###gcc_' + key, defaultValue);
 			if(value === "false"){
@@ -93,15 +87,15 @@ var mainCode = function(){
 			}
 		};
 	}
-
-	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
-		GM_log = function(message){
-			return console.log(message);
+	
+	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+		GM_setValue = function(key, value){
+			localStorage.setItem('###gcc_' + key, value);
 		};
 	}
-
-	if(typeof(GM_listValues) === "undefined" && typeof(localStorage) !== "undefined"){
-		GM_listValues = function(message){
+	
+	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+		GM_listValues = function(){
 			var result = [];
 			var allKeys = Object.keys(localStorage);
 			for(var i=0; i<allKeys.length; i++){
@@ -112,6 +106,12 @@ var mainCode = function(){
 			return result;
 		};
 	}	
+
+	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
+		GM_log = function(message){
+			return console.log(message);
+		};
+	}
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
@@ -645,7 +645,12 @@ var mainCode = function(){
 			gccommentOnProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
-			mysteryMoverOnMapPage();
+			if(browser === "Chrome"){
+				httpsMapSync();
+			}
+			else{
+				mysteryMoverOnMapPage();
+			}
 		} else if (document.URL.search("sendtogps\.aspx") >= 0) {
 			log('debug', 'matched sendToGPS');
 			sendToGPS();
@@ -3613,6 +3618,27 @@ var mainCode = function(){
 		}
 	}
 
+	function httpsMapSync(){		
+		var GCC_iFrameWindow = null;
+		window.addEventListener("message", function(e){
+			if (event.origin !== "http://www.geocaching.com")
+			{
+				return;
+			}
+			
+			if(e.data.indexOf("GCC_httpsConfigSync_") === 0){
+				var data = JSON.parse(e.data.replace("GCC_httpsConfigSync_", ""));
+				for(var key in data){
+					GM_setValue(key, data[key]);
+				}
+				
+				$('#GCC_httpsConfigSyncIframe').remove();
+				mysteryMoverOnMapPage();
+			}	
+		}, false);		
+		GCC_iFrameWindow = $('<iframe id="GCC_httpsConfigSyncIframe" src="http://geocaching.com/dummy#GCC_httpsConfigSync" height=1 width=1 style="display:hidden"></iframe>').appendTo('body')[0].contentWindow;
+	}                                                                                                            
+	
 	// ***
 	// *** MysteryMover
 	// ***
@@ -5276,36 +5302,13 @@ var mainCode = function(){
 }
 
 if (typeof (chrome) !== "undefined") {
-	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
-	
-	for(var i=0; i<scriptsToInject.length;i++){
-		var script = document.createElement('script');	
-		script.setAttribute('type', 'text/javascript');	
-		script.src = chrome.extension.getURL(scriptsToInject[i]);
-		document.getElementsByTagName('head')[0].appendChild(script);
-	}	
-
-	var code = document.createElement('script');	
-	code.setAttribute('type', 'text/javascript');	
-	code.textContent = "var version = "+version+";(";
-	code.textContent += mainCode.toString();	
-	code.textContent += ")();";
-	document.getElementsByTagName('head')[0].appendChild(code);
-} else {
-	mainCode();
-}
-
-//Update check
-if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
-				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
-	
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
 		GM_log = function(message){
 			return console.log(message);
 		};
 	}
 	
-	if(typeof(GM_getValue) === "undefined" && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_getValue = function(key, defaultValue){
 			var value = localStorage.getItem('###gcc_' + key, defaultValue);
 			if(value === "false"){
@@ -5320,11 +5323,24 @@ if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\
 		};
 	}
 	
-	if(typeof(GM_setValue) === "undefined" && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
 			localStorage.setItem('###gcc_' + key, value);
 		};
 	}
+	
+	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+		GM_listValues = function(){
+			var result = [];
+			var allKeys = Object.keys(localStorage);
+			for(var i=0; i<allKeys.length; i++){
+				if(allKeys[i].indexOf('###gcc_') == 0){
+					result.push(allKeys[i].substring(7));
+				}
+			}
+			return result;
+		};
+	}	
 	
 	if(typeof(GM_xmlhttpRequest) === "undefined" || (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1)) {
 		GM_xmlhttpRequest = function(rdata){
@@ -5359,7 +5375,42 @@ if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\
 			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
 		};
 	}
+
+	if(document.URL.indexOf("#GCC_httpsConfigSync") !== -1){
+		//httpsConfigSync provider part
+		var data = {};
+		var allKeys = GM_listValues();
+		for(var i=0;i<allKeys.length;i++){
+			data[allKeys[i]] = GM_getValue(allKeys[i], null);
+		}
+		window.parent.postMessage("GCC_httpsConfigSync_"+JSON.stringify(data), "https://www.geocaching.com");
+		
+		return;
+	}
 	
+	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
+	
+	for(var i=0; i<scriptsToInject.length;i++){
+		var script = document.createElement('script');	
+		script.setAttribute('type', 'text/javascript');	
+		script.src = chrome.extension.getURL(scriptsToInject[i]);
+		document.getElementsByTagName('head')[0].appendChild(script);
+	}	
+
+	var code = document.createElement('script');	
+	code.setAttribute('type', 'text/javascript');	
+	code.textContent = "var version = "+version+";(";
+	code.textContent += mainCode.toString();	
+	code.textContent += ")();";
+	document.getElementsByTagName('head')[0].appendChild(code);
+} else {
+	mainCode();
+}
+
+//Update check
+if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
+				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
+				
 	function log(level, text) {
 		GM_log(level + ": " + text);
 	}

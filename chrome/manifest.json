@@ -8,13 +8,14 @@
       "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*", "https://geocaching.com/*", "https://www.geocaching.com/*"],
       "run_at": "document_idle"
    } ],
-   "permissions": [ 
+   "permissions": [
         "https://www.dropbox.com/",
         "https://api.dropbox.com/",
         "https://api-content.dropbox.com/",
 		"https://raw.githubusercontent.com/",
         "storage"
 	],
+   "converted_from_user_script": true,
    "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js"],
    "icons": { "128": "icon128.png" },
    "description": "Add comments to your geocaches on geocaching.com.", 
