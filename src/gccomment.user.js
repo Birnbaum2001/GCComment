@@ -3626,10 +3626,21 @@ var mainCode = function(){
 				return;
 			}
 			
+			var keysToIgnore ={};
+			keysToIgnore[AUTOMOVEMYSTERIESBETA]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETAFOUND]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETASOLVED]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETAHOME]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETAAREA]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETAUNSOLVED]=true;
+			keysToIgnore[AUTOMOVEMYSTERIESBETAINCLUDEWPT]=true;
+			
 			if(e.data.indexOf("GCC_httpsConfigSync_") === 0){
 				var data = JSON.parse(e.data.replace("GCC_httpsConfigSync_", ""));
 				for(var key in data){
-					GM_setValue(key, data[key]);
+					if(!keysToIgnore[key]){
+						GM_setValue(key, data[key]);
+					}
 				}
 				
 				$('#GCC_httpsConfigSyncIframe').remove();
