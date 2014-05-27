@@ -5,7 +5,7 @@
       "exclude_matches": [ ],
       "include_globs": [ ],
       "js": [ "jquery-1.9.1.min.js", "gccomment.js"],
-      "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*"],
+      "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*", "https://geocaching.com/*", "https://www.geocaching.com/*"],
       "run_at": "document_idle"
    } ],
    "permissions": [ 
