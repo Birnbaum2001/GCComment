@@ -2193,7 +2193,7 @@ var mainCode = function(){
 			if (currentComment && currentComment.lat && currentComment.lng) {
 				detailFinalInputLatLng.value = convertDec2DMS(currentComment.lat, currentComment.lng);
 			}
-
+			
 			if (currentComment
 					&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))
 					&& typeof(unsafeWindow.L)!=="undefined") {
@@ -2262,7 +2262,13 @@ var mainCode = function(){
 
 					return map;
 				};
-
+				
+				if(browser === "Chrome"){
+					$('#map_preview_canvas').replaceWith('<div style="width: 228px; height: 175px;" class="TopSpacing" id="map_preview_canvas"></div>');
+					$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
+					$('#map_canvas2').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas2"></div>');
+					setStaticMaps();
+				}
 			} else {
 				detailFinalInputLatLng.value = DEFAULTCOORDS;
 				detailFinalInputLatLng.setAttribute('style', 'color:grey');
