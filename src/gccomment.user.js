@@ -106,9 +106,7 @@ var mainCode = function(){
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
-	}
-
-	var version = "81";
+	}	
 
 	// thanks to Geggi
 	// Check for Scriptish bug in Fennec browser
@@ -5280,7 +5278,7 @@ if (typeof (chrome) !== "undefined") {
 
 	var code = document.createElement('script');	
 	code.setAttribute('type', 'text/javascript');	
-	code.textContent = "(";
+	code.textContent = "var version = "+version+";(";
 	code.textContent += mainCode.toString();	
 	code.textContent += ")();";
 	document.getElementsByTagName('head')[0].appendChild(code);
