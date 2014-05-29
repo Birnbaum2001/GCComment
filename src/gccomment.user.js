@@ -2449,8 +2449,36 @@ var mainCode = function(){
 				}
 			}
 		}
+	
+		saveToCacheNote(currentComment);
 	}
 
+	function saveToCacheNote(){
+		function getCacheNoteText(currentComment){
+			var result = "GCCNote:\n"
+			result += lang.final_coordinate+": "+convertDec2DMS(currentComment.lat, currentComment.lng)+"\n";
+			for (var j = 0; currentComment.waypoints && (j < currentComment.waypoints.length); j++) {
+				result += currentComment.waypoints[j].name+": "+convertDec2DMS(currentComment.waypoints[j].coordinate.lat, currentComment.waypoints[j].coordinate.lng)+"\n";
+			}			
+			result += "\n"+currentComment.commentValue;
+			return result;
+		}
+	
+		if(currentComment){ //TODO: Setting
+			if($("#cache_note").children().length !== 0){
+				log("debug", "saveToCacheNote failed: cache note is in edit mode");
+			}
+			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
+				log("debug", "saveToCacheNote failed: cache note contains other text");
+			}
+			else{
+				$("#cache_note").click();
+				$(".inplace_form .inplace_field")[0].value = getCacheNoteText(currentComment);
+				$(".inplace_save").click();
+			}
+		}
+	};
+	
 	function createAdditionalWaypointsRow(data) {
 		var wpttr = document.createElement('tr');
 		wpttr.setAttribute('id', 'wptrow_' + data.prefix);
