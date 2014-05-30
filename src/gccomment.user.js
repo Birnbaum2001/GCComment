@@ -250,6 +250,7 @@ var mainCode = function(){
 	var DELETEALL_FILTER_ARCHIVED_NOT_ARCHIVED = "DELETEALL_FILTER_ARCHIVED_NOT_ARCHIVED";
 	var LAZY_TABLE_REFRESH = "lazytablerefresh";
 	var AUTO_UPDATE_GS_FINAL = "autoupdategsfinal";
+	var AUTO_UPLOAD_CACHE_NOTES = "autoupdatecachenotes";
 	var AUTOMARKFOUND = "automarkfound";
 	var AUTOMARKARCHIVE = "automarkarchive";
 	var SETTINGS_LANGUAGE = "settings language";
@@ -338,6 +339,7 @@ var mainCode = function(){
 		settings_allowExport : "Allow export of comment data to other scripts (e.g., GC Tour)",
 		settings_lazyTable : "Lazy table refresh (no update on state change or delete from overview)",
 		settings_syncWithGS : "When saving the final coordindates, also correct coordinates at Groundspeak",
+		settings_saveCacheNotes : "When saving comments, also upload them as Groundspeak cache notes",
 		settings_saveprefs : "Save preferences",
 		settings_language : "Language",
 		thank_you : "Thank you",
@@ -480,6 +482,7 @@ var mainCode = function(){
 		settings_allowExport : "Erlaube den Export der Kommentare an andere Skripte (z.B. GC Tour)",
 		settings_lazyTable : "Träge Tabellenaktualisierung (Keine Aktualisierung der Übersichtstabelle nach Statusänderung oder Löschen)",
 		settings_syncWithGS : "Korrigiere die Finalkoordinaten bei Groundspeak beim Speichern",
+		settings_saveCacheNotes : "Lade alle Kommentare beim Speichern als Cache Note hoch",
 		settings_saveprefs : "Einstellungen speichern",
 		settings_language : "Language / Sprache",
 		thank_you : "Danke",
@@ -1101,7 +1104,9 @@ var mainCode = function(){
 			appendCheckBox(configDiv, LAZY_TABLE_REFRESH, lang.settings_lazyTable);
 
 			appendCheckBox(configDiv, AUTO_UPDATE_GS_FINAL, lang.settings_syncWithGS);
-
+			
+			appendCheckBox(configDiv, AUTO_UPLOAD_CACHE_NOTES, lang.settings_saveCacheNotes);
+			
 			configDiv.appendChild(document.createTextNode(lang.settings_language + ":"));
 			var languageSelector = document.createElement('select');
 			languageSelector.setAttribute("name", "languageSelector");
@@ -2454,6 +2459,10 @@ var mainCode = function(){
 	}
 
 	function saveToCacheNote(){
+		if (!GM_getValue(AUTO_UPLOAD_CACHE_NOTES)) {
+			return;
+		}
+		
 		function getCacheNoteText(currentComment){
 			var result = "GCCNote:\n"
 			result += lang.final_coordinate+": "+convertDec2DMS(currentComment.lat, currentComment.lng)+"\n";
