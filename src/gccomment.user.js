@@ -48,7 +48,7 @@
  */
 
 // version information
-var version = "81";
+var version = "83";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = ''; //TODO
