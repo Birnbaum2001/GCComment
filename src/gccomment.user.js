@@ -2466,15 +2466,20 @@ var mainCode = function(){
 	
 		if(currentComment){ //TODO: Setting
 			if($("#cache_note").children().length !== 0){
-				log("debug", "saveToCacheNote failed: cache note is in edit mode");
+				log("info", "saveToCacheNote failed: cache note is in edit mode");
 			}
 			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
-				log("debug", "saveToCacheNote failed: cache note contains other text");
+				log("info", "saveToCacheNote failed: cache note contains other text");
 			}
 			else{			
 				var text = $.trim(getCacheNoteText(currentComment));
 				if (text.length > 500 ) {
 						text = text.substr(0, 500);
+				}
+
+				if($("#cache_note").text().trim() === text){
+					log("debug", "saveToCacheNote: cache note identical - nothing to do");
+					return;
 				}
 
 				$.pageMethod("/seek/cache_details.aspx/SetUserCacheNote", JSON.stringify({
