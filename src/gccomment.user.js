@@ -3481,7 +3481,9 @@ var mainCode = function(){
 				// saveComment();
 				// detailCommentInputLatLng.value = cstr;
 				// log("info", "coordinatestring: " + cstr);
-
+				
+				saveToCacheNote(currentComment);
+				
 				if (GM_getValue(AUTO_UPDATE_GS_FINAL) == 1) {
 					$.pageMethod("/seek/cache_details.aspx/SetUserCoordinate", JSON.stringify({
 						dto : {
@@ -3589,7 +3591,8 @@ var mainCode = function(){
 		currentComment.origlng = orig[1];
 
 		doSaveCommentToGUID(currentComment);
-
+		saveToCacheNote(currentComment);
+		
 		var clean = DEFAULTCOORDS;
 		if (currentComment.lat && currentComment.lng) {
 			clean = convertDec2DMS(currentComment.lat, currentComment.lng);
