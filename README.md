@@ -11,4 +11,4 @@ To install the script, click https://raw.githubusercontent.com/Birnbaum2001/GCCo
 
 About the folders...
 - src is the main source folder.
-- The opera & dist folder have been a try to support opera as well. This has not been investigated further after v69.
+- The opera folder has been a try to support opera as well. This has not been investigated further after v69.
