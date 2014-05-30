@@ -2471,10 +2471,26 @@ var mainCode = function(){
 			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
 				log("debug", "saveToCacheNote failed: cache note contains other text");
 			}
-			else{
-				$("#cache_note").click();
-				$(".inplace_form .inplace_field")[0].value = getCacheNoteText(currentComment);
-				$(".inplace_save").click();
+			else{			
+				var text = $.trim(getCacheNoteText(currentComment));
+				if (text.length > 500 ) {
+						text = text.substr(0, 500);
+				}
+
+				$.pageMethod("/seek/cache_details.aspx/SetUserCacheNote", JSON.stringify({
+					dto :{
+						et : text,
+						ut : unsafeWindow.userToken
+					}
+				}), function(r) {
+					var r = JSON.parse(r.d);
+					if (!r.success == true) {
+						log("info", "failed while saving comment to cache note");
+						return;
+					}
+					
+					$("#cache_note").text(text);
+				});				
 			}
 		}
 	};
