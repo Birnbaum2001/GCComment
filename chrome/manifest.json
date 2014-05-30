@@ -19,7 +19,7 @@
    "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js"],
    "icons": { "128": "icon128.png" },
    "description": "Add comments to your geocaches on geocaching.com.", 
-   "homepage_url": "https://userscripts.org/scripts/show/75959",
+   "homepage_url": "https://github.com/lukeIam/GCComment",
    "name": "GCComment",
    "version": "8.3"
 }
