@@ -1733,8 +1733,8 @@ var mainCode = function(){
 
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-			result = result.replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(
-					/?/g, "").replace(/?/g, "").replace(/?/g, "");
+			result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
+					/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
 		}
 
 		// remove empty lines
@@ -5454,33 +5454,32 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 
-	if(document.URL.indexOf("#GCC_httpsConfigSync") !== -1){
-		//httpsConfigSync provider part
-		var data = {};
-		var allKeys = GM_listValues();
-		for(var i=0;i<allKeys.length;i++){
-			data[allKeys[i]] = GM_getValue(allKeys[i], null);
-		}
-		window.parent.postMessage("GCC_httpsConfigSync_"+JSON.stringify(data), "https://www.geocaching.com");
-		
-		return;
-	}
-	
-	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
-	
-	for(var i=0; i<scriptsToInject.length;i++){
-		var script = document.createElement('script');	
-		script.setAttribute('type', 'text/javascript');	
-		script.src = chrome.extension.getURL(scriptsToInject[i]);
-		document.getElementsByTagName('head')[0].appendChild(script);
-	}	
+    if (document.URL.indexOf("#GCC_httpsConfigSync") !== -1) {
+        //httpsConfigSync provider part
+        var data = {};
+        var allKeys = GM_listValues();
+        for (var i = 0; i < allKeys.length; i++) {
+            data[allKeys[i]] = GM_getValue(allKeys[i], null);
+        }
+        window.parent.postMessage("GCC_httpsConfigSync_" + JSON.stringify(data), "https://www.geocaching.com");
+    } else {
 
-	var code = document.createElement('script');	
-	code.setAttribute('type', 'text/javascript');	
-	code.textContent = "var version = "+version+";(";
-	code.textContent += mainCode.toString();	
-	code.textContent += ")();";
-	document.getElementsByTagName('head')[0].appendChild(code);
+        var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
+
+        for (var i = 0; i < scriptsToInject.length; i++) {
+            var script = document.createElement('script');
+            script.setAttribute('type', 'text/javascript');
+            script.src = chrome.extension.getURL(scriptsToInject[i]);
+            document.getElementsByTagName('head')[0].appendChild(script);
+        }
+
+        var code = document.createElement('script');
+        code.setAttribute('type', 'text/javascript');
+        code.textContent = "var version = " + version + ";(";
+        code.textContent += mainCode.toString();
+        code.textContent += ")();";
+        document.getElementsByTagName('head')[0].appendChild(code);
+    }
 } else {
 	mainCode();
 }
