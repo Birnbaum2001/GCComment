@@ -2455,7 +2455,7 @@ var mainCode = function(){
 			}
 		}
 	
-		saveToCacheNote(currentComment);
+		//saveToCacheNote(currentComment);
 	}
 
 	function saveToCacheNote(){
