@@ -3,7 +3,7 @@
 // @namespace		http://www.birnbaum2001.com/gccomment
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
-// @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.9.2/dropbox.js
+// @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
@@ -1296,130 +1296,144 @@ function gccommentOnProfilePage() {
 }
 
 function checkDropbox() {
-	var client = new Dropbox.Client({
-		key : dpkey,
-		sandbox : true
-	});
+	doDropboxAction(function(client) {
+		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+		waitingTag.setAttribute('style', 'display:inline');
+		waitingTag.setAttribute('src', waitingGif);
 
-	client.authDriver(new Dropbox.Drivers.Redirect({
-		useQuery : true,
-		rememberUser : true
-	}));
+		client.readdir("/", function(error, directoryEntries) {
+			if (error) {
+				waitingTag.setAttribute("src", errorIcon);
+				log("debug", error); // Something went wrong.
+				client.signOut(function(error) {
+					checkDropbox();
+				});
+				return;
+			}
+			waitingTag.setAttribute("src", successIcon);
+			setTimeout(function() {
+				$("#waiting").fadeOut('slow', function() {
+				});
+			}, 5000);
+			$('#dropboxSelect').empty();
+			if (directoryEntries.length > 0)
+				$('#dropboxImportLink').removeAttr('disabled');
 
-	client.authenticate(function(error, client) {
-		if (error) {
-			log("debug", 'There was an error during authentication: ' + error.status);
-		}
-	});
+			var filteredDirectoryEntries = new Array();
+			for (var index = 0; index < directoryEntries.length; index++) {
+				var gccMatch = directoryEntries[index].match(/\.gcc$/);
+				if (gccMatch)
+					filteredDirectoryEntries.push(directoryEntries[index]);
+			}
+			filteredDirectoryEntries.sort().reverse();
 
-	dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-	waitingTag.setAttribute('style', 'display:inline');
-	waitingTag.setAttribute('src', waitingGif);
+			for (var count = 0; count < filteredDirectoryEntries.length; count++) {
+				$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
+			}
 
-	client.readdir("/", function(error, directoryEntries) {
-		if (error) {
-			waitingTag.setAttribute("src", errorIcon);
-			return log("debug", error); // Something went wrong.
-		}
-		waitingTag.setAttribute("src", successIcon);
-		setTimeout(function() {
-			$("#waiting").fadeOut('slow', function() {
-			});
-		}, 5000);
-		$('#dropboxSelect').empty();
-		if (directoryEntries.length > 0)
-			$('#dropboxImportLink').removeAttr('disabled');
-
-		var filteredDirectoryEntries = new Array();
-		for (var index = 0; index < directoryEntries.length; index++) {
-			var gccMatch = directoryEntries[index].match(/\.gcc$/);
-			if (gccMatch)
-				filteredDirectoryEntries.push(directoryEntries[index]);
-		}
-		filteredDirectoryEntries.sort().reverse();
-
-		for (var count = 0; count < filteredDirectoryEntries.length; count++) {
-			$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
-		}
-
-		log("debug", "reading dir entries on dropbox successful");
+			log("debug", "reading dir entries on dropbox successful");
+		});
 	});
 }
 
 function storeToDropbox() {
-	var client = new Dropbox.Client({
-		key : dpkey,
-		sandbox : true
-	});
+	doDropboxAction(function(client) {
+		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+		waitingTag.setAttribute('style', 'display:inline');
+		waitingTag.setAttribute('src', waitingGif);
 
-	client.authDriver(new Dropbox.Drivers.Redirect({
-		useQuery : true,
-		rememberUser : true
-	}));
+		client.writeFile("" + createTimeString(new Date(), true) + "_backup-all.gcc", xmlversion
+				+ buildGCCExportString(false), function(error, stat) {
+			if (error) {
+				waitingTag.setAttribute("src", errorIcon);
+				log("debug", error); // Something went wrong.
+				client.signOut(function(error) {
+					storeToDropbox();
+				});
+				return;
+			}
+			waitingTag.setAttribute("src", successIcon);
+			setTimeout(function() {
+				unsafeWindow.$("#waiting").fadeOut('slow', function() {
+				});
+			}, 5000);
 
-	client.authenticate(function(error, client) {
-		if (error) {
-			log("debug", 'There was an error during authentication: ' + error.status);
-		}
-	});
-
-	dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-	waitingTag.setAttribute('style', 'display:inline');
-	waitingTag.setAttribute('src', waitingGif);
-
-	client.writeFile("" + createTimeString(new Date(), true) + "_backup-all.gcc", xmlversion
-			+ buildGCCExportString(false), function(error, stat) {
-		if (error) {
-			waitingTag.setAttribute("src", errorIcon);
-			return log("debug", error); // Something went wrong.
-		}
-		waitingTag.setAttribute("src", successIcon);
-		setTimeout(function() {
-			unsafeWindow.$("#waiting").fadeOut('slow', function() {
-			});
-		}, 5000);
-
-		log("debug", "Export to dropbox successful");
+			log("debug", "Export to dropbox successful");
+		});
 	});
 }
 
 function loadFromDropbox() {
+	doDropboxAction(function(client) {
+		dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
+		waitingTag.setAttribute('style', 'display:inline');
+		waitingTag.setAttribute('src', waitingGif);
+
+		var select = document.getElementById('dropboxSelect');
+		var fileName = select.options[select.selectedIndex].text;
+
+		client.readFile(fileName, function(error, data) {
+			if (error) {
+				waitingTag.setAttribute("src", errorIcon);
+				log("debug", error); // Something went wrong.
+				client.signOut(function(error) {
+					loadFromDropbox();
+				});
+				return;
+			}
+			waitingTag.setAttribute("src", successIcon);
+			setTimeout(function() {
+				$("#waiting").fadeOut('slow', function() {
+				});
+			}, 5000);
+
+			importText.value = data;
+		});
+	});
+}
+
+function doDropboxAction(fnOnSuccess) {
+	log("debug", "Creating DP client");
 	var client = new Dropbox.Client({
-		key : dpkey,
+		key : "xb38rim9eiyriq7",
 		sandbox : true
 	});
 
-	client.authDriver(new Dropbox.Drivers.Redirect({
-		useQuery : true,
-		rememberUser : true
+	log("debug", "Defining Redirect Authdriver");
+	client.authDriver(new Dropbox.AuthDriver.Redirect({
+		rememberUser : true,
+		redirectUrl : "https://www.geocaching.com/my/default.aspx"
 	}));
 
-	client.authenticate(function(error, client) {
-		if (error) {
-			log("debug", 'There was an error during authentication: ' + error.status);
+	log("debug", "Trying non interactive auth");
+	client.authenticate({
+		interactive : false
+	}, function(noninteractiveerror, client) {
+		if (noninteractiveerror) {
+			log("debug", 'There was an error during non interactive auth: ' + JSON.stringify(noninteractiveerror));
 		}
-	});
 
-	dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
-	waitingTag.setAttribute('style', 'display:inline');
-	waitingTag.setAttribute('src', waitingGif);
+		log("debug", "non interactive auth result: " + client.isAuthenticated());
+		if (client.isAuthenticated()) {
+			log("debug", "Non interactive auth success.");
+			fnOnSuccess(client);
+		} else {
+			log("debug", "non interactive auth failed. trying interactive auth");
+			client.reset();
+			client.authenticate(function(interactiveerror, client) {
+				if (interactiveerror) {
+					log("debug", 'There was an error during interactive auth: ' + JSON.stringify(interactiveerror));
+				}
 
-	var select = document.getElementById('dropboxSelect');
-	var fileName = select.options[select.selectedIndex].text;
-
-	client.readFile(fileName, function(error, data) {
-		if (error) {
-			waitingTag.setAttribute("src", errorIcon);
-			return log("debug", error); // Something went wrong.
-		}
-		waitingTag.setAttribute("src", successIcon);
-		setTimeout(function() {
-			$("#waiting").fadeOut('slow', function() {
+				console.log("interactive auth result: " + client.isAuthenticated());
+				if (client.isAuthenticated()) {
+					log("debug", "Interactive auth success.");
+					fnOnSuccess(client);
+				}
 			});
-		}, 5000);
-
-		importText.value = data;
+		}
 	});
+
 }
 
 function toggleExportFilterOptions() {
@@ -1705,7 +1719,8 @@ function gccommentOnLogPage() {
 
 				var gccActionDiv = document.createElement('div');
 				var markfound = appendCheckBox(gccActionDiv, AUTOMARKFOUND, lang.log_markfound);
-				var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE, lang.log_movearchive);
+				// var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE,
+				// lang.log_movearchive);
 				submitButton.before(gccActionDiv);
 				var actionDiv = $(gccActionDiv).css('padding', '5px').css('border', 'solid 1px lightgray');
 				submitButton.appendTo(actionDiv);
@@ -1855,7 +1870,7 @@ function gccommentOnDetailpage() {
 
 		SaveFinalCoords = document.createElement("a");
 		SaveFinalCoords.setAttribute('style', 'margin-left:3px;margin-right:3px');
-		var imgSave = document.createElement('img');
+		imgSave = document.createElement('img');
 		imgSave.src = commentIconSave;
 		imgSave.title = lang.detail_finalsave;
 		imgSave.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
@@ -1881,8 +1896,8 @@ function gccommentOnDetailpage() {
 						dto : {
 							ut : unsafeWindow.userToken
 						}
-					}), function(r) {
-						var r = JSON.parse(r.d);
+					}), function(response) {
+						var r = JSON.parse(response.d);
 						if (r.status == "success") {
 							window.location.reload();
 						}
@@ -1892,7 +1907,7 @@ function gccommentOnDetailpage() {
 		}, false);
 
 		DeleteComment = document.createElement('a');
-		var imgDelete = document.createElement('img');
+		imgDelete = document.createElement('img');
 		imgDelete.src = commentIconDelete;
 		imgDelete.title = lang.detail_delete;
 		imgDelete.setAttribute('style', 'cursor:pointer');
@@ -3628,8 +3643,8 @@ function drawMarker(lat, lng, type, state, gccode) {
 		url = origunsolved;
 	else if (type === "wpt") {
 		url = waypointIcon;
-		var iconSize = new unsafeWindow.L.Point(16, 16);
-		var iconAnchor = new unsafeWindow.L.Point(8, 8);
+		iconSize = new unsafeWindow.L.Point(16, 16);
+		iconAnchor = new unsafeWindow.L.Point(8, 8);
 
 	}
 
@@ -4059,7 +4074,7 @@ function exportToGPX() {
 
 function performFilteredDropboxExport() {
 	var exportType = $('#exportTypeSelector option:selected').text();
-	var data;
+	var data = null;
 	if (exportType === "GCC") {
 		data = xmlversion + buildGCCExportString(true);
 	} else if (exportType === "CSV") {
@@ -4079,38 +4094,25 @@ function performFilteredDropboxExport() {
 				+ exportType.toLowerCase();
 		var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
 		if (fileName) {
-			var client = new Dropbox.Client({
-				key : dpkey,
-				sandbox : true
-			});
+			doDropboxAction(function(client) {
+				exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
 
-			client.authDriver(new Dropbox.Drivers.Redirect({
-				useQuery : true,
-				rememberUser : true
-			}));
+				client.writeFile(fileName, data, function(error, stat) {
+					if (error) {
+						waitingTag.setAttribute("src", errorIcon);
+						log("debug", error); // Something went wrong.
+						return;
+					}
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						unsafeWindow.$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
 
-			client.authenticate(function(error, client) {
-				if (error) {
-					log("debug", 'There was an error during authentication: ' + error.status);
-				}
-			});
-
-			exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
-			waitingTag.setAttribute('style', 'display:inline');
-			waitingTag.setAttribute('src', waitingGif);
-
-			client.writeFile(fileName, data, function(error, stat) {
-				if (error) {
-					waitingTag.setAttribute("src", errorIcon);
-					return log("debug", error); // Something went wrong.
-				}
-				waitingTag.setAttribute("src", successIcon);
-				setTimeout(function() {
-					unsafeWindow.$("#waiting").fadeOut('slow', function() {
-					});
-				}, 5000);
-
-				log("debug", "Export to dropbox successful");
+					log("debug", "Export to dropbox successful");
+				});
 			});
 		}
 	}
