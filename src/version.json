@@ -1,6 +1,10 @@
 {
-	"latestVersion":83,
+	"latestVersion":84,
 	"changes":[{
+		"version": 84,
+		"date": "2014-07-3",
+		"change": "<ul><li>fixed dropbox authentication. If you encounter any problems, remove all cookies on geocaching.com</li></ul>"
+	},{
 		"version": 83,
 		"date": "2014-05-19",
 		"change": "<ul><li>change host to github</li></ul>"
