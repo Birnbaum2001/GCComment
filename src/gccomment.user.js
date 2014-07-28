@@ -142,7 +142,6 @@ var LAST_IMPORT = "lastimport";
 var LAST_EXPORT = "lastexport";
 var ARCHIVED = "archive";
 var browser = "unknown";
-var dpkey = "gjgp2VmSkXA=|slxBk5B17uUM44vAflpUrXnRlUqzUFUYHbJm5mcuyg==";
 var xmlversion = "<?xml version='1.0' encoding='utf-8'?>\n";
 var homelat, homelng;
 
@@ -552,9 +551,11 @@ function main() {
 
 	if (GM_getValue(ENABLE_EXPORT)) {
 		log('info', 'Enabling export to other scripts');
-		unsafeWindow.getGCComment = function(guid) {
+		exportFunction(function(guid) {
 			return doLoadCommentFromGUID(guid);
-		};
+		}, unsafeWindow, {
+			defineAs : "getGCComment"
+		});
 	}
 
 	// register own CSS styles
@@ -684,8 +685,8 @@ function doMaintenance() {
 function gccommentOnProfilePage() {
 	checkforupdates();
 
-	appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.js');
-	appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
+	appendScript('src', 'http://cdn.datatables.net/1.10.1/js/jquery.dataTables.js');
+	appendCSS('src', 'http://cdn.datatables.net/1.10.1/css/jquery.dataTables.css');
 	appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 			+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
 			+ '.haveFinalIcon{margin-left:3px;width:14px}');
@@ -1354,7 +1355,7 @@ function storeToDropbox() {
 			}
 			waitingTag.setAttribute("src", successIcon);
 			setTimeout(function() {
-				unsafeWindow.$("#waiting").fadeOut('slow', function() {
+				$("#waiting").fadeOut('slow', function() {
 				});
 			}, 5000);
 
@@ -1393,7 +1394,7 @@ function loadFromDropbox() {
 }
 
 function doDropboxAction(fnOnSuccess) {
-	log("debug", "Creating DP client");
+	log("debug", "Creating DB client");
 	var client = new Dropbox.Client({
 		key : "xb38rim9eiyriq7",
 		sandbox : true
@@ -1510,7 +1511,7 @@ function performFilteredDeleteAll() {
 }
 
 function patchNDownloadGPX(gccString, filename) {
-	unsafeWindow.$('#patchResultDiv').empty();
+	$('#patchResultDiv').empty();
 	var parser = new DOMParser();
 	var xmlDoc = parser.parseFromString(gccString, "text/xml");
 	var urls = xmlDoc.getElementsByTagName('url');
@@ -1667,7 +1668,7 @@ function patchNDownloadGPX(gccString, filename) {
 			"{{countWPTAdded}}", countWPTAdded).replace("{{countCoordChanged}}", countCoordChanged).replace(
 			"{{total}}", xmlDoc.getElementsByTagName('wpt').length);
 
-	unsafeWindow.$('#patchResultDiv').append(patchResult);
+	$('#patchResultDiv').append(patchResult);
 
 	// remove emojis
 	if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
@@ -1687,7 +1688,7 @@ var download;
 var oldhandler;
 
 function handleGPXFileSelected(filename, gccString) {
-	unsafeWindow.$('#patchResultDiv').empty();
+	$('#patchResultDiv').empty();
 
 	var parser = new DOMParser();
 	var xmlDoc = parser.parseFromString(gccString, "text/xml");
@@ -1695,7 +1696,7 @@ function handleGPXFileSelected(filename, gccString) {
 	var parseStatus = document.createElement('p');
 	parseStatus.innerHTML = 'The file ' + filename + " contains " + xmlDoc.getElementsByTagName('wpt').length
 			+ " waypoints.";
-	unsafeWindow.$('#patchResultDiv').append(parseStatus);
+	$('#patchResultDiv').append(parseStatus);
 	download.removeAttribute('disabled');
 	if (oldhandler)
 		download.removeEventListener('mouseup', oldhandler);
@@ -2646,8 +2647,8 @@ function gccommentOnPrintPage() {
 
 				contentGroup.insertBefore(commentDiv, contentGroup.firstChild);
 				$("#gccommentwidget").click(function() {
-					unsafeWindow.$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
-					unsafeWindow.$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
+					$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+					$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
 				});
 
 				if (comment.waypoints && (comment.waypoints.length > 0)) {
@@ -2746,13 +2747,11 @@ function refreshTable(show) {
 	var td_action;
 
 	var keys = GM_listValues();
-	var counter = 0;
 	var commentCountWhite = 0;
 	var commentCountRed = 0;
 	var commentCountGreen = 0;
 	var commentCountGray = 0;
 	var commentCountArchive = 0;
-	var start = new Date();
 	for (var ind = 0; ind < keys.length; ind++) {
 		var commentKey = keys[ind];
 		if (commentKey.indexOf(COMPREFIX) == -1)
@@ -2947,8 +2946,6 @@ function refreshTable(show) {
 		tr.appendChild(td_action);
 		tbody.appendChild(tr);
 	}
-	var end = new Date();
-	// alert("Duration " + (end - start) + "ms.");
 
 	$('#gccommenttablediv').append(commentTable);
 	if (!show) {
@@ -2958,7 +2955,8 @@ function refreshTable(show) {
 		// commentTable.style.display = 'block';
 		// commentTable.setAttribute('style', 'table-layout:fixed;');
 	}
-	$('#gccommentoverviewtable').dataTable({
+
+	var oDataTableSettings = {
 		"bAutoWidth" : false,
 		"bStateSave" : true,
 		"bJQueryUI" : true,
@@ -2972,14 +2970,16 @@ function refreshTable(show) {
 			"sWidth" : "72px",
 			"bSortable" : false
 		} ]
-	});
+	};
+
+	$('#gccommentoverviewtable').dataTable(cloneInto(oDataTableSettings, unsafeWindow));
+
 	var filteredByString = filter;
 	if (filter === stateOptions[0]) {
 		filteredByString = lang.type_untyped;
 	} else if (!filter) {
 		filteredByString = lang.nothing;
 	}
-
 	$('#gccommentoverviewtable_length').append(
 			$('#gccommentoverviewtable_filter > label').css('margin', '10px')).css('padding', '5px').css(
 			'font-weight', '500').append($('#gccommentoverviewtable_paginate')).append(
@@ -3417,12 +3417,12 @@ function saveFinalCoords() {
 		waitingTag.setAttribute('style', 'display:inline');
 		waitingTag.setAttribute("src", successIcon);
 		setTimeout(function() {
-			unsafeWindow.$("#waiting").fadeOut('slow', function() {
+			$("#waiting").fadeOut('slow', function() {
 			});
 		}, 5000);
 
 		// if (document.getElementById('gctidy-small-map-link')) {
-		if (typeof unsafeWindow.GCTidyWaypoints == "object") {
+		if (typeof unsafeWindow.GCTidyWaypoints === "object") {
 			var finalwpt = {
 				lat : currentComment.lat,
 				lng : currentComment.lng,
@@ -3439,7 +3439,7 @@ function saveFinalCoords() {
 		waitingTag.setAttribute('style', 'display:inline');
 		waitingTag.setAttribute("src", errorIcon);
 		setTimeout(function() {
-			unsafeWindow.$("#waiting").fadeOut('slow', function() {
+			$("#waiting").fadeOut('slow', function() {
 			});
 		}, 5000);
 	}
@@ -4107,7 +4107,7 @@ function performFilteredDropboxExport() {
 					}
 					waitingTag.setAttribute("src", successIcon);
 					setTimeout(function() {
-						unsafeWindow.$("#waiting").fadeOut('slow', function() {
+						$("#waiting").fadeOut('slow', function() {
 						});
 					}, 5000);
 
