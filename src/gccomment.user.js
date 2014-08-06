@@ -205,7 +205,6 @@ var mainCode = function(){
 	var LAST_EXPORT = "lastexport";
 	var ARCHIVED = "archive";
 	var browser = "unknown";
-	var dpkey = "gjgp2VmSkXA=|slxBk5B17uUM44vAflpUrXnRlUqzUFUYHbJm5mcuyg==";
 	var xmlversion = "<?xml version='1.0' encoding='utf-8'?>\n";
 	var homelat, homelng;
 
@@ -615,9 +614,19 @@ var mainCode = function(){
 
 		if (GM_getValue(ENABLE_EXPORT)) {
 			log('info', 'Enabling export to other scripts');
-			unsafeWindow.getGCComment = function(guid) {
-				return doLoadCommentFromGUID(guid);
+
+			var getGCommentFunction = function(guid) {
+					return doLoadCommentFromGUID(guid);
 			};
+
+			if(browser=="firefox"){
+				exportFunction(getGCommentFunction, unsafeWindow, {
+					defineAs : "getGCComment"
+				});
+			}
+			else{
+				unsafeWindow.getGCComment = getGCommentFunction;
+			}
 		}
 
 		// register own CSS styles
@@ -756,8 +765,8 @@ var mainCode = function(){
 			appendCSS('table.dataTable{clear:both;width:100%;margin:0 auto}table.dataTable thead th{border-bottom:1px solid #000;font-weight:700;cursor:hand;padding:3px 18px 3px 10px}table.dataTable tfoot th{border-top:1px solid #000;font-weight:700;padding:3px 18px 3px 10px}table.dataTable td{padding:3px 10px}table.dataTable td.center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable tr.odd{background-color:#E2E4FF}table.dataTable tr.even{background-color:#FFF}table.dataTable tr.odd td.sorting_1{background-color:#D3D6FF}table.dataTable tr.odd td.sorting_2{background-color:#DADCFF}table.dataTable tr.odd td.sorting_3{background-color:#E0E2FF}table.dataTable tr.even td.sorting_1{background-color:#EAEBFF}table.dataTable tr.even td.sorting_2{background-color:#F2F3FF}table.dataTable tr.even td.sorting_3{background-color:#F9F9FF}.dataTables_wrapper{position:relative;clear:both;zoom:1}.dataTables_length{float:left}.dataTables_info{clear:both;float:left}.paginate_disabled_previous,.paginate_enabled_previous,.paginate_disabled_next,.paginate_enabled_next{height:19px;float:left;cursor:hand;color:#111!important}.paginate_disabled_previous:hover,.paginate_enabled_previous:hover,.paginate_disabled_next:hover,.paginate_enabled_next:hover{text-decoration:none!important}.paginate_disabled_previous,.paginate_disabled_next{color:#666!important}.paginate_disabled_previous,.paginate_enabled_previous{padding-left:23px}.paginate_disabled_next,.paginate_enabled_next{padding-right:23px;margin-left:10px}.paginate_enabled_previous{background:url(../images/back_enabled.png) no-repeat top left}.paginate_enabled_previous:hover{background:url(../images/back_enabled_hover.png) no-repeat top left}.paginate_disabled_previous{background:url(../images/back_disabled.png) no-repeat top left}.paginate_enabled_next{background:url(../images/forward_enabled.png) no-repeat top right}.paginate_enabled_next:hover{background:url(../images/forward_enabled_hover.png) no-repeat top right}.paginate_disabled_next{background:url(../images/forward_disabled.png) no-repeat top right}.paging_full_numbers{height:22px;line-height:22px}.paging_full_numbers a:hover{text-decoration:none}.paging_full_numbers a.paginate_button,.paging_full_numbers a.paginate_active{border:1px solid #aaa;-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;cursor:hand;color:#333!important;margin:0 3px;padding:2px 5px}.paging_full_numbers a.paginate_button{background-color:#ddd}.paging_full_numbers a.paginate_button:hover{background-color:#ccc;text-decoration:none!important}.paging_full_numbers a.paginate_active{background-color:#99B3FF}.dataTables_processing{position:absolute;top:50%;left:50%;width:250px;height:30px;margin-left:-125px;margin-top:-15px;border:1px solid #ddd;text-align:center;color:#999;font-size:14px;background-color:#FFF;padding:14px 0 2px}.sorting{background:url(../images/sort_both.png) no-repeat center right}.sorting_asc{background:url(../images/sort_asc.png) no-repeat center right}.sorting_desc{background:url(../images/sort_desc.png) no-repeat center right}.sorting_asc_disabled{background:url(../images/sort_asc_disabled.png) no-repeat center right}.sorting_desc_disabled{background:url(../images/sort_desc_disabled.png) no-repeat center right}.dataTables_scroll{clear:both}.dataTables_scrollBody{margin-top:-1px}.dataTables_filter,.dataTables_paginate{float:right;text-align:right}.paginate_disabled_previous:active,.paginate_enabled_previous:active,.paginate_disabled_next:active,.paginate_enabled_next:active,.paging_full_numbers a:active,table.dataTable th:active{outline:none}');
 		}
 		else{
-			appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.js');
-			appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css');
+			appendScript('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.10.1/jquery.dataTables.js');
+			appendCSS('src', 'http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.10.1/css/jquery.dataTables.css');
 		}
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
@@ -1430,7 +1439,7 @@ function storeToDropbox() {
 			}
 			waitingTag.setAttribute("src", successIcon);
 			setTimeout(function() {
-				unsafeWindow.$("#waiting").fadeOut('slow', function() {
+				window.$("#waiting").fadeOut('slow', function() {
 				});
 			}, 5000);
 
@@ -1469,7 +1478,7 @@ function loadFromDropbox() {
 }
 
 function doDropboxAction(fnOnSuccess) {
-	log("debug", "Creating DP client");
+	log("debug", "Creating DB client");
 	var client = new Dropbox.Client({
 		key : "xb38rim9eiyriq7",
 		sandbox : true
@@ -1586,7 +1595,7 @@ function doDropboxAction(fnOnSuccess) {
 	}
 
 	function patchNDownloadGPX(gccString, filename) {
-		unsafeWindow.$('#patchResultDiv').empty();
+		window.$('#patchResultDiv').empty();
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(gccString, "text/xml");
 		var urls = xmlDoc.getElementsByTagName('url');
@@ -1743,7 +1752,7 @@ function doDropboxAction(fnOnSuccess) {
 				"{{countWPTAdded}}", countWPTAdded).replace("{{countCoordChanged}}", countCoordChanged).replace(
 				"{{total}}", xmlDoc.getElementsByTagName('wpt').length);
 
-		unsafeWindow.$('#patchResultDiv').append(patchResult);
+		window.$('#patchResultDiv').append(patchResult);
 
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
@@ -1763,7 +1772,7 @@ function doDropboxAction(fnOnSuccess) {
 	var oldhandler;
 
 	function handleGPXFileSelected(filename, gccString) {
-		unsafeWindow.$('#patchResultDiv').empty();
+		window.$('#patchResultDiv').empty();
 
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(gccString, "text/xml");
@@ -1771,7 +1780,7 @@ function doDropboxAction(fnOnSuccess) {
 		var parseStatus = document.createElement('p');
 		parseStatus.innerHTML = 'The file ' + filename + " contains " + xmlDoc.getElementsByTagName('wpt').length
 				+ " waypoints.";
-		unsafeWindow.$('#patchResultDiv').append(parseStatus);
+		window.$('#patchResultDiv').append(parseStatus);
 		download.removeAttribute('disabled');
 		if (oldhandler)
 			download.removeEventListener('mouseup', oldhandler);
@@ -2782,8 +2791,8 @@ function doDropboxAction(fnOnSuccess) {
 
 					contentGroup.insertBefore(commentDiv, contentGroup.firstChild);
 					$("#gccommentwidget").click(function() {
-						unsafeWindow.$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
-						unsafeWindow.$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
+					$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+					$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
 					});
 
 					if (comment.waypoints && (comment.waypoints.length > 0)) {
@@ -2882,13 +2891,11 @@ function doDropboxAction(fnOnSuccess) {
 		var td_action;
 
 		var keys = GM_listValues();
-		var counter = 0;
 		var commentCountWhite = 0;
 		var commentCountRed = 0;
 		var commentCountGreen = 0;
 		var commentCountGray = 0;
 		var commentCountArchive = 0;
-		var start = new Date();
 		for (var ind = 0; ind < keys.length; ind++) {
 			var commentKey = keys[ind];
 			if (commentKey.indexOf(COMPREFIX) == -1)
@@ -3083,8 +3090,6 @@ function doDropboxAction(fnOnSuccess) {
 			tr.appendChild(td_action);
 			tbody.appendChild(tr);
 		}
-		var end = new Date();
-		// alert("Duration " + (end - start) + "ms.");
 
 		$('#gccommenttablediv').append(commentTable);
 		if (!show) {
@@ -3094,7 +3099,8 @@ function doDropboxAction(fnOnSuccess) {
 			// commentTable.style.display = 'block';
 			// commentTable.setAttribute('style', 'table-layout:fixed;');
 		}
-		$('#gccommentoverviewtable').dataTable({
+
+	var oDataTableSettings = {
 			"bAutoWidth" : false,
 			"bStateSave" : true,
 			"bJQueryUI" : true,
@@ -3108,14 +3114,16 @@ function doDropboxAction(fnOnSuccess) {
 				"sWidth" : "72px",
 				"bSortable" : false
 			} ]
-		});
+	};
+
+	$('#gccommentoverviewtable').dataTable(cloneInto(oDataTableSettings, unsafeWindow));
+
 		var filteredByString = filter;
 		if (filter === stateOptions[0]) {
 			filteredByString = lang.type_untyped;
 		} else if (!filter) {
 			filteredByString = lang.nothing;
 		}
-
 		$('#gccommentoverviewtable_length').append(
 				$('#gccommentoverviewtable_filter > label').css('margin', '10px')).css('padding', '5px').css(
 				'font-weight', '500').append($('#gccommentoverviewtable_paginate')).append(
@@ -3555,12 +3563,12 @@ function doDropboxAction(fnOnSuccess) {
 			waitingTag.setAttribute('style', 'display:inline');
 			waitingTag.setAttribute("src", successIcon);
 			setTimeout(function() {
-				unsafeWindow.$("#waiting").fadeOut('slow', function() {
+			$("#waiting").fadeOut('slow', function() {
 				});
 			}, 5000);
 
 			// if (document.getElementById('gctidy-small-map-link')) {
-			if (typeof unsafeWindow.GCTidyWaypoints == "object") {
+		if (typeof unsafeWindow.GCTidyWaypoints === "object") {
 				var finalwpt = {
 					lat : currentComment.lat,
 					lng : currentComment.lng,
@@ -3577,7 +3585,7 @@ function doDropboxAction(fnOnSuccess) {
 			waitingTag.setAttribute('style', 'display:inline');
 			waitingTag.setAttribute("src", errorIcon);
 			setTimeout(function() {
-				unsafeWindow.$("#waiting").fadeOut('slow', function() {
+			$("#waiting").fadeOut('slow', function() {
 				});
 			}, 5000);
 		}
@@ -4278,7 +4286,7 @@ function doDropboxAction(fnOnSuccess) {
 					}
 					waitingTag.setAttribute("src", successIcon);
 					setTimeout(function() {
-						unsafeWindow.$("#waiting").fadeOut('slow', function() {
+						$("#waiting").fadeOut('slow', function() {
 						});
 					}, 5000);
 
