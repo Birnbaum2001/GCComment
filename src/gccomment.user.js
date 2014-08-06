@@ -1754,10 +1754,11 @@ function doDropboxAction(fnOnSuccess) {
 
 		window.$('#patchResultDiv').append(patchResult);
 
+
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-			result = result.replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(
-					/?/g, "").replace(/?/g, "").replace(/?/g, "");
+			result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
+					/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
 		}
 
 		// remove empty lines
