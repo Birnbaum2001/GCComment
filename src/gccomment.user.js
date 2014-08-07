@@ -49,9 +49,9 @@
 
 // version information
 var version = "84";
-var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
-var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
-var updateurlChrome = ''; //TODO
+var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/version.json';
+var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
+var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
 
 
 var mainCode = function(){
@@ -619,7 +619,7 @@ var mainCode = function(){
 					return doLoadCommentFromGUID(guid);
 			};
 
-			if(browser=="firefox"){
+			if(browser==="firefox"){
 				exportFunction(getGCommentFunction, unsafeWindow, {
 					defineAs : "getGCComment"
 				});
@@ -5543,7 +5543,12 @@ if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\
 		var updateInfo = document.createElement('div');
 		updateInfo.setAttribute('id', 'gccupdateinfo');
 		var updatelnk = document.createElement('a');
-		updatelnk.setAttribute('href', updateurl);
+		if(browser === "Chrome"){
+			updatelnk.setAttribute('href', updateurlChrome);
+		}
+		else{
+			updatelnk.setAttribute('href', updateurl);
+		}
 		updatelnk.innerHTML = lang.update_clickToUpdate;
 		updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
 				oChanges.latestVersion).replace("{{version}}", version)
