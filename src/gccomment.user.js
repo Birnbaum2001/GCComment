@@ -619,7 +619,7 @@ var mainCode = function(){
 					return doLoadCommentFromGUID(guid);
 			};
 
-			if(browser==="firefox"){
+			if(browser === "FireFox"){
 				exportFunction(getGCommentFunction, unsafeWindow, {
 					defineAs : "getGCComment"
 				});
