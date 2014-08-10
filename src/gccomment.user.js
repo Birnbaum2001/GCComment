@@ -670,7 +670,7 @@ var mainCode = function(){
 				//FireFox in GM-Context
 				var code = document.createElement('script');
 				code.setAttribute('type', 'text/javascript');
-				code.textContent = "var version = " + version + ";(";
+				code.textContent = "(";
 				code.textContent += mainCode.toString();
 				code.textContent += ")();";
 				document.getElementsByTagName('head')[0].appendChild(code);
@@ -2241,6 +2241,7 @@ function doDropboxAction(fnOnSuccess) {
 			if (currentComment
 					&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))
 					&& typeof(unsafeWindow.L)!=="undefined") {
+				var modifyCachePageMap = function(){
 				unsafeWindow.L.OrigMap = unsafeWindow.L.Map;
 				unsafeWindow.L.Map = function(id, params) {
 					var map = new unsafeWindow.L.OrigMap(id, params);
@@ -2312,6 +2313,22 @@ function doDropboxAction(fnOnSuccess) {
 					$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
 					$('#map_canvas2').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas2"></div>');
 					setStaticMaps();
+					}
+				};
+				
+				if(browser === "FireFox"){
+					var code = document.createElement('script');
+					code.setAttribute('type', 'text/javascript');
+					code.textContent = "var browser=\""+browser+"\";var unsafeWindow = unsafeWindow||window; var currentComment = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify(currentComment)) + "\"));";
+					code.textContent += "var lang = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify({finale:lang.finale})) + "\"));";
+					code.textContent +="var waypointIcon='"+waypointIcon+"'; var finalIcon='"+finalIcon+"';(";
+					code.textContent += modifyCachePageMap.toString();
+					code.textContent += ")();";
+					document.getElementsByTagName('head')[0].appendChild(code);
+					
+				}
+				else{
+					modifyCachePageMap();
 				}
 			} else {
 				detailFinalInputLatLng.value = DEFAULTCOORDS;
