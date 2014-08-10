@@ -53,6 +53,14 @@ var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/mast
 var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
 
+var browser = "unknown";
+if (typeof (chrome) !== "undefined") {
+	// Chrome detected
+	browser = "Chrome";
+} else {
+	browser = "FireFox";
+}
+
 var mainCode = function(){	
 	var $ = $||null;
 	var jQuery = jQuery||null;
@@ -658,8 +666,18 @@ var mainCode = function(){
 			if(browser === "Chrome"){
 				httpsMapSync();
 			}
+			else if(browser === "FireFox" && window.wrappedJSObject){
+				//FireFox in GM-Context
+				var code = document.createElement('script');
+				code.setAttribute('type', 'text/javascript');
+				code.textContent = "var version = " + version + ";(";
+				code.textContent += mainCode.toString();
+				code.textContent += ")();";
+				document.getElementsByTagName('head')[0].appendChild(code);
+			}
 			else{
-				mysteryMoverOnMapPage();
+				//mysteryMoverOnMapPage();
+				httpsMapSync();
 			}
 		} else if (document.URL.search("sendtogps\.aspx") >= 0) {
 			log('debug', 'matched sendToGPS');
@@ -1753,8 +1771,8 @@ function doDropboxAction(fnOnSuccess) {
 
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-			result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
-					/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
+			result = result.replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(
+					/?/g, "").replace(/?/g, "").replace(/?/g, "");
 		}
 
 		// remove empty lines
@@ -3714,7 +3732,7 @@ function doDropboxAction(fnOnSuccess) {
 	function httpsMapSync(){		
 		var GCC_iFrameWindow = null;
 		window.addEventListener("message", function(e){
-			if (event.origin !== "http://www.geocaching.com")
+			if (e.origin !== "http"+(browser==="FireFox"?"s":"")+"://www.geocaching.com")
 			{
 				return;
 			}
@@ -3740,7 +3758,8 @@ function doDropboxAction(fnOnSuccess) {
 				mysteryMoverOnMapPage();
 			}	
 		}, false);		
-		GCC_iFrameWindow = $('<iframe id="GCC_httpsConfigSyncIframe" src="http://geocaching.com/dummy#GCC_httpsConfigSync" height=1 width=1 style="display:hidden"></iframe>').appendTo('body')[0].contentWindow;
+		
+		GCC_iFrameWindow = $('<iframe id="GCC_httpsConfigSyncIframe" src="http'+(browser==="FireFox"?"s":"")+'://geocaching.com/dummy#GCC_httpsConfigSync" height=1 width=1 style="display:hidden"></iframe>').appendTo('body')[0].contentWindow;
 	}                                                                                                            
 	
 	// ***
@@ -5495,6 +5514,16 @@ if (typeof (chrome) !== "undefined") {
     }
 } else {
 	mainCode();
+}
+
+if (document.URL.indexOf("#GCC_httpsConfigSync") !== -1 && browser === "FireFox") {
+    //httpsConfigSync provider part for FireFox
+    var data = {};
+    var allKeys = GM_listValues();
+    for (var i = 0; i < allKeys.length; i++) {
+        data[allKeys[i]] = GM_getValue(allKeys[i], null);
+    }
+    window.parent.postMessage("GCC_httpsConfigSync_" + JSON.stringify(data), "https://www.geocaching.com");
 }
 
 //Update check
