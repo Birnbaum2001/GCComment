@@ -625,7 +625,7 @@ var mainCode = function(){
 					return doLoadCommentFromGUID(guid);
 			};
 
-			if(browser === "FireFox"){
+			if(browser === "FireFox" && window.wrappedJSObject){
 				exportFunction(getGCommentFunction, unsafeWindow, {
 					defineAs : "getGCComment"
 				});
