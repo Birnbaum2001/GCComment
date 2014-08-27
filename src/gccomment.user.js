@@ -1771,8 +1771,8 @@ function doDropboxAction(fnOnSuccess) {
 
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-			result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
-					/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
+			result = result.replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(/?/g, "").replace(
+					/?/g, "").replace(/?/g, "").replace(/?/g, "");
 		}
 		
 		// remove empty lines
@@ -2520,10 +2520,13 @@ function doDropboxAction(fnOnSuccess) {
 		}
 		
 		function getCacheNoteText(currentComment){
-			var result = "GCCNote:\n"
+			var result = "GCCNote:\n";
+
+			if(currentComment.lat !== undefined && currentComment.lng !== undefined){
 			result += lang.final_coordinate+": "+convertDec2DMS(currentComment.lat, currentComment.lng)+"\n";
+			}
 			for (var j = 0; currentComment.waypoints && (j < currentComment.waypoints.length); j++) {
-				result += currentComment.waypoints[j].name+": "+convertDec2DMS(currentComment.waypoints[j].coordinate.lat, currentComment.waypoints[j].coordinate.lng)+"\n";
+				result += currentComment.waypoints[j].name+": "+currentComment.waypoints[j].coordinate+"\n";
 			}			
 			result += "\n"+currentComment.commentValue;
 			return result;
