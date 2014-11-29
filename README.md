@@ -1,13 +1,11 @@
-* Chrome support ;-)
-* Save settings to cache note (easily accessible in c:geo)
-
-Original description:
-
 GCComment is a user javascript extension for Firefox with Greasemonkey. With GCComment, you can create, manage and 
 print your personal comments for geocaches on geocaching.com. Moreover, you can mark final locations of caches on 
 the map.
 
-To install the script, click 
+Iinstall the script :
+Firefox: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js
+Chrome: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip
+Opera: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.crx
 
 About the folders...
 - src is the main source folder.
