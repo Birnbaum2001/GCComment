@@ -11,7 +11,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			84
+// @version			85
 // @author			Birnbaum2001
 // ==/UserScript==
 
