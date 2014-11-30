@@ -48,7 +48,7 @@
  */
 
 // version information
-var version = "84";
+var version = "85";
 var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
