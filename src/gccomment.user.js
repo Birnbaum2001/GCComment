@@ -11,7 +11,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			85
+// @version			86
 // @author			Birnbaum2001
 // ==/UserScript==
 
@@ -48,7 +48,7 @@
  */
 
 // version information
-var version = "85";
+var version = "86";
 var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
@@ -59,6 +59,12 @@ if (typeof (chrome) !== "undefined") {
 	browser = "Chrome";
 } else {
 	browser = "FireFox";
+	
+	//Workaround for a GM_listValues bug 
+	var realListValues = GM_listValues;
+	GM_listValues = function(){			
+		return cloneInto(realListValues(), window);
+	};	
 }
 
 var mainCode = function(){	
@@ -78,10 +84,13 @@ var mainCode = function(){
 	else if(typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
 	}
-
-	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	
+	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
-			var value = localStorage.getItem('###gcc_' + key, defaultValue);
+			var value = localStorageCache[key];
+			if(typeof(value) === "undefined"){
+				return defaultValue;
+			}
 			if(value === "false"){
 				return false;
 			}
@@ -96,23 +105,19 @@ var mainCode = function(){
 	
 	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
-			localStorage.setItem('###gcc_' + key, value);
-		};
-	}
-	
-	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
-		GM_listValues = function(){
-			var result = [];
-			var allKeys = Object.keys(localStorage);
-			for(var i=0; i<allKeys.length; i++){
-				if(allKeys[i].indexOf('###gcc_') == 0){
-					result.push(allKeys[i].substring(7));
-				}
-			}
-			return result;
+			localStorageCache[key] = value;
+			var data = {};
+			data[key] = value;
+			window.postMessage("GCC_Storage_" + JSON.stringify(data), "*");
 		};
 	}	
-
+	
+	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+		GM_listValues = function(){			
+			return Object.keys(localStorageCache);
+		};
+	}	
+	
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
 		GM_log = function(message){
 			return console.log(message);
@@ -664,20 +669,29 @@ var mainCode = function(){
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 			if(browser === "Chrome"){
-				httpsMapSync();
+				mysteryMoverOnMapPage();
 			}
 			else if(browser === "FireFox" && window.wrappedJSObject){
 				//FireFox in GM-Context
+				
+				var localStorageCache = {};
+
+				var allKeys = GM_listValues();
+				for (var i = 0; i < allKeys.length; i++) {
+					localStorageCache[allKeys[i]] = GM_getValue(allKeys[i], null);
+				}		
+				
 				var code = document.createElement('script');
-				code.setAttribute('type', 'text/javascript');
-				code.textContent = "(";
+				code.setAttribute('type', 'text/javascript');				
+				code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
+				code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
+				code.textContent += "\"));(";
 				code.textContent += mainCode.toString();
 				code.textContent += ")();";
 				document.getElementsByTagName('head')[0].appendChild(code);
 			}
 			else{
-				//mysteryMoverOnMapPage();
-				httpsMapSync();
+				mysteryMoverOnMapPage();
 			}
 		} else if (document.URL.search("sendtogps\.aspx") >= 0) {
 			log('debug', 'matched sendToGPS');
@@ -3747,40 +3761,7 @@ function doDropboxAction(fnOnSuccess) {
 			var row = $(event.target).parents('tr');
 			$('#gccommentoverviewtable').dataTable().fnDeleteRow(row[0]);
 		}
-	}
-
-	function httpsMapSync(){		
-		var GCC_iFrameWindow = null;
-		window.addEventListener("message", function(e){
-			if (e.origin !== "http"+(browser==="FireFox"?"s":"")+"://www.geocaching.com")
-			{
-				return;
-			}
-			
-			var keysToIgnore ={};
-			keysToIgnore[AUTOMOVEMYSTERIESBETA]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETAFOUND]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETASOLVED]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETAHOME]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETAAREA]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETAUNSOLVED]=true;
-			keysToIgnore[AUTOMOVEMYSTERIESBETAINCLUDEWPT]=true;
-			
-			if(e.data.indexOf("GCC_httpsConfigSync_") === 0){
-				var data = JSON.parse(e.data.replace("GCC_httpsConfigSync_", ""));
-				for(var key in data){
-					if(!keysToIgnore[key]){
-						GM_setValue(key, data[key]);
-					}
-				}
-				
-				$('#GCC_httpsConfigSyncIframe').remove();
-				mysteryMoverOnMapPage();
-			}	
-		}, false);		
-		
-		GCC_iFrameWindow = $('<iframe id="GCC_httpsConfigSyncIframe" src="http'+(browser==="FireFox"?"s":"")+'://geocaching.com/dummy#GCC_httpsConfigSync" height=1 width=1 style="display:hidden"></iframe>').appendTo('body')[0].contentWindow;
-	}                                                                                                            
+	}	                                                                                     
 	
 	// ***
 	// *** MysteryMover
@@ -5438,9 +5419,12 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
-	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
-			var value = localStorage.getItem('###gcc_' + key, defaultValue);
+			var value = localStorageCache[key];
+			if(typeof(value) === "undefined"){
+				return defaultValue;
+			}
 			if(value === "false"){
 				return false;
 			}
@@ -5455,20 +5439,22 @@ if (typeof (chrome) !== "undefined") {
 	
 	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
-			localStorage.setItem('###gcc_' + key, value);
+			localStorageCache[key] = value;			
+			chrome.runtime.sendMessage({"setValue": value, "setKey": key});				
 		};
 	}
 	
+	window.addEventListener("message", function(e){
+		if(e.data.indexOf("GCC_Storage_") === 0){
+			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
+			localStorageCache[Object.keys(data)[0]] = data[Object.keys(data)[0]];
+			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]});
+		}
+	});	
+	
 	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
-		GM_listValues = function(){
-			var result = [];
-			var allKeys = Object.keys(localStorage);
-			for(var i=0; i<allKeys.length; i++){
-				if(allKeys[i].indexOf('###gcc_') == 0){
-					result.push(allKeys[i].substring(7));
-				}
-			}
-			return result;
+		GM_listValues = function(){			
+			return Object.keys(localStorageCache);
 		};
 	}	
 	
@@ -5505,165 +5491,167 @@ if (typeof (chrome) !== "undefined") {
 			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
 		};
 	}
+	
+	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
 
-    if (document.URL.indexOf("#GCC_httpsConfigSync") !== -1) {
-        //httpsConfigSync provider part
-        var data = {};
-        var allKeys = GM_listValues();
-        for (var i = 0; i < allKeys.length; i++) {
-            data[allKeys[i]] = GM_getValue(allKeys[i], null);
-        }
-        window.parent.postMessage("GCC_httpsConfigSync_" + JSON.stringify(data), "https://www.geocaching.com");
-    } else {
+	for (var i = 0; i < scriptsToInject.length; i++) {
+		var script = document.createElement('script');
+		script.setAttribute('type', 'text/javascript');
+		script.src = chrome.extension.getURL(scriptsToInject[i]);
+		document.getElementsByTagName('head')[0].appendChild(script);
+	}
 
-        var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
-
-        for (var i = 0; i < scriptsToInject.length; i++) {
-            var script = document.createElement('script');
-            script.setAttribute('type', 'text/javascript');
-            script.src = chrome.extension.getURL(scriptsToInject[i]);
-            document.getElementsByTagName('head')[0].appendChild(script);
-        }
-
-        var code = document.createElement('script');
-        code.setAttribute('type', 'text/javascript');
-        code.textContent = "var version = " + version + ";(";
-        code.textContent += mainCode.toString();
-        code.textContent += ")();";
-        document.getElementsByTagName('head')[0].appendChild(code);
-    }
+	var localStorageCache;
+	var dfd = new jQuery.Deferred();
+	chrome.runtime.sendMessage({"getAllValues": ""}, function(data){
+		localStorageCache = data;
+		dfd.resolve();
+	});	
+	
+	dfd.done(function(){
+		var code = document.createElement('script');
+		code.setAttribute('type', 'text/javascript');
+		code.textContent = "var version = " + version + ";";
+		code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
+		code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
+		code.textContent += "\"));(";
+		code.textContent += mainCode.toString();
+		code.textContent += ")();";
+		document.getElementsByTagName('head')[0].appendChild(code);
+		updateCheck();
+	});  
 } else {
+	window.addEventListener("message", function(e){
+	
+		if(e.data.indexOf("GCC_Storage_") === 0){
+			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));		
+			GM_setValue(Object.keys(data)[0], data[Object.keys(data)[0]]);
+		}
+	});
+	updateCheck();
 	mainCode();
 }
 
-if (document.URL.indexOf("#GCC_httpsConfigSync") !== -1 && browser === "FireFox") {
-    //httpsConfigSync provider part for FireFox
-    var data = {};
-    var allKeys = GM_listValues();
-    for (var i = 0; i < allKeys.length; i++) {
-        data[allKeys[i]] = GM_getValue(allKeys[i], null);
-    }
-    window.parent.postMessage("GCC_httpsConfigSync_" + JSON.stringify(data), "https://www.geocaching.com");
-}
-
-//Update check
-if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
-				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
-				
-	function log(level, text) {
-		GM_log(level + ": " + text);
-	}
-	
-	var SETTINGS_LANGUAGE = "settings language";
-	var SETTINGS_LANGUAGE_EN = "English";
-	var SETTINGS_LANGUAGE_DE = "Deutsch";
-	var SETTINGS_LANGUAGE_AUTO = "Auto";	
-	
-	var languages = [];
-	languages[SETTINGS_LANGUAGE_EN] = {
-		update_changes : 'Changes in version ',
-		update_clickToUpdate : "Click here to update!",
-		tmpl_update : "Hooray, a GCComment update is available. The new version is {{serverVersion}} while your installed version is {{version}}.",
-	};
-	languages[SETTINGS_LANGUAGE_DE] = {	
-		update_changes : 'Änderungen in Version ',
-		update_clickToUpdate : "Hier klicken, um das Update einzuspielen!",		
-		tmpl_update : "Hooray, eine Aktualisierung für GCComment ist verfügbar. Die neue Version ist {{serverVersion}}, während die installierte Version {{version}} ist.",
-	};
-	
-	var langsetting = GM_getValue(SETTINGS_LANGUAGE);
-	var lang = languages[SETTINGS_LANGUAGE_EN];
-	
-	if (langsetting === SETTINGS_LANGUAGE_AUTO) {
-		if ($('.selected-language > a:first')) {
-			var gslang = $('.selected-language > a:first').text();
-			if (gslang.indexOf("English") > -1)
-				lang = languages[SETTINGS_LANGUAGE_EN];
-			else if (gslang.indexOf("Deutsch") > -1)
-				lang = languages[SETTINGS_LANGUAGE_DE];
+function updateCheck(){
+	//Update check
+	if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
+					|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
+					
+		function log(level, text) {
+			GM_log(level + ": " + text);
 		}
-	} else {
-		lang = languages[langsetting];
-	}
-	if (!lang) {
-		lang = languages[SETTINGS_LANGUAGE_EN];
-	}
-	
-	function updateAvailable(oChanges) {
-		log("info", "current version: " + version + " latest version: " + oChanges.latestVersion);
-		var updateInfo = document.createElement('div');
-		updateInfo.setAttribute('id', 'gccupdateinfo');
-		var updatelnk = document.createElement('a');
-		if(browser === "Chrome"){
-			updatelnk.setAttribute('href', updateurlChrome);
-		}
-		else{
-			updatelnk.setAttribute('href', updateurl);
-		}
-		updatelnk.innerHTML = lang.update_clickToUpdate;
-		updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
-				oChanges.latestVersion).replace("{{version}}", version)
-				+ " "));
-		updateInfo.appendChild(updatelnk);
-		updateInfo.appendChild(document.createElement('br'));
-		updateInfo.appendChild(document.createElement('br'));
-		document.getElementById("gccRoot").insertBefore(updateInfo, document.getElementById("gccRoot").firstChild);
-
-		var aNewChanges = oChanges.changes.filter(function(oChange) {
-			return oChange.version > version;
-		});
-
-		aNewChanges.forEach(function(oChange) {
-			updateInfo.appendChild(document.createTextNode(lang.update_changes + oChange.version + " ("
-					+ oChange.date + ")"));
-			updateInfo.appendChild(document.createElement('br'));
-
-			var divv = document.createElement('div');
-			divv.innerHTML = oChange.change;
-			updateInfo.appendChild(divv);
-		});
-	}
-	
-	function checkforupdates() {
-		var updateDateString = GM_getValue('updateDate');
-		var updateDate = null;
-		if (updateDateString && (updateDateString != "NaN")) {
-			updateDate = new Date(parseInt(updateDateString));
+		
+		var SETTINGS_LANGUAGE = "settings language";
+		var SETTINGS_LANGUAGE_EN = "English";
+		var SETTINGS_LANGUAGE_DE = "Deutsch";
+		var SETTINGS_LANGUAGE_AUTO = "Auto";	
+		
+		var languages = [];
+		languages[SETTINGS_LANGUAGE_EN] = {
+			update_changes : 'Changes in version ',
+			update_clickToUpdate : "Click here to update!",
+			tmpl_update : "Hooray, a GCComment update is available. The new version is {{serverVersion}} while your installed version is {{version}}."
+		};
+		languages[SETTINGS_LANGUAGE_DE] = {	
+			update_changes : 'Änderungen in Version ',
+			update_clickToUpdate : "Hier klicken, um das Update einzuspielen!",		
+			tmpl_update : "Hooray, eine Aktualisierung für GCComment ist verfügbar. Die neue Version ist {{serverVersion}}, während die installierte Version {{version}} ist."
+		};
+		
+		var langsetting = GM_getValue(SETTINGS_LANGUAGE);
+		var lang = languages[SETTINGS_LANGUAGE_EN];
+		
+		if (langsetting === SETTINGS_LANGUAGE_AUTO) {
+			if ($('.selected-language > a:first')) {
+				var gslang = $('.selected-language > a:first').text();
+				if (gslang.indexOf("English") > -1)
+					lang = languages[SETTINGS_LANGUAGE_EN];
+				else if (gslang.indexOf("Deutsch") > -1)
+					lang = languages[SETTINGS_LANGUAGE_DE];
+			}
 		} else {
-			updateDate = new Date();
-			var newDate = "" + (updateDate - 0);
-			GM_setValue('updateDate', newDate);
+			lang = languages[langsetting];
 		}
-		var currentDate = new Date();
+		if (!lang) {
+			lang = languages[SETTINGS_LANGUAGE_EN];
+		}
+		
+		function updateAvailable(oChanges) {
+			log("info", "current version: " + version + " latest version: " + oChanges.latestVersion);
+			var updateInfo = document.createElement('div');
+			updateInfo.setAttribute('id', 'gccupdateinfo');
+			var updatelnk = document.createElement('a');
+			if(browser === "Chrome"){
+				updatelnk.setAttribute('href', updateurlChrome);
+			}
+			else{
+				updatelnk.setAttribute('href', updateurl);
+			}
+			updatelnk.innerHTML = lang.update_clickToUpdate;
+			updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
+					oChanges.latestVersion).replace("{{version}}", version)
+					+ " "));
+			updateInfo.appendChild(updatelnk);
+			updateInfo.appendChild(document.createElement('br'));
+			updateInfo.appendChild(document.createElement('br'));
+			document.getElementById("gccRoot").insertBefore(updateInfo, document.getElementById("gccRoot").firstChild);
 
-		// in ms. equals 1 day
-		if (currentDate - updateDate > 86400000) {
-
-			GM_xmlhttpRequest({
-				method : 'GET',
-				header : {
-					'Cache-Control' : 'max-age=3600, must-revalidate'
-				},
-				url : updatechangesurl,
-				onload : function(responseDetails) {
-					try {
-						var oChanges = JSON.parse(responseDetails.responseText);
-						var serverVersion = oChanges.latestVersion;
-						log('info', 'updatecheck: installed version=' + version + ", server version=" + serverVersion);
-						if (serverVersion > version) {
-							updateAvailable(oChanges);
-						}
-					} catch (JSONException) {
-						log("error", "Could not load update info: " + JSONException);
-					}
-				},
-				onerror : function(responseDetails) {
-					log("info", "Unable to get version from Github! Errorcode " + responseDetails.status);
-				}
+			var aNewChanges = oChanges.changes.filter(function(oChange) {
+				return oChange.version > version;
 			});
-			GM_setValue('updateDate', "" + (currentDate - 0));
+
+			aNewChanges.forEach(function(oChange) {
+				updateInfo.appendChild(document.createTextNode(lang.update_changes + oChange.version + " ("
+						+ oChange.date + ")"));
+				updateInfo.appendChild(document.createElement('br'));
+
+				var divv = document.createElement('div');
+				divv.innerHTML = oChange.change;
+				updateInfo.appendChild(divv);
+			});
 		}
-	}	
-	
-	checkforupdates();
+		
+		function checkforupdates() {
+			var updateDateString = GM_getValue('updateDate');
+			var updateDate = null;
+			if (updateDateString && (updateDateString != "NaN")) {
+				updateDate = new Date(parseInt(updateDateString));
+			} else {
+				updateDate = new Date();
+				var newDate = "" + (updateDate - 0);
+				GM_setValue('updateDate', newDate);
+			}
+			var currentDate = new Date();
+
+			// in ms. equals 1 day
+			if (currentDate - updateDate > 86400000) {
+
+				GM_xmlhttpRequest({
+					method : 'GET',
+					header : {
+						'Cache-Control' : 'max-age=3600, must-revalidate'
+					},
+					url : updatechangesurl,
+					onload : function(responseDetails) {
+						try {
+							var oChanges = JSON.parse(responseDetails.responseText);
+							var serverVersion = oChanges.latestVersion;
+							log('info', 'updatecheck: installed version=' + version + ", server version=" + serverVersion);
+							if (serverVersion > version) {
+								updateAvailable(oChanges);
+							}
+						} catch (JSONException) {
+							log("error", "Could not load update info: " + JSONException);
+						}
+					},
+					onerror : function(responseDetails) {
+						log("info", "Unable to get version from Github! Errorcode " + responseDetails.status);
+					}
+				});
+				GM_setValue('updateDate', "" + (currentDate - 0));
+			}
+		}	
+		
+		checkforupdates();
+	}
 }
