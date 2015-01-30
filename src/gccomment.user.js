@@ -5423,10 +5423,12 @@ if (typeof (chrome) !== "undefined") {
 	
 	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
-			var value = localStorageCache[key];
-			if(typeof(value) === "undefined"){
+			if(typeof(localStorageCache) === "undefined" || typeof(localStorageCache[key]) === "undefined"){
 				return defaultValue;
-			}
+			}		
+			
+			var value = localStorageCache[key];
+			
 			if(value === "false"){
 				return false;
 			}
@@ -5441,6 +5443,9 @@ if (typeof (chrome) !== "undefined") {
 	
 	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
+			if(typeof(localStorageCache) === "undefined"){
+				var localStorageCache = {};
+			}
 			localStorageCache[key] = value;			
 			chrome.runtime.sendMessage({"setValue": value, "setKey": key});				
 		};
@@ -5459,6 +5464,23 @@ if (typeof (chrome) !== "undefined") {
 			return Object.keys(localStorageCache);
 		};
 	}	
+	
+	if(!GM_getValue("ChromeStorageMigrated", false)){
+		if(window.location.protocol === "https:"){		
+			alert("GCComment needs to do maintenance - you will be redirected to your profile page.");
+			document.location.href = "http://www.geocaching.com/my";
+		}
+	
+		GM_log("Start chrome storage migration");
+		var allKeys = Object.keys(localStorage);
+		for(var i=0; i<allKeys.length; i++){
+			if(allKeys[i].indexOf('###gcc_') == 0){
+				GM_setValue(allKeys[i].substring(7), localStorage.getItem(allKeys[i], null));
+			}
+		}
+		GM_setValue("ChromeStorageMigrated", true);
+		GM_log("Chrome storage migration successful");
+	}
 	
 	if(typeof(GM_xmlhttpRequest) === "undefined" || (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1)) {
 		GM_xmlhttpRequest = function(rdata){
