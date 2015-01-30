@@ -2335,6 +2335,8 @@ function doDropboxAction(fnOnSuccess) {
 					code.setAttribute('type', 'text/javascript');
 					code.textContent = "var browser=\""+browser+"\";var unsafeWindow = unsafeWindow||window; var currentComment = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify(currentComment)) + "\"));";
 					code.textContent += "var lang = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify({finale:lang.finale})) + "\"));";
+					code.textContent += "function log(str){console.log(str);}";
+					code.textContent += parseCoordinates.toString();
 					code.textContent +="var waypointIcon='"+waypointIcon+"'; var finalIcon='"+finalIcon+"';(";
 					code.textContent += modifyCachePageMap.toString();
 					code.textContent += ")();";
