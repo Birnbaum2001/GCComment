@@ -1,6 +1,10 @@
 {
-	"latestVersion":84,
+	"latestVersion":86,
 	"changes":[{
+		"version": 86,
+		"date": "2014-07-3",
+		"change": "<ul><li>fix: many bug and made chrome working again</li></ul>"
+	},{
 		"version": 84,
 		"date": "2014-07-3",
 		"change": "<ul><li>fixed dropbox authentication. If you encounter any problems, remove all cookies on geocaching.com</li></ul>"

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>82</gccommentlatestversion>
+	<gccommentlatestversion>86</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>86</version>
+			<date>2015-02-20</date>
+			<content>&lt;ul&gt; &lt;li&gt;fix: many bug and made chrome working again</content>
+		</change>
 		<change>
 			<version>82</version>
 			<date>2014-05-16</date>
