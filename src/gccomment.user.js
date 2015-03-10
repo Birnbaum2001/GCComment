@@ -4,6 +4,7 @@
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
+// @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
@@ -58,13 +59,7 @@ if (typeof (chrome) !== "undefined") {
 	// Chrome detected
 	browser = "Chrome";
 } else {
-	browser = "FireFox";
-	
-	//Workaround for a GM_listValues bug 
-	var realListValues = GM_listValues;
-	GM_listValues = function(){			
-		return cloneInto(realListValues(), window);
-	};	
+	browser = "FireFox";	
 }
 
 var mainCode = function(){	
@@ -83,9 +78,9 @@ var mainCode = function(){
 	}
 	else if(typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
-	}
+	}	
 	
-	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
+	if((typeof(GM_getValue) === "undefined" || (browser === "Chrome" && (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
 			var value = localStorageCache[key];
 			if(typeof(value) === "undefined"){
@@ -103,7 +98,7 @@ var mainCode = function(){
 		};
 	}
 	
-	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_setValue) === "undefined"|| (browser === "Chrome" && (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
 			localStorageCache[key] = value;
 			var data = {};
@@ -112,7 +107,7 @@ var mainCode = function(){
 		};
 	}	
 	
-	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_listValues = function(){			
 			return Object.keys(localStorageCache);
 		};
@@ -122,7 +117,7 @@ var mainCode = function(){
 		GM_log = function(message){
 			return console.log(message);
 		};
-	}
+	}	
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
