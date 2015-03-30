@@ -50,9 +50,9 @@
 
 // version information
 var version = "86";
-var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/version.json';
-var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
-var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
+var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
+var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
+var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
 
 var browser = "unknown";
 if (typeof (chrome) !== "undefined") {
