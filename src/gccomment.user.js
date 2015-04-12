@@ -4,6 +4,7 @@
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
+// @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
@@ -11,7 +12,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			86
+// @version			87
 // @author			Birnbaum2001
 // ==/UserScript==
 
@@ -48,23 +49,17 @@
  */
 
 // version information
-var version = "86";
-var updatechangesurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/version.json';
-var updateurl = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/src/gccomment.user.js';
-var updateurlChrome = 'https://raw.githubusercontent.com/lukeIam/GCComment/master/dist/GCComment.zip';
+var version = "87";
+var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
+var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
+var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
 
 var browser = "unknown";
 if (typeof (chrome) !== "undefined") {
 	// Chrome detected
 	browser = "Chrome";
 } else {
-	browser = "FireFox";
-	
-	//Workaround for a GM_listValues bug 
-	var realListValues = GM_listValues;
-	GM_listValues = function(){			
-		return cloneInto(realListValues(), window);
-	};	
+	browser = "FireFox";	
 }
 
 var mainCode = function(){	
@@ -83,9 +78,9 @@ var mainCode = function(){
 	}
 	else if(typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
-	}
+	}	
 	
-	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
+	if((typeof(GM_getValue) === "undefined" || (browser === "Chrome" && (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
 			var value = localStorageCache[key];
 			if(typeof(value) === "undefined"){
@@ -103,7 +98,7 @@ var mainCode = function(){
 		};
 	}
 	
-	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_setValue) === "undefined"|| (browser === "Chrome" && (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
 			localStorageCache[key] = value;
 			var data = {};
@@ -112,7 +107,7 @@ var mainCode = function(){
 		};
 	}	
 	
-	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_listValues = function(){			
 			return Object.keys(localStorageCache);
 		};
@@ -122,12 +117,24 @@ var mainCode = function(){
 		GM_log = function(message){
 			return console.log(message);
 		};
-	}
+	}	
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
 	}	
-
+	
+	if(browser === "Chrome" && location.protocol === "http" && !GM_getValue("ChromeStorageMigrated", false)){	
+		GM_log("Start chrome storage migration");
+		var allKeys = Object.keys(localStorage);
+		for(var i=0; i<allKeys.length; i++){
+			if(allKeys[i].indexOf('###gcc_') === 0 && GM_getValue(allKeys[i].substring(7), null) === null){				
+				GM_setValue(allKeys[i].substring(7), localStorage.getItem(allKeys[i], null));
+			}
+		}
+		GM_setValue("ChromeStorageMigrated", true);
+		GM_log("Chrome storage migration successful");
+	}
+	
 	// thanks to Geggi
 	// Check for Scriptish bug in Fennec browser
 	GM_setValue("browser", "firefox");
@@ -5421,7 +5428,7 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
-	if((typeof(GM_getValue) === "undefined"|| (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){	
+	if((typeof(GM_getValue) === "undefined"|| (browser === "Chrome" && (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){	
 		GM_getValue = function(key, defaultValue){
 			if(typeof(localStorageCache) === "undefined" || typeof(localStorageCache[key]) === "undefined"){
 				return defaultValue;
@@ -5441,13 +5448,13 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
-	if((typeof(GM_setValue) === "undefined"|| (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_setValue) === "undefined"|| (browser === "Chrome" && (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_setValue = function(key, value){
 			if(typeof(localStorageCache) === "undefined"){
 				var localStorageCache = {};
 			}
 			localStorageCache[key] = value;			
-			chrome.runtime.sendMessage({"setValue": value, "setKey": key});				
+			chrome.runtime.sendMessage({"setValue": value, "setKey": key}, function(){} );				
 		};
 	}
 	
@@ -5455,34 +5462,17 @@ if (typeof (chrome) !== "undefined") {
 		if(e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
 			localStorageCache[Object.keys(data)[0]] = data[Object.keys(data)[0]];
-			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]});
+			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]}, function(){});
 		}
 	});	
 	
-	if((typeof(GM_listValues) === "undefined" || (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1)) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_listValues = function(){			
 			return Object.keys(localStorageCache);
 		};
-	}	
-	
-	if(!GM_getValue("ChromeStorageMigrated", false)){
-		if(window.location.protocol === "https:"){		
-			alert("GCComment needs to do maintenance - you will be redirected to your profile page.");
-			document.location.href = "http://www.geocaching.com/my";
-		}
-	
-		GM_log("Start chrome storage migration");
-		var allKeys = Object.keys(localStorage);
-		for(var i=0; i<allKeys.length; i++){
-			if(allKeys[i].indexOf('###gcc_') == 0){
-				GM_setValue(allKeys[i].substring(7), localStorage.getItem(allKeys[i], null));
-			}
-		}
-		GM_setValue("ChromeStorageMigrated", true);
-		GM_log("Chrome storage migration successful");
 	}
 	
-	if(typeof(GM_xmlhttpRequest) === "undefined" || (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1)) {
+	if(typeof(GM_xmlhttpRequest) === "undefined" || (browser === "Chrome" && (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1))) {
 		GM_xmlhttpRequest = function(rdata){
 			var request = new XMLHttpRequest ();
 			request.onreadystatechange = function(data) { 
