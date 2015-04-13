@@ -283,6 +283,7 @@ var mainCode = function(){
 	var gccIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAwUExURdPer+b9v0mis4rElNjQMVyuXfvzR+O+c0BOO+egPfT93X2FbL/Z3qaxkODo4J2EMhLWxjYAAAB9SURBVHjaVMwJDkMhCATQQawgLtz/tl/kt0mHjMtLFK22Wmuz/blhNHfXP2iqZ7Gl+gVXIyJbQxOqwt4gAUZnXjkQtzVgWOcERrwPMYz7FWYARjQAKBzbypIISgiQlR5QGHTD0hOK6gDEvQdwyrTeE0pm/2BmtmHH7EeAAQAb9gXg4KzWZAAAAABJRU5ErkJggg==';
 	var commentIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARFJREFUeNqkU03OREAQbXwRseAYnMy3sJO4BJYsuJQlFm4h/unp10kLZiY6mUqeblX9XlWXolBKyS/2JzZZluVs8SAoRM+rgK7rhe/7/4cCnGma0rquqYzhHM4fidhLLksWVlUVRHIIqOzhOY4jdV8QhmEgruuSrus8+FTZJq7rSvq+5wIfm3jPtG3bhTzPM8eyLFeBewX7vpNpmjhJiGEPInD2v1WA4DiOh4DoNPYAqjIM44jxHmiaVjRNw4m4I8AadAF8iJumSWzbJm3bEsuyisc5KMvycQ4UUQomkZXuiesEQcDXOI55XwQBmd8m8Y4kSXi2KIrop/gZ6rfPiMxhGCpP8/FVQIYMU379nV8CDADQEaUK/jLo9wAAAABJRU5ErkJggg==';
 	var commentIconEdit = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAYJJREFUeNqUU89LAlEQnn27BMKyNzsmnvYP6FJ3b0XgPei2Ed4M6yheJFaDiPWgB5GIrkHU/9Cha+YmQkpQ2SVEZV3E15uBt2j+SAeGj5l533zzfimcc1jC1oXvCt+w9vfSmChd32UEtBTZoFAoFAVYGMscYigUgmg0CrquQ9nJwnncp9rx7Ro1oQaCzGOxGJimOXcEoRyQnz8ZVD8YPL4xUMPhcFGQN1cho313FXj/UYCJCaxVyVIdt8AWHeIi8sHRKYYttoicsXegux2fpQydTgdT91MTjEYjGA6HQexWv8AztwKy7VxRvl6vI7QnJkBiv9+HwWBAcfrkgfD1pU3ks8sKXS2u6/V6VNNUVS25rmtFIhHwfR88zyOUdlN5IsxelIExBpqmQaPRAMMwSsFjcRyH12o1/teazeZUDtfhevngJl6iGN2SyslkkjCXy9G5SAIqJxKJw2BEWRj3fD5ParZt81n1cZ95jVhA5VQqpfz3y+Y2WIaMpiz5nefarwADACQFMs6fhMd+AAAAAElFTkSuQmCC';
+	var commentIconShare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVQ4T32TTYtSURjH/8e3MvVqQ5PjFJNvODJiJojgB3DRSnBnX8GFG1tJCxlx4cKNhBsLFxIuBEGEdm3cubJBpIF8SWocNSfHqaYCPXEOKN65MA883MM99/k9L//7kHq9TrFlq9UKlFKsn+FwmGzf3zwTBjCbzZv3LHBt/X4foVCIA14cv6fvXj2XwDYAlpX52mQyGUajEYLBIGHBBw+1GE5+4iaE1Go1UQWEEMjlcu4qlQqJ0ic8MWqxK6gwXfzDl7EYQqrVKrXZbOj1emDBSqUSOp0OVqsVL9+ewLynw67hLnpnc1j3DZjO/2BwfrWphFQqFWq328FKZs6yarVaxN98hMUkwHhfjf7octOaxaTH+Mc1+qMFh5ByuUwdDgeGwyEP1uv1eP1hAeu+HqYdDQbnC4kI5j0Bo4tf6J1dgpRKJep0OvkAWd9qtRrHlYEoSHfvDnYENS4W17j6/Vd0R4rFInW5XFx3NgOFQoHpdAqLxYLZbIZAIMBVsD1+gO7X71IVCoUCdbvdHLAtIYN1u11EIhEOODQbcToYSwH5fJ56PB4+uG1j2TudDqLRKAcc2R+h8/mbFJDL5ajX64UgCCIAa6PdbiMWi3HA08MDnJwOpYBsNkt9Ph8MBoMIMJlM0Gq1EI/HOeDZkRWtTk8KyGQy1O/3Yz6fiwAajQbNZhOJRIID1peSXzmdTtNAILDZvvU+sKE2Gg2kUqnbtzGZTFL28XK55JDtdWZKZDKZWwH/ARw1EUZjI/GaAAAAAElFTkSuQmCC';
 	var commentIconDelete = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAXpJREFUeNqUUr9Lw1AQvpd2qFFaRBwFHaQ46x8g0jooQqGjexy6BfpPtB3TweziYkX8tQiOrhkcTIbi4CgilKRJIc3z3YN7pLU19eC4e/fuu/vu3mOcc8iSj9M6+EHIV5aXGMXonKdAt9s9F8bAglSUbDUIFei5emwfPD0Yn1EEQjnDJAHmlUoFyuXyXBZvtSPlIxhla22Vadg5C4yyc/Oo/PVCAV5P6jb6mmBgZIGJAXVGwTGowL/Am5c9Ncb71zfXZgGwaBzHUsfjMWxf3cr43vU9hGGoxpE7mGaQJAlEojomogZBIO1u7w6GwyEMBgOZ97J/CBsXPcinwdgRwaPRSPr0pGk2BbFAupM7yOVytud5EogdUH3fn1CM4b2u61AqlaDf70OxWLTVvJZlcdd1+bQ4jvMrhnmYT+wYUcH/IKgbNI5pmtK22225FwJg50ajcTax8WntdDqyW6vV4rPu0zr3GbFzs9lkWX9kboFFwChskZ/4l/wIMADyMlZUy0YWOAAAAABJRU5ErkJggg==';
 	var commentIconDeleteAll = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAANbY1E9YMgAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAYUExURe6trfLy8tHR0Y+Pj7GxsQAAAIjuhv///20imzoAAAAIdFJOU/////////8A3oO9WQAAAGtJREFUeNpcjwEKwDAIA9Xo/P+Pl9iugwaq5KpgrC9ZV+KoS6CCekZFkDlke7QhQmT5ZwGR5QcYVeWu5x8goY/4AUl4zESeCfogaOx/7UCXNlBlroo5vXkrDNMXYAcmmIhNxY6qLHf8V4ABAESSBHQ3l0TpAAAAAElFTkSuQmCC';
 	var commentIconSave = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZBJREFUeNqckz1LxEAQhmeTNGIjWliJIKKltWCjWAgWWihW1hYHgthb2Fmo1aE2dld5wtlZCFoINv4C/8EVnk0u2a8k7jvJHmejOQeGbDLvM7s7MxFFUdD5Taegf9jxwbYQZ812sbyyTr3PLm2tLtQCH54/aHJqmt5enyjIsoyMsWSNqQVDDy0YrKPMWveinZs/QWi0LrVgwEbIhI/wYcvznIW8oxPCsYZ7PdgImZSCK0JBEcC63MUwiGRwb4iDARtBxB8cmCQJpWlKUkpO5HdFYlgQBBSGIWv9JpHmBJKUg65bL7VbCEZzApdNSkVj4xMjzQAYsJHR5Qm8fbl5+M3iuM/Pmdk5Ajs4AcO9LjX210gIwQ7D/X0NUMgrd81+HA9OEKCSWit2FAZ2enlHt/fvg+rDfft8B6Avu+Aq7UFdtbIUKQbxbnnYypbqKsZdwCDZaro4gXsC8oNiq+R+oIaHiOPoQqd1ITb3Dov5xSVuC6CTo10Wx3xX+WMWdDVg7E4rfGBjpzHyL/3YbopvAQYALTKvvIqUmbwAAAAASUVORK5CYII=';
@@ -420,6 +421,7 @@ var mainCode = function(){
 		detail_finaldelete : "Delete final coordinate",
 		detail_lastsaved : "last saved",
 		detail_edit : "Edit comment",
+		detail_edit : "Share comment",
 		detail_delete : "Delete comment",
 		detail_thestate : "State",
 		detail_save : "Save comment",
@@ -563,6 +565,7 @@ var mainCode = function(){
 		detail_finaldelete : "Finalkoordinate löschen",
 		detail_lastsaved : "zuletzt gespeichert",
 		detail_edit : "Kommentar editieren",
+		detail_edit : "Kommentar teilen",
 		detail_delete : "Kommentar löschen",
 		detail_thestate : "Kommentarstatus",
 		detail_save : "Kommentar speichern",
@@ -1951,6 +1954,14 @@ function doDropboxAction(fnOnSuccess) {
 			imgEdit.setAttribute('style', 'cursor:pointer');
 			EditComment.appendChild(imgEdit);
 			EditComment.addEventListener('mouseup', editComment, false);
+			
+			ShareComment = document.createElement('a');
+			var imgShare = document.createElement('img');
+			imgShare.src = commentIconShare;
+			imgShare.title = lang.detail_edit;
+			imgShare.setAttribute('style', 'cursor:pointer');
+			ShareComment.appendChild(imgShare);
+			ShareComment.addEventListener('mouseup', shareComment, false);
 
 			EditCancelComment = document.createElement('a');
 			var imgEditCancel = document.createElement('img');
@@ -1968,10 +1979,12 @@ function doDropboxAction(fnOnSuccess) {
 				if (currentComment == null) {
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ShareComment.style.display = 'none';
 					detailCommentTextArea.value = "";
 				} else {
 					AddComment.style.display = 'none';
 					EditComment.style.display = 'inline';
+					ShareComment.style.display = 'inline';
 					DeleteComment.style.display = 'inline';
 					detailCommentTextArea.value = currentComment.commentValue;
 					if (currentComment.lat && currentComment.lng) {
@@ -2052,6 +2065,7 @@ function doDropboxAction(fnOnSuccess) {
 					detailCommentTextPane.style.display = 'none';
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ShareComment.style.display = 'none';
 					SaveComment.style.display = 'none';
 					DeleteComment.style.display = 'none';
 					EditCancelComment.style.display = 'none';
@@ -2127,6 +2141,8 @@ function doDropboxAction(fnOnSuccess) {
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(EditComment);
 			header.appendChild(document.createTextNode('   '));
+			header.appendChild(ShareComment);
+			header.appendChild(document.createTextNode('   '));
 			header.appendChild(SaveComment);
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(EditCancelComment);
@@ -2177,6 +2193,7 @@ function doDropboxAction(fnOnSuccess) {
 
 				AddComment.style.display = 'none';
 				EditComment.style.display = "inline";
+				ShareComment.style.display = "inline";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				detailCommentTextArea.style.display = 'none';
@@ -2190,6 +2207,7 @@ function doDropboxAction(fnOnSuccess) {
 			} else {
 				AddComment.style.display = 'inline';
 				EditComment.style.display = "none";
+				ShareComment.style.display = "none";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				DeleteComment.style.display = 'none';
@@ -2413,6 +2431,7 @@ function doDropboxAction(fnOnSuccess) {
 								doSaveCommentToGUID(currentComment);
 								AddComment.style.display = "none";
 								EditComment.style.display = "inline";
+								ShareComment.style.display = "inline";
 								DeleteComment.style.display = "inline";
 							}
 							currentComment.waypoints = currentComment.waypoints || [];
@@ -3520,10 +3539,15 @@ function doDropboxAction(fnOnSuccess) {
 			}
 		}
 		EditComment.style.display = 'none';
+		ShareComment.style.display = 'none';
 		EditCancelComment.style.display = 'inline';
 		setTimeout(function() {
 			detailCommentTextArea.focus();
 		}, 50);
+	}
+	
+	function shareComment(){
+		console.log("share");		
 	}
 
 	function retrieveOriginalCoordinates() {
