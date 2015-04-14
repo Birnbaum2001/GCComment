@@ -1960,8 +1960,8 @@ function doDropboxAction(fnOnSuccess) {
 			imgShare.src = commentIconShare;
 			imgShare.title = lang.detail_edit;
 			imgShare.setAttribute('style', 'cursor:pointer');
-			ShareComment.appendChild(imgShare);
-			ShareComment.addEventListener('mouseup', shareComment, false);
+			ShareComment.appendChild(imgShare);			
+			ShareComment.addEventListener('mouseup', function(){shareComment(currentCacheGUID);}, false);
 
 			EditCancelComment = document.createElement('a');
 			var imgEditCancel = document.createElement('img');
@@ -3546,9 +3546,68 @@ function doDropboxAction(fnOnSuccess) {
 		}, 50);
 	}
 	
-	function shareComment(){
-		console.log("share");		
+	function shareComment(guid){
+		var comment = doLoadCommentFromGUID(guid);		
+		var data = "<gccomment>"+commentToGCC(comment)+"</gccomment>"
+		debugger;
+		gistShare.shareComment(data, comment.gccode, comment.name).done(function(code){
+			console.log(comment.gccode +" successfully shared: "+code);		
+		}).fail(function(msg){
+			console.log("Sharing failed: "+ msg);
+		});		
 	}
+	
+	var gistShare = new function(){
+		this.shareComment = function(data, gcid, name){
+			var d = new $.Deferred();
+			gist.uploadNewGist(data, gcid+".gcc", "Shared comment for " + name + "(" + gcid + ")").done(function(result){
+				if(typeof(result) !== "undefined" && typeof(result["id"]) !== "undefined"){
+					d.resolve(result["id"]);
+				}
+				else{
+					d.reject("Creation failed");
+				}
+			}).fail(function(jqXHR, textStatus){
+				d.reject(textStatus + " - " + jqXHR.responseText);
+			});
+			
+			return d.promise();
+		};
+	};
+	
+	var gist = new function(){
+		var gistApiUrl = "https://api.github.com/gists";
+		this.getGist = function(id){			
+			return $.ajax(gistApiUrl+"/"+id,{
+				cache: false,
+				dataType: "json"
+			});			
+		};
+		
+		this.uploadNewGist = function(data, filename, desc){
+			if(typeof(data) != "object"){
+				data = [data];
+			}
+			
+			if(typeof(filename) != "object"){
+				filename = [filename];
+			}
+			
+			var f = {};
+			for(i=0;i<filename.length&&i<data.length;i++){
+				f[filename[i]] = {
+					content:data[i]
+				};
+			}
+			return $.post(gistApiUrl,				
+				JSON.stringify({
+					public: false,
+					description: desc,
+					files: f
+				})
+			);			
+		};
+	};
 
 	function retrieveOriginalCoordinates() {
 		var origCoordinates;
@@ -4185,7 +4244,63 @@ function doDropboxAction(fnOnSuccess) {
 		GM_setValue(LAST_EXPORT, "" + (new Date() - 0));
 		return result;
 	}
-
+	
+	function commentToGCC(comment){
+		var result = "";
+		result = result + "<comment>";
+		result = result + "<gcid>";
+		result = result + comment.guid;
+		result = result + "</gcid>";
+		result = result + "<gccode>";
+		result = result + comment.gccode;
+		result = result + "</gccode>";
+		result = result + "<name>";
+		result = result + escapeXML(comment.name);
+		result = result + "</name>";
+		result = result + "<content>";
+		result = result + escapeXML(comment.commentValue);
+		result = result + "</content>";
+		result = result + "<save>";
+		result = result + comment.saveTime;
+		result = result + "</save>";
+		result = result + "<state>";
+		result = result + comment.state;
+		result = result + "</state>";
+		result = result + "<finallat>";
+		if (comment.lat)
+			result = result + comment.lat;
+		result = result + "</finallat>";
+		result = result + "<finallng>";
+		if (comment.lng)
+			result = result + comment.lng;
+		result = result + "</finallng>";
+		result = result + "<origlat>";
+		if (comment.origlat)
+			result = result + comment.origlat;
+		result = result + "</origlat>";
+		result = result + "<origlng>";
+		if (comment.origlng)
+			result = result + comment.origlng;
+		result = result + "</origlng>";
+		result = result + "<archived>";
+		if (comment.archived)
+			result = result + comment.archived;
+		result = result + "</archived>";
+		result = result + "<waypoints>";
+		for (var j = 0; comment.waypoints && (j < comment.waypoints.length); j++) {
+			result = result + "<waypoint>";
+			result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
+			result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
+			result = result + "<name>" + comment.waypoints[j].name + "</name>";
+			result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
+			result = result + "</waypoint>";
+		}
+		result = result + "</waypoints>";
+		result = result + "</comment>";
+		
+		return result;
+	}
+	
 	function getComments(filtered) {
 		var filteredComments = new Array();
 		var commentKeys = GM_listValues();
