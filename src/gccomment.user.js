@@ -3549,6 +3549,7 @@ function doDropboxAction(fnOnSuccess) {
 	}
 	
 	function shareComment(guid){
+		$('#shareParagraph').hide();
 		var comment = doLoadCommentFromGUID(guid);		
 		var data = "<gccomment>"+commentToGCC(comment)+"</gccomment>"
 		
