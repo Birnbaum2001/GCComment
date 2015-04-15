@@ -3862,6 +3862,7 @@ function doDropboxAction(fnOnSuccess) {
 		detailCommentInputLatLng.setAttribute("disabled", "");
 		AddComment.style.display = 'none';
 		EditComment.style.display = 'inline';
+		ShareComment.style.display = 'inline';
 		DeleteComment.style.display = 'inline';
 		updateSaveTime(new Date());
 
