@@ -121,7 +121,41 @@ var mainCode = function(){
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
-	}	
+	}
+	
+	if(typeof(GM_xmlhttpRequest) === "undefined" || (browser === "Chrome" && (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1))) {
+		GM_xmlhttpRequest = function(rdata){
+			var request = new XMLHttpRequest ();
+			request.onreadystatechange = function(data) { 
+				if (request.readyState == 4) {
+					if (request.status.toString().substr(0,1) === "2"){
+						if(rdata.onload){
+							rdata.onload(request);
+						}
+					}
+					else
+					{
+						if(rdata.onerror){
+							rdata.onerror(request);
+						}
+					}
+				}                
+			};
+			
+			request.open(rdata.method, rdata.url);
+
+			if (rdata.headers) {
+				for (var header in rdata.headers) {
+					if(header == "User-Agent" || header == "Origin" ||header == "Cookie" ||header == "Cookie2" ||header == "Referer"){
+						continue;
+					}
+					request.setRequestHeader(header, rdata.headers[header]);
+				}
+			}
+			
+			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
+		};
+	}
 	
 	if(browser === "Chrome" && location.protocol === "http" && !GM_getValue("ChromeStorageMigrated", false)){	
 		GM_log("Start chrome storage migration");
@@ -3660,14 +3694,18 @@ function doDropboxAction(fnOnSuccess) {
 	
 	var gist = new function(){
 		var gistApiUrl = "https://api.github.com/gists";
-		this.getGist = function(id){			
-			return $.ajax(gistApiUrl+"/"+id,{
-				cache: false,
-				dataType: "json"
-			});			
+		this.getGist = function(id){
+			var d = new $.Deferred();
+			GM_xmlhttpRequest({url: gistApiUrl+"/"+id,
+				onload: function(e){d.resolve(JSON.parse(e.responseText));},
+				onerror: function(e){d.reject(e.statusText);}
+			});
+			
+			return d.promise();	
 		};
 		
 		this.uploadNewGist = function(data, filename, desc){
+			var d = new $.Deferred();
 			if(typeof(data) != "object"){
 				data = [data];
 			}
@@ -3682,13 +3720,21 @@ function doDropboxAction(fnOnSuccess) {
 					content:data[i]
 				};
 			}
-			return $.post(gistApiUrl,				
-				JSON.stringify({
-					public: false,
-					description: desc,
-					files: f
-				})
-			);			
+			
+			GM_xmlhttpRequest({
+					url: gistApiUrl,
+					method: "POST",
+					data: JSON.stringify({
+						public: false,
+						description: desc,
+						files: f
+					}),
+					onload: function(e){d.resolve(JSON.parse(e.responseText));},
+					onerror: function(e){d.reject(e.statusText);}
+				}
+			);
+			
+			return d.promise();			
 		};
 	};
 
@@ -5700,7 +5746,7 @@ if (typeof (chrome) !== "undefined") {
 			var request = new XMLHttpRequest ();
 			request.onreadystatechange = function(data) { 
 				if (request.readyState == 4) {
-					if (request.status == 200){
+					if (request.status.toString().substr(0,1) === "2"){
 						if(rdata.onload){
 							rdata.onload(request);
 						}
