@@ -3,6 +3,7 @@
 // @namespace		http://www.birnbaum2001.com/gccomment
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
+// @include			/^https?://lukeiam.github.io/gcc/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @grant				GM_getValue
@@ -497,7 +498,9 @@ var mainCode = function(){
 		waypoints : "Waypoints",
 		archived_filter_no_archived : "no archived",
 		archived_filter_include_archived : "include archived",
-		archived_filter_only_archived : "only archived"
+		archived_filter_only_archived : "only archived",
+		shareImportNew : "A site wants to import a new comment:\n%name%\nAllow?",
+		shareImportOverride : "A site wants to override one of your comments:\n%name%\nAllow?"
 	};
 	languages[SETTINGS_LANGUAGE_DE] = {
 		mycomments : "Meine Kommentare",
@@ -641,7 +644,9 @@ var mainCode = function(){
 		waypoints : "Wegpunkte",
 		archived_filter_no_archived : "keine archivierten",
 		archived_filter_include_archived : "archivierte einschließen",
-		archived_filter_only_archived : "nur archivierte"
+		archived_filter_only_archived : "nur archivierte",
+		shareImportNew : "Eine Seite möchte einen neuen Kommentar importieren:\n%name%\nErlauben?",
+		shareImportOverride : "Eine Seite möchte einen deiner Kommentare überschreiben:\n%name%\nErlauben?"
 	};
 	var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 	var lang = languages[SETTINGS_LANGUAGE_EN];
@@ -748,6 +753,10 @@ var mainCode = function(){
 		} else if (document.URL.search("\/seek\/log\.aspx") >= 0) {
 			log('debug', 'matched gccommentOnLogPage');
 			gccommentOnLogPage();
+		}
+		else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
+			log('debug', 'matched gccommentOnSharingPage');
+			gccommentOnSharingPage();
 		}
 	}
 
@@ -1917,6 +1926,41 @@ function doDropboxAction(fnOnSuccess) {
 		}
 	}
 
+	function gccommentOnSharingPage(){
+		$('#btnAddToGcc').removeClass("forceHide");
+		window.addEventListener("message", function(e){
+			if(e.data.indexOf("GCC_Share_") === 0){
+				var data = JSON.parse(e.data.replace("GCC_Share_", ""));
+				console.log("Recived data from sharing site");
+				
+				if(typeof(data) === "undefined" || typeof(data.guid) === "undefined"
+					|| typeof(data.gccode) === "undefined" || typeof(data.name) === "undefined"){
+					console.log("Got invalid data from sharing site");
+					return;
+				}
+				
+				var msg = "";
+				
+				var oExisting = doLoadCommentFromGUID(data.guid);				
+				if (oExisting) {
+					msg = lang.shareImportOverride.replace("%name%", oExisting.name + " (" + oExisting.gccode + ")");
+				}
+				else{
+					msg = lang.shareImportNew.replace("%name%", data.name + " (" + data.gccode + ")");
+				}
+				
+				if(confirm(msg)){
+					console.log("Share import confirmed by user");
+					doSaveCommentWTimeToGUID(data);
+					$('#btnAddToGcc').removeClass("addButton").addClass("tickButton");
+				}
+				else{
+					console.log("Share import denied by user");
+				}
+			}
+		});	
+	}
+	
 	function toggleTabOnProfile(tabid) {
 		log('debug', 'tabid ' + tabid);
 		// do specials
