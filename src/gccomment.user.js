@@ -63,20 +63,20 @@ if (typeof (chrome) !== "undefined") {
 }
 
 var mainCode = function(){	
-	var $ = $||null;
-	var jQuery = jQuery||null;
+	var $ = this.$||$||null;
+	var jQuery = this.jQuery||jQuery||null;
 
-	if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
+	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
 		$ = unsafeWindow.$;
 	}
-	else if(typeof(window.$) !== "undefined"){
+	else if(typeof($) === "undefined" && typeof(window.$) !== "undefined"){
 		$ = window.$;
 	}
 
-	if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
+	if(typeof(jQuery) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
 		jQuery = unsafeWindow.jQuery;
 	}
-	else if(typeof(window.$) !== "undefined"){
+	else if(typeof(jQuery) === "undefined" && typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
 	}	
 	
@@ -2433,9 +2433,8 @@ function doDropboxAction(fnOnSuccess) {
 
 		// check for waypoints header and add if not present
 		var waypointElement = document.getElementById('ctl00_ContentBody_WaypointsInfo');
-		if (!waypointElement) {
-			var wptP = $('#ctl00_ContentBody_bottomSection > p:first');
-			wptP[0].innerHTML = '<span id="ctl00_ContentBody_WaypointsInfo" style="font-weight:bold;">Additional Waypoints</span><br>';
+		if (!waypointElement) {			
+			$('#ctl00_ContentBody_bottomSection > p:first').first().html('<span id="ctl00_ContentBody_WaypointsInfo" style="font-weight:bold;">Additional Waypoints</span><br>');
 		}
 
 		// add link to add waypoints
