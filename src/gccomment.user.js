@@ -457,7 +457,7 @@ var mainCode = function(){
 		detail_finaldelete : "Delete final coordinate",
 		detail_lastsaved : "last saved",
 		detail_edit : "Edit comment",
-		detail_edit : "Share comment",
+		detail_share : "Share comment",
 		detail_delete : "Delete comment",
 		detail_thestate : "State",
 		detail_save : "Save comment",
@@ -601,7 +601,7 @@ var mainCode = function(){
 		detail_finaldelete : "Finalkoordinate löschen",
 		detail_lastsaved : "zuletzt gespeichert",
 		detail_edit : "Kommentar editieren",
-		detail_edit : "Kommentar teilen",
+		detail_share : "Kommentar teilen",
 		detail_delete : "Kommentar löschen",
 		detail_thestate : "Kommentarstatus",
 		detail_save : "Kommentar speichern",
@@ -1994,7 +1994,7 @@ function doDropboxAction(fnOnSuccess) {
 			ShareComment = document.createElement('a');
 			var imgShare = document.createElement('img');
 			imgShare.src = commentIconShare;
-			imgShare.title = lang.detail_edit;
+			imgShare.title = lang.detail_share;
 			imgShare.setAttribute('style', 'cursor:pointer');
 			ShareComment.appendChild(imgShare);			
 			ShareComment.addEventListener('mouseup', function(){shareComment(currentCacheGUID);}, false);
