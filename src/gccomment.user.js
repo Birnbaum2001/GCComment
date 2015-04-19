@@ -2104,7 +2104,7 @@ function doDropboxAction(fnOnSuccess) {
 			};
 			
 			var updateArchiveIcon = function(){
-				if(currentComment.archived === ARCHIVED){
+				if(currentComment !== null && currentComment.archived === ARCHIVED){
 					imgArchive.src = archiveRemove;
 					imgArchive.title = lang.table_removefromarchive;
 					ArchiveComment.removeEventListener('mouseup', add2Archive);					
