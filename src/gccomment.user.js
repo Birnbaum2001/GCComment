@@ -1968,10 +1968,12 @@ function doDropboxAction(fnOnSuccess) {
 				if (currentComment == null) {
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ArchiveComment.style.display = 'none';
 					detailCommentTextArea.value = "";
 				} else {
 					AddComment.style.display = 'none';
 					EditComment.style.display = 'inline';
+					ArchiveComment.style.display = 'inline';
 					DeleteComment.style.display = 'inline';
 					detailCommentTextArea.value = currentComment.commentValue;
 					if (currentComment.lat && currentComment.lng) {
@@ -2027,8 +2029,15 @@ function doDropboxAction(fnOnSuccess) {
 				}
 			}, false);
 
+			ArchiveComment = document.createElement('a');
+			imgArchive = document.createElement('img');
+			imgArchive.src = archiveAdd;
+			imgArchive.title = lang.table_addtoarchive;
+			imgArchive.setAttribute('style', 'cursor:pointer');
+			ArchiveComment.appendChild(imgArchive);			
+						
 			DeleteComment = document.createElement('a');
-		imgDelete = document.createElement('img');
+			imgDelete = document.createElement('img');
 			imgDelete.src = commentIconDelete;
 			imgDelete.title = lang.detail_delete;
 			imgDelete.setAttribute('style', 'cursor:pointer');
@@ -2052,6 +2061,7 @@ function doDropboxAction(fnOnSuccess) {
 					detailCommentTextPane.style.display = 'none';
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ArchiveComment.style.display = 'none';
 					SaveComment.style.display = 'none';
 					DeleteComment.style.display = 'none';
 					EditCancelComment.style.display = 'none';
@@ -2080,7 +2090,36 @@ function doDropboxAction(fnOnSuccess) {
 					doSaveCommentToGUID(currentComment);
 				}
 			}
-
+			
+			var add2Archive = function(){
+				currentComment.archived = ARCHIVED;
+				doSaveCommentToGUID(currentComment);
+				updateArchiveIcon();
+			};
+			
+			var removeFromArchive = function(){
+				currentComment.archived = null;
+				doSaveCommentToGUID(currentComment);
+				updateArchiveIcon();
+			};
+			
+			var updateArchiveIcon = function(){
+				if(currentComment.archived === ARCHIVED){
+					imgArchive.src = archiveRemove;
+					imgArchive.title = lang.table_removefromarchive;
+					ArchiveComment.removeEventListener('mouseup', add2Archive);					
+					ArchiveComment.addEventListener('mouseup', removeFromArchive);					
+				}
+				else{
+					imgArchive.src = archiveAdd;
+					imgArchive.title = lang.table_addtoarchive;
+					ArchiveComment.removeEventListener('mouseup', removeFromArchive);
+					ArchiveComment.addEventListener('mouseup', add2Archive);
+				}
+			};
+			
+			updateArchiveIcon();
+				
 			detailCommentDiv = document.createElement('div');
 			detailCommentDiv.setAttribute('name', 'mycomments');
 			var header = document.createElement('p');
@@ -2131,6 +2170,8 @@ function doDropboxAction(fnOnSuccess) {
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(EditCancelComment);
 			header.appendChild(document.createTextNode('   '));
+			header.appendChild(ArchiveComment);
+			header.appendChild(document.createTextNode('   '));
 			header.appendChild(DeleteComment);
 			header.appendChild(document.createTextNode('          '));
 			header.appendChild(small);
@@ -2177,6 +2218,7 @@ function doDropboxAction(fnOnSuccess) {
 
 				AddComment.style.display = 'none';
 				EditComment.style.display = "inline";
+				ArchiveComment.style.display = "inline";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				detailCommentTextArea.style.display = 'none';
@@ -2190,6 +2232,7 @@ function doDropboxAction(fnOnSuccess) {
 			} else {
 				AddComment.style.display = 'inline';
 				EditComment.style.display = "none";
+				ArchiveComment.style.display = "none";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				DeleteComment.style.display = 'none';
@@ -2413,6 +2456,7 @@ function doDropboxAction(fnOnSuccess) {
 								doSaveCommentToGUID(currentComment);
 								AddComment.style.display = "none";
 								EditComment.style.display = "inline";
+								ArchiveComment.style.display = "inline";
 								DeleteComment.style.display = "inline";
 							}
 							currentComment.waypoints = currentComment.waypoints || [];
@@ -3520,6 +3564,7 @@ function doDropboxAction(fnOnSuccess) {
 			}
 		}
 		EditComment.style.display = 'none';
+		ArchiveComment.style.display = 'none';
 		EditCancelComment.style.display = 'inline';
 		setTimeout(function() {
 			detailCommentTextArea.focus();
@@ -3697,6 +3742,7 @@ function doDropboxAction(fnOnSuccess) {
 		detailCommentInputLatLng.setAttribute("disabled", "");
 		AddComment.style.display = 'none';
 		EditComment.style.display = 'inline';
+		ArchiveComment.style.display = 'inline';
 		DeleteComment.style.display = 'inline';
 		updateSaveTime(new Date());
 
