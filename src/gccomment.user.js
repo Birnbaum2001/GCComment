@@ -108,6 +108,15 @@ var mainCode = function(){
 		};
 	}	
 	
+	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
+		GM_deleteValue  = function(key){			
+			localStorageCache[key] = undefined;	
+			var data = {};
+			data[key] = "%%%undefined%%%";			
+			window.postMessage("GCC_Storage_" + JSON.stringify(data), "*");	
+		};
+	}
+	
 	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_listValues = function(){			
 			return Object.keys(localStorageCache);
@@ -5816,9 +5825,24 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
+	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
+		GM_deleteValue  = function(key){
+			if(typeof(localStorageCache) === "undefined"){
+				var localStorageCache = {};
+			}
+			localStorageCache[key] = undefined;			
+			chrome.runtime.sendMessage({"setValue": undefined, "setKey": key}, function(){} );				
+		};
+	}
+	
 	window.addEventListener("message", function(e){
 		if(e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
+			for(name in data){
+				if(data[name] === "%%%undefined%%%"){
+					data[name] = undefined;
+				}
+			}
 			localStorageCache[Object.keys(data)[0]] = data[Object.keys(data)[0]];
 			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]}, function(){});
 		}
