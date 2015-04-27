@@ -6,6 +6,7 @@
 // @include			/^https?://lukeiam.github.io/gcc/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
