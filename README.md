@@ -10,4 +10,4 @@ Opera: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCCo
 
 About the folders...
 - src is the main source folder.
-- The opera folder has been a try to support opera as well. This has not been investigated further after v69.
+- The opera folder has been a try to support opera as well. This has not been investigated further after v69. (since Opera 15 the chrome versions could be used without limitations)
