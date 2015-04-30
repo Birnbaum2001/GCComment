@@ -44,12 +44,16 @@ var changeStorageMode = function(targetMode, data, response){
 };
 
 
-var handleWrite = function(data, sendResponse){
+var handleWrite = function(data, sendResponse){	
 	storage.get(null, function(oldData){
 		var changedData = {};
+		var removedData = [];
 		var count = 0;
 		for(keyName in data){
-			if(oldData[keyName] !== data[keyName]){
+			if(data[keyName] === undefined){
+				removedData.push(keyName);
+			}
+			else if(oldData[keyName] !== data[keyName]){
 				changedData[keyName] = data[keyName];
 				count++;
 			}
@@ -71,6 +75,14 @@ var handleWrite = function(data, sendResponse){
 		}
 		else{
 			sendResponse();
+		}
+		
+		if(removedData.length > 0){
+			storage.remove(removedData, function(e){			
+				if (count === 0){
+					sendResponse(e);
+				}
+			});
 		}
 	});
 };

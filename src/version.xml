@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>86</gccommentlatestversion>
+	<gccommentlatestversion>88</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>88</version>
+			<date>2015-04-30</date>
+			<content>&lt;ul&gt; &lt;li&gt;Made comments shareable&lt;/li&gt; &lt;li&gt;Add an archive button to the cache page&lt;/li&gt; &lt;li&gt;Fix a problem with FireFox 39</content>
+		</change>
+		<change>
+			<version>87</version>
+			<date>2015-04-12</date>
+			<content>&lt;ul&gt; &lt;li&gt;Mostly changes for chrome</content>
+		</change>
 		<change>
 			<version>86</version>
 			<date>2015-02-20</date>

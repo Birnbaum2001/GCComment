@@ -5,7 +5,7 @@
       "exclude_matches": [ ],
       "include_globs": [ ],
       "js": [ "jquery-1.9.1.min.js", "gccomment.js"],
-      "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*", "https://geocaching.com/*", "https://www.geocaching.com/*"],
+      "matches":  [ "http://geocaching.com/*", "http://www.geocaching.com/*", "https://geocaching.com/*", "https://www.geocaching.com/*", "https://lukeiam.github.io/gcc/*", "http://lukeiam.github.io/gcc/*"],
       "run_at": "document_idle"
    } ],
    "permissions": [
@@ -24,5 +24,5 @@
    "description": "Add comments to your geocaches on geocaching.com.", 
    "homepage_url": "https://github.com/Birnbaum2001/GCComment",
    "name": "GCComment",
-   "version": "8.7"
+   "version": "8.8"
 }

@@ -3,8 +3,10 @@
 // @namespace		http://www.birnbaum2001.com/gccomment
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
+// @include			/^https?://lukeiam.github.io/gcc/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
+// @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
@@ -12,8 +14,8 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			87
-// @author			Birnbaum2001
+// @version			88
+// @author			Birnbaum2001, lukeIam
 // ==/UserScript==
 
 /*
@@ -49,7 +51,7 @@
  */
 
 // version information
-var version = "87";
+var version = "88";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
@@ -63,20 +65,20 @@ if (typeof (chrome) !== "undefined") {
 }
 
 var mainCode = function(){	
-	var $ = $||null;
-	var jQuery = jQuery||null;
+	var $ = this.$||$||null;
+	var jQuery = this.jQuery||jQuery||null;
 
-	if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
+	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
 		$ = unsafeWindow.$;
 	}
-	else if(typeof(window.$) !== "undefined"){
+	else if(typeof($) === "undefined" && typeof(window.$) !== "undefined"){
 		$ = window.$;
 	}
 
-	if(typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
+	if(typeof(jQuery) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
 		jQuery = unsafeWindow.jQuery;
 	}
-	else if(typeof(window.$) !== "undefined"){
+	else if(typeof(jQuery) === "undefined" && typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
 	}	
 	
@@ -107,6 +109,15 @@ var mainCode = function(){
 		};
 	}	
 	
+	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
+		GM_deleteValue  = function(key){			
+			localStorageCache[key] = undefined;	
+			var data = {};
+			data[key] = "%%%undefined%%%";			
+			window.postMessage("GCC_Storage_" + JSON.stringify(data), "*");	
+		};
+	}
+	
 	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_listValues = function(){			
 			return Object.keys(localStorageCache);
@@ -121,7 +132,41 @@ var mainCode = function(){
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
-	}	
+	}
+	
+	if(typeof(GM_xmlhttpRequest) === "undefined" || (browser === "Chrome" && (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1))) {
+		GM_xmlhttpRequest = function(rdata){
+			var request = new XMLHttpRequest ();
+			request.onreadystatechange = function(data) { 
+				if (request.readyState == 4) {
+					if (request.status.toString().substr(0,1) === "2"){
+						if(rdata.onload){
+							rdata.onload(request);
+						}
+					}
+					else
+					{
+						if(rdata.onerror){
+							rdata.onerror(request);
+						}
+					}
+				}                
+			};
+			
+			request.open(rdata.method, rdata.url);
+
+			if (rdata.headers) {
+				for (var header in rdata.headers) {
+					if(header == "User-Agent" || header == "Origin" ||header == "Cookie" ||header == "Cookie2" ||header == "Referer"){
+						continue;
+					}
+					request.setRequestHeader(header, rdata.headers[header]);
+				}
+			}
+			
+			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
+		};
+	}
 	
 	if(browser === "Chrome" && location.protocol === "http" && !GM_getValue("ChromeStorageMigrated", false)){	
 		GM_log("Start chrome storage migration");
@@ -316,6 +361,9 @@ var mainCode = function(){
 	var archive = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALnSURBVDjLfZNLaFx1HIW/e2fuzJ00w0ymkpQpiUKfMT7SblzU4kayELEptRChUEFEqKALUaRUV2YhlCLYjYq4FBeuiqZgC6FIQzBpEGpDkzHNs5PMTJtmHnfu6//7uSh2IYNnffg23zmWqtIpd395YwiRL1Q0qyIfD56cmOvUs/4LWJg40auiH6jI+7v3ncybdo2Hy9ebKvqNGrn03Nj1+x0Bi1dHHVV9W0U+ye4d2d83+Ca2GJrlGZx0gkppkkfrsysqclFFvh8++3v7CWDh6ugIohfSPcPH+w6fwu05ABoSby9yb3Kc/mePYXc9TdCqslWapVGdn1Zjxo++O33Fujtx4gdEzj61f8xyC8/jN2rsVOcxYZOoVSZtBewZOAT+NonuAWw3S728wFZpFm975cekGjlz8NXLVtSo0SxPImGdtFfFq5epr21wdOxrnMwuaC2jrRJWfYHdxRfIFeDWr0unkyrSUqxcyk2TLQzQrt6hqydPvidDBg/8VTAp8DegvYa3OU1z+SbuM6dQI62kioAAVgondwAnncWvzCDNCk4CLO9vsJVw8xqN+iPiTB5SaTSKURGSaoTHHgxoAMlduL1HiFMZXP8BsvkbO1GD2O3GpLOIF0KsSBijxmCrMY+FqgGJQDzQgGT3XrJ7DuI5EKZd4iDG+CHG84m8AIki1Ai2imRsx4FEBtQHCUB8MG1wi8QKGhjEC4mbAVHTx8kNYSuoiGurkRtLN76ivb0K6SIkusCEoBEgaCQYPyT2QhKpAXKHTiMmQ2lmChWZTrw32v9TsLOyVlu8Nhi2G4Vs32HsTC9IA2KPRuU2Erp097+O5RRYvz3H1r3JldivfY7IR0+mfOu7l3pV5EM1cq744mi+OPwaRD71tSk0Vsp3/uLB6s2minyrIpeOf7a00fFMf1w+MqRGzqvIW/teecdqV5a5P/8ncXv9ZxUdf/lCae5/3/hvpi4OjajIp4ikVOTLY+cXr3Tq/QPcssKNXib9yAAAAABJRU5ErkJggg==';
 	var archiveAdd = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMVSURBVDjLdZNLaFx1GEfPnZk7cyfNkElS0jTVKKRpE2PSpAhKHyqo2QhtShUiCPWBLhTdFKUUlxYUqggGxYqIbsSNFKQmVqMhTVujSQuhtnmMaR5NJs0kncz7ztz5f5+LgguNv/WPszkcS1XZbFPnDrUh8q6KRlTkrdYj/Vc3+1n/Bkz3H65T0TdV5PXapiNRU1jjztxgVkU/UyMfPtg7uLwpYGagx1bVF1Tk7ciO7p3bWp/BJ4ZsfAw75Gc1NsTGrfF5FTmtIl90Hhsp/AOYHujpRvSdUHXnwW0tR3Gqm0FLlJMz3Bw6xb0P7MdXcR/FXILbsXEyiRujasypva+Mfm9N9R/+EpFjW3f2Wk5NO25mjVTiBqaUxcvFCVlF6ht3g5vEX9mIz4mQjk9zOzZOPjn/TUCNPL/ryT7Ly6yRjQ8hpTShfIJ8Ok56cYm9vR9jh7dAbg7NxbDS09Q2dFBVA1d+mH02oCI5xaoKOiEiNY0UEtepqI4SrQ4TJg/uApgguEtQWCS/Mkp27hLO/UdRI7mAioAAVhC7qhk7FMFdHUOyq9h+sPJ/gU8prfxMJr1BORyFYAj1yqgIATXCXQ8GtAiBLTh1XZSDYRx3HVn5iZSXoexUYkIRJF+CsiKlMmoMATXmrlA1IB5IHrRIoHIHkfpdpO6M4fkcLiyFuLwWJu26lNwUB5MTtBghoCJhn20DYSivgxRBXDBFcBooK/yyEGTKruXxRx/inppmfv3zLOevXWByw630qZHh2eGPKCQXINQA/gowJVAPENQTflzw6GzZg/EZ9mx/CmN5PNK+j4s5z/KJMU9nFkdenRw4GZv//WsMQYjsBjsMCqbokcisY1uVHGp9A4DjT5yhqa4Do/j8n343b+o7X7oSHzvzbT4x48UnzrVj+Z1I48NY9lZEwnw1OkT1dpvh2bMcaOrhvfMvkimsc21yyv1PTH/0dbWpkZMq8lzTYy9bhdU5Pr84yPVomX0dB2iu72Jm5SqXJka4dTP1gfV/OV8+3datIicQCarI+8eXc/uB14AIkAE++a1v+cTfDyOvKVPjhy0AAAAASUVORK5CYII=';
 	var archiveRemove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMNSURBVDjLdZNLaFx1GMV/d+bO3DtJxkwSSWNq05YkrTVa04qIiOiiRIxgE2ohhUIKRQQFBcGiIiJiFaGIYEFERFy5dCE1pQ8JIbSEJhG66GM6idOk6Uwyec7zztz7/z4XlSw0nvXhx4FzjqWqbKXb517rQeRzFY2ryPv7Bkf+3Mpn/RuQHDncqqLvqMjbLZ2DCVNZZjV9uaii36uRr58Yunx/S8Cd8wMRVT2hIqfi2/u6tu17nZAYiplJIk6YpdQo6/em7qrIGRX5sXd4vLIJSJ4f6EP0Y6ep94Vtjx3BbeoGrRGs3eGv0dPsePx5QnU7qZZyLKamKORuTqgxpw++MfGbdXvk8E+IDD/cNWS5zU/iFZbZyN3E1Ir4pQyOVaWtYy94a4QbOgi5cfKZJIupKcprd3+x1cjxPYfOWn5hmWJmFKnlcco5yvkM+fkFDg59SyRWD6U0Wkph5ZO0tO+nsRmmf589aqtISbEao65DvLmDSu4GdU0JEk0xYpTBmwMTBW8BKvOUsxMU01dwdx1BjZRsFQEBrCiRxm4iThxvaRIpLhEJg1WegZBSy16ikF8niCUg6qB+gIpgqxEe9GBAq2DX47YeIIjGcL0VJHuRDb9A4DZgnDhSrkGgSC1AjcFWYx4UqgbEBymDVrEbthNv28PG6iR+yGVlIsfKtTm8xXVCD0VpfY5/EojEQpEIEINgBaQK4oGpgttOoLA6sUIt6/L08Q9xdvdQuX6BG+OX8IP1+pAaGZsd+4bK2hw47RCuA1MD9QFBfSFzJUn3S0dxZ0axfj5G3eyv7Opopja3HthizKuF+fHhW+mxU82dh7oe3d9POL4XyinwSpiqj1mr4bbthv73Nidsf/oIIU+czSlP//Bsq4q8q0bean9qINHe2w++R37+KtOffckzrwxSP3eOaiVLGSjkw9yaYeE/Z7p29kCPGvlIRY51vnjSqiylmb/4B3be0x0tgWWH7lHIBaQXw8b39BPr/+589UxPn4p8gEhURb7ierWntHr/zbCxdpqwLih89/KF4Iu/AXSvuZLBEiNYAAAAAElFTkSuQmCC';
+	
+	var commentIconShare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVQ4T32TTYtSURjH/8e3MvVqQ5PjFJNvODJiJojgB3DRSnBnX8GFG1tJCxlx4cKNhBsLFxIuBEGEdm3cubJBpIF8SWocNSfHqaYCPXEOKN65MA883MM99/k9L//7kHq9TrFlq9UKlFKsn+FwmGzf3zwTBjCbzZv3LHBt/X4foVCIA14cv6fvXj2XwDYAlpX52mQyGUajEYLBIGHBBw+1GE5+4iaE1Go1UQWEEMjlcu4qlQqJ0ic8MWqxK6gwXfzDl7EYQqrVKrXZbOj1emDBSqUSOp0OVqsVL9+ewLynw67hLnpnc1j3DZjO/2BwfrWphFQqFWq328FKZs6yarVaxN98hMUkwHhfjf7octOaxaTH+Mc1+qMFh5ByuUwdDgeGwyEP1uv1eP1hAeu+HqYdDQbnC4kI5j0Bo4tf6J1dgpRKJep0OvkAWd9qtRrHlYEoSHfvDnYENS4W17j6/Vd0R4rFInW5XFx3NgOFQoHpdAqLxYLZbIZAIMBVsD1+gO7X71IVCoUCdbvdHLAtIYN1u11EIhEOODQbcToYSwH5fJ56PB4+uG1j2TudDqLRKAcc2R+h8/mbFJDL5ajX64UgCCIAa6PdbiMWi3HA08MDnJwOpYBsNkt9Ph8MBoMIMJlM0Gq1EI/HOeDZkRWtTk8KyGQy1O/3Yz6fiwAajQbNZhOJRIID1peSXzmdTtNAILDZvvU+sKE2Gg2kUqnbtzGZTFL28XK55JDtdWZKZDKZWwH/ARw1EUZjI/GaAAAAAElFTkSuQmCC';
+	var linkIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAUNSURBVHhe1ZvNK3xRGMfPDDErSUqThbIg/gRZKAt2io2dGpSXLESxUhYWpNiQ15UiRSkL7xJCCUXelpQkykZRXu5vnvM7hzN3njv33Dsz5977qW/NuM+Zeb7fc+feO+cOnxaGeJDX11eyuLhILi8vyfv7O8nJySElJSWkoqKCVUgCAXiJ+/t7LS8vDybNUK2trazaHE8FMDo6iho20s/PDxtpjGcC6O/vR02a6fv7m70CjicCsGueK1YIrg8gXvNcRiG4OoBEmefCQnBtALLmOzs7tZGREXQbJv2B0ZUByJpfW1tjIzQ6u1gNJjEE1wUga351dZWN+OPz8xOtxcRxVQDxmOd8fX2hY/Sqr6+n9a4JIBHmObIhAK4IIJHmOTIfh/B3CecDSIZ5jtmBsb293dkAkmmeMzMzg74mqLa2VvOHHzjC4OAg6erqYs+MCZ/qrH/FFXh+fmaPogkEAuEYHGBjYwOdEb3E87wdrq+v0dflonsgq1UK1oxe8ez2wNXVFfq6om5vb9UHMDw8jDYjSm9+Z2dHOz4+Zs/MMZt5UHp6Oq1VHkBBQQHaEJdofn19PWp7+DPNtuLIzDzo6OiI1isPAGuGSzS/vLyM1oCMkDUPpz+OawIoLS1lFbHNg7a2tljlHzK7PYhfAnNcE8D8/DzdbmYetLCwQGs5sjOvNw8oDwAOPvrGZmdn6TYZ8yAR2ZkPhUJsRCTKA6irq4tobG5ujv5d1vz4+DitB+zu9iLKA3h6evptzOrMDw0N0Xognt1eRHkAQHl5uTYxMUEf2zEf724vkpQAZG5IAE7OPCdhAfT19WnBYDCqkcrKSu3s7IxV/eH0zHPiDmBlZQVtQq/8/Hw2wrr5/f19rbq6Gq3Ry4p5IK4ABgYG0CYwTU9P0zFWzR8eHqLbMcnu9iK2A5BdzADZPdrD9Tq2HZPVmefYCsCKeavneVUzz7EcgIqZl10wATU2NtIxdrEUgBXzsBYHWDUPlJWVoTV6TU5OshH2kQ5A1vzS0hIbYc885+7uTqupqYmqzczM1Lq7u1lV/EgFIGte9vu8KMw8Rqx7/PFgGoAK89vb2/R3P04QMwAV5sWj/cHBAf2bSgwDkDUvLl1vbm6iNXpx8/rzvLgqpAo0ADvmAaxGL2zmRakm6h3t7PYAfOHB6kRx83t7e+h20MfHB61RRUQAds0DcNrCarm4eSA1NRWtAb28vLAqNfwGMDY2hjakF2aek5GRgY4RzZ+fn6M1XKqh7/j4+Ig2o1cs8wAshAQCgYgxU1NTbKv5YkZKSgqrVAcNoKioCG1IlJl5kYuLC3pGEJFZzGhra2PV6iBw0MGaEWXFPIbsMpYTEPi6ijXDlexb1FzwQ2gnID09PWhDIHEN3g6y5hsaGtgI9cCvNNCmQG9vb6zMOolevU0W/mAwGO4Dp6mpiT2yxs3NDSkuLmbPjAmFQiR8lmDPHOLk5ASdGa7m5maWlRxemXkOPfRiDYqSDUHWvN0FzGRAA5C5BDYLIRk3LVTwe/LNzs5GGxZlFILXdnuRiKsPn8+HNi6qpaWFVf/HqzPPibr8gutxzIAouMcPyN4Wc+PMc6ICAPx+P2rEjtxsHkADABIRglt3exHDAACZj4OR3D7znJgBAHb2BC/MPMc0ACArKws1iqmjo4ON8gZSAQC9vb2oYS64ZXV6esqqvYPlf5/f3d2lenh4IGlpaaSwsJBUVVWR3NxcVuElCPkH5Y60i7z5JBsAAAAASUVORK5CYII=';
 
 	var languages = [];
 	languages[SETTINGS_LANGUAGE_EN] = {
@@ -420,6 +468,7 @@ var mainCode = function(){
 		detail_finaldelete : "Delete final coordinate",
 		detail_lastsaved : "last saved",
 		detail_edit : "Edit comment",
+		detail_share : "Share comment",
 		detail_delete : "Delete comment",
 		detail_thestate : "State",
 		detail_save : "Save comment",
@@ -459,7 +508,9 @@ var mainCode = function(){
 		waypoints : "Waypoints",
 		archived_filter_no_archived : "no archived",
 		archived_filter_include_archived : "include archived",
-		archived_filter_only_archived : "only archived"
+		archived_filter_only_archived : "only archived",
+		shareImportNew : "A site wants to import a new comment:\n%name%\nAllow?",
+		shareImportOverride : "A site wants to override one of your comments:\n%name%\nAllow?"
 	};
 	languages[SETTINGS_LANGUAGE_DE] = {
 		mycomments : "Meine Kommentare",
@@ -563,6 +614,7 @@ var mainCode = function(){
 		detail_finaldelete : "Finalkoordinate löschen",
 		detail_lastsaved : "zuletzt gespeichert",
 		detail_edit : "Kommentar editieren",
+		detail_share : "Kommentar teilen",
 		detail_delete : "Kommentar löschen",
 		detail_thestate : "Kommentarstatus",
 		detail_save : "Kommentar speichern",
@@ -602,7 +654,9 @@ var mainCode = function(){
 		waypoints : "Wegpunkte",
 		archived_filter_no_archived : "keine archivierten",
 		archived_filter_include_archived : "archivierte einschließen",
-		archived_filter_only_archived : "nur archivierte"
+		archived_filter_only_archived : "nur archivierte",
+		shareImportNew : "Eine Seite möchte einen neuen Kommentar importieren:\n%name%\nErlauben?",
+		shareImportOverride : "Eine Seite möchte einen deiner Kommentare überschreiben:\n%name%\nErlauben?"
 	};
 	var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 	var lang = languages[SETTINGS_LANGUAGE_EN];
@@ -709,6 +763,10 @@ var mainCode = function(){
 		} else if (document.URL.search("\/seek\/log\.aspx") >= 0) {
 			log('debug', 'matched gccommentOnLogPage');
 			gccommentOnLogPage();
+		}
+		else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
+			log('debug', 'matched gccommentOnSharingPage');
+			gccommentOnSharingPage();
 		}
 	}
 
@@ -1878,6 +1936,41 @@ function doDropboxAction(fnOnSuccess) {
 		}
 	}
 
+	function gccommentOnSharingPage(){
+		$('#btnAddToGcc').removeClass("forceHide");
+		window.addEventListener("message", function(e){
+			if(e.data.indexOf("GCC_Share_") === 0){
+				var data = JSON.parse(e.data.replace("GCC_Share_", ""));
+				console.log("Recived data from sharing site");
+				
+				if(typeof(data) === "undefined" || typeof(data.guid) === "undefined"
+					|| typeof(data.gccode) === "undefined" || typeof(data.name) === "undefined"){
+					console.log("Got invalid data from sharing site");
+					return;
+				}
+				
+				var msg = "";
+				
+				var oExisting = doLoadCommentFromGUID(data.guid);				
+				if (oExisting) {
+					msg = lang.shareImportOverride.replace("%name%", oExisting.name + " (" + oExisting.gccode + ")");
+				}
+				else{
+					msg = lang.shareImportNew.replace("%name%", data.name + " (" + data.gccode + ")");
+				}
+				
+				if(confirm(msg)){
+					console.log("Share import confirmed by user");
+					doSaveCommentWTimeToGUID(data);
+					$('#btnAddToGcc').removeClass("addButton").addClass("tickButton");
+				}
+				else{
+					console.log("Share import denied by user");
+				}
+			}
+		});	
+	}
+	
 	function toggleTabOnProfile(tabid) {
 		log('debug', 'tabid ' + tabid);
 		// do specials
@@ -1951,6 +2044,14 @@ function doDropboxAction(fnOnSuccess) {
 			imgEdit.setAttribute('style', 'cursor:pointer');
 			EditComment.appendChild(imgEdit);
 			EditComment.addEventListener('mouseup', editComment, false);
+			
+			ShareComment = document.createElement('a');
+			var imgShare = document.createElement('img');
+			imgShare.src = commentIconShare;
+			imgShare.title = lang.detail_share;
+			imgShare.setAttribute('style', 'cursor:pointer');
+			ShareComment.appendChild(imgShare);			
+			ShareComment.addEventListener('mouseup', function(){shareComment(currentCacheGUID);}, false);
 
 			EditCancelComment = document.createElement('a');
 			var imgEditCancel = document.createElement('img');
@@ -1968,10 +2069,14 @@ function doDropboxAction(fnOnSuccess) {
 				if (currentComment == null) {
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ShareComment.style.display = 'none';
+					ArchiveComment.style.display = 'none';
 					detailCommentTextArea.value = "";
 				} else {
 					AddComment.style.display = 'none';
 					EditComment.style.display = 'inline';
+					ShareComment.style.display = 'inline';
+					ArchiveComment.style.display = 'inline';
 					DeleteComment.style.display = 'inline';
 					detailCommentTextArea.value = currentComment.commentValue;
 					if (currentComment.lat && currentComment.lng) {
@@ -2027,6 +2132,13 @@ function doDropboxAction(fnOnSuccess) {
 				}
 			}, false);
 
+			ArchiveComment = document.createElement('a');
+			imgArchive = document.createElement('img');
+			imgArchive.src = archiveAdd;
+			imgArchive.title = lang.table_addtoarchive;
+			imgArchive.setAttribute('style', 'cursor:pointer');
+			ArchiveComment.appendChild(imgArchive);			
+						
 			DeleteComment = document.createElement('a');
 		imgDelete = document.createElement('img');
 			imgDelete.src = commentIconDelete;
@@ -2052,6 +2164,8 @@ function doDropboxAction(fnOnSuccess) {
 					detailCommentTextPane.style.display = 'none';
 					AddComment.style.display = 'inline';
 					EditComment.style.display = 'none';
+					ShareComment.style.display = 'none';
+					ArchiveComment.style.display = 'none';
 					SaveComment.style.display = 'none';
 					DeleteComment.style.display = 'none';
 					EditCancelComment.style.display = 'none';
@@ -2080,7 +2194,36 @@ function doDropboxAction(fnOnSuccess) {
 					doSaveCommentToGUID(currentComment);
 				}
 			}
-
+			
+			var add2Archive = function(){
+				currentComment.archived = ARCHIVED;
+				doSaveCommentToGUID(currentComment);
+				updateArchiveIcon();
+			};
+			
+			var removeFromArchive = function(){
+				currentComment.archived = null;
+				doSaveCommentToGUID(currentComment);
+				updateArchiveIcon();
+			};
+			
+			var updateArchiveIcon = function(){
+				if(currentComment !== null && currentComment.archived === ARCHIVED){
+					imgArchive.src = archiveRemove;
+					imgArchive.title = lang.table_removefromarchive;
+					ArchiveComment.removeEventListener('mouseup', add2Archive);					
+					ArchiveComment.addEventListener('mouseup', removeFromArchive);					
+				}
+				else{
+					imgArchive.src = archiveAdd;
+					imgArchive.title = lang.table_addtoarchive;
+					ArchiveComment.removeEventListener('mouseup', removeFromArchive);
+					ArchiveComment.addEventListener('mouseup', add2Archive);
+				}
+			};
+			
+			updateArchiveIcon();
+				
 			detailCommentDiv = document.createElement('div');
 			detailCommentDiv.setAttribute('name', 'mycomments');
 			var header = document.createElement('p');
@@ -2127,9 +2270,13 @@ function doDropboxAction(fnOnSuccess) {
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(EditComment);
 			header.appendChild(document.createTextNode('   '));
+			header.appendChild(ShareComment);
+			header.appendChild(document.createTextNode('   '));
 			header.appendChild(SaveComment);
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(EditCancelComment);
+			header.appendChild(document.createTextNode('   '));
+			header.appendChild(ArchiveComment);
 			header.appendChild(document.createTextNode('   '));
 			header.appendChild(DeleteComment);
 			header.appendChild(document.createTextNode('          '));
@@ -2177,6 +2324,8 @@ function doDropboxAction(fnOnSuccess) {
 
 				AddComment.style.display = 'none';
 				EditComment.style.display = "inline";
+				ShareComment.style.display = "inline";
+				ArchiveComment.style.display = "inline";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				detailCommentTextArea.style.display = 'none';
@@ -2190,6 +2339,8 @@ function doDropboxAction(fnOnSuccess) {
 			} else {
 				AddComment.style.display = 'inline';
 				EditComment.style.display = "none";
+				ShareComment.style.display = "none";
+				ArchiveComment.style.display = "none";
 				EditCancelComment.style.display = "none";
 				SaveComment.style.display = 'none';
 				DeleteComment.style.display = 'none';
@@ -2379,9 +2530,8 @@ function doDropboxAction(fnOnSuccess) {
 
 		// check for waypoints header and add if not present
 		var waypointElement = document.getElementById('ctl00_ContentBody_WaypointsInfo');
-		if (!waypointElement) {
-			var wptP = $('#ctl00_ContentBody_bottomSection > p:first');
-			wptP[0].innerHTML = '<span id="ctl00_ContentBody_WaypointsInfo" style="font-weight:bold;">Additional Waypoints</span><br>';
+		if (!waypointElement) {			
+			$('#ctl00_ContentBody_bottomSection > p:first').first().html('<span id="ctl00_ContentBody_WaypointsInfo" style="font-weight:bold;">Additional Waypoints</span><br>');
 		}
 
 		// add link to add waypoints
@@ -2413,6 +2563,8 @@ function doDropboxAction(fnOnSuccess) {
 								doSaveCommentToGUID(currentComment);
 								AddComment.style.display = "none";
 								EditComment.style.display = "inline";
+								ShareComment.style.display = "inline";
+								ArchiveComment.style.display = "inline";
 								DeleteComment.style.display = "inline";
 							}
 							currentComment.waypoints = currentComment.waypoints || [];
@@ -3520,11 +3672,169 @@ function doDropboxAction(fnOnSuccess) {
 			}
 		}
 		EditComment.style.display = 'none';
+		ShareComment.style.display = 'none';
+		ArchiveComment.style.display = 'none';
 		EditCancelComment.style.display = 'inline';
 		setTimeout(function() {
 			detailCommentTextArea.focus();
 		}, 50);
 	}
+	
+	function shareComment(guid){
+		$('#shareParagraph').hide();
+		var comment = doLoadCommentFromGUID(guid);		
+		var data = "<gccomment>"+commentToGCC(comment)+"</gccomment>"
+		
+		gistShare.shareComment(data, comment.gccode, comment.name).done(function(code){
+			console.log(comment.gccode +" successfully shared: "+ code);
+			if($('shareParagraph').length <= 0){
+				$('#gccommentarea small').after('<p style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" id="shareLink"></input></p>');
+			}			
+			$('#shareLink').attr("value","http://gcc.lukeIam.de#"+code);
+			$('#shareParagraph').slideDown({
+				done:(function(){
+					$('#shareLink').select();
+				})
+			});
+			
+		}).fail(function(msg){
+			console.log("Sharing of " + comment.gccode + " failed: \n"+ msg);
+		});		
+	}
+	
+	var gistShare = new function () {
+		this.shareComment = function (data, gcid, name) {
+			var d = new $.Deferred();
+
+			gist.uploadNewGist(data, gcid + ".gcc", "Shared comment for \"" + name + "\" (" + gcid + ")").done(function (result) {
+				if (typeof (result) !== "undefined" && typeof (result["id"]) !== "undefined") {
+					d.resolve("gcc" + result["id"]);
+				}
+				else {
+					d.reject("Creation failed");
+				}
+			}).fail(function (jqXHR, textStatus) {
+				d.reject(textStatus + " - " + jqXHR.responseText);
+			});
+
+			return d.promise();
+		};
+
+		this.getComment = function (id) {
+			var d = new $.Deferred();
+			var files = [];
+
+			gist.getGist(id).done(function (result) {
+				if (typeof (result) !== "undefined" && typeof (result["files"]) !== "undefined") {
+					var truncatedFilesUrls = [];
+
+					for (f in result["files"]) {
+						if (!f["truncated"]) {
+							files.push(result["files"][f]);
+						}
+						else {
+							truncatedFilesUrls.push({
+								url: result["files"][f]["raw_url"],
+								fileInfo: result["files"][f]
+							});
+						}
+					}
+
+					if (truncatedFilesUrls.length > 0) {
+						var fileLoadPromises = [];
+						for (urlData in truncatedFilesUrls) {
+							fileLoadPromises.push(
+								(function () {
+									var d2 = new $.Deferred();
+									$.ajax(urlData["url"], {
+										cache: false,
+										dataType: "text"
+									}).done(function (data) {
+										urlData["fileInfo"]["content"] = data;
+										d2.resolve(urlData["fileInfo"]);
+									}).fail(function (msg) {
+										d2.reject(msg);
+									});
+									return d2.promise();
+								})()
+							);
+						}
+
+						$.when.apply($, fileLoadPromises).done(function () {
+							for (var i = 0; i < arguments.length; i++) {
+								files.push(arguments[i]);
+							}
+							d.resolve(files);
+						}).fail(function () {
+							if (files.length > 0) {
+								d.resolve(files);
+								console.log("Getting some raw gist failed");
+							}
+							else {
+								d.reject("Getting raw gist failed");
+							}
+						});
+					}
+					else {
+						d.resolve(files);
+					}
+				}
+				else {
+					d.reject("Getting gist failed");
+				}
+			}).fail(function (jqXHR, textStatus) {
+				d.reject(textStatus + " - " + jqXHR.responseText);
+			});
+
+			return d.promise();
+		};		
+	};
+	
+	var gist = new function(){
+		var gistApiUrl = "https://api.github.com/gists";
+		this.getGist = function(id){
+			var d = new $.Deferred();
+			GM_xmlhttpRequest({url: gistApiUrl+"/"+id,
+				onload: function(e){d.resolve(JSON.parse(e.responseText));},
+				onerror: function(e){d.reject(e.statusText);}
+			});
+			
+			return d.promise();	
+		};
+		
+		this.uploadNewGist = function(data, filename, desc){
+			var d = new $.Deferred();
+			if(typeof(data) != "object"){
+				data = [data];
+			}
+			
+			if(typeof(filename) != "object"){
+				filename = [filename];
+			}
+			
+			var f = {};
+			for(i=0;i<filename.length&&i<data.length;i++){
+				f[filename[i]] = {
+					content:data[i]
+				};
+			}
+			
+			GM_xmlhttpRequest({
+					url: gistApiUrl,
+					method: "POST",
+					data: JSON.stringify({
+						public: false,
+						description: desc,
+						files: f
+					}),
+					onload: function(e){d.resolve(JSON.parse(e.responseText));},
+					onerror: function(e){d.reject(e.statusText);}
+				}
+			);
+			
+			return d.promise();			
+		};
+	};
 
 	function retrieveOriginalCoordinates() {
 		var origCoordinates;
@@ -3697,6 +4007,8 @@ function doDropboxAction(fnOnSuccess) {
 		detailCommentInputLatLng.setAttribute("disabled", "");
 		AddComment.style.display = 'none';
 		EditComment.style.display = 'inline';
+		ShareComment.style.display = 'inline';
+		ArchiveComment.style.display = 'inline';
 		DeleteComment.style.display = 'inline';
 		updateSaveTime(new Date());
 
@@ -4161,7 +4473,63 @@ function doDropboxAction(fnOnSuccess) {
 		GM_setValue(LAST_EXPORT, "" + (new Date() - 0));
 		return result;
 	}
-
+	
+	function commentToGCC(comment){
+		var result = "";
+		result = result + "<comment>";
+		result = result + "<gcid>";
+		result = result + comment.guid;
+		result = result + "</gcid>";
+		result = result + "<gccode>";
+		result = result + comment.gccode;
+		result = result + "</gccode>";
+		result = result + "<name>";
+		result = result + escapeXML(comment.name);
+		result = result + "</name>";
+		result = result + "<content>";
+		result = result + escapeXML(comment.commentValue);
+		result = result + "</content>";
+		result = result + "<save>";
+		result = result + comment.saveTime;
+		result = result + "</save>";
+		result = result + "<state>";
+		result = result + comment.state;
+		result = result + "</state>";
+		result = result + "<finallat>";
+		if (comment.lat)
+			result = result + comment.lat;
+		result = result + "</finallat>";
+		result = result + "<finallng>";
+		if (comment.lng)
+			result = result + comment.lng;
+		result = result + "</finallng>";
+		result = result + "<origlat>";
+		if (comment.origlat)
+			result = result + comment.origlat;
+		result = result + "</origlat>";
+		result = result + "<origlng>";
+		if (comment.origlng)
+			result = result + comment.origlng;
+		result = result + "</origlng>";
+		result = result + "<archived>";
+		if (comment.archived)
+			result = result + comment.archived;
+		result = result + "</archived>";
+		result = result + "<waypoints>";
+		for (var j = 0; comment.waypoints && (j < comment.waypoints.length); j++) {
+			result = result + "<waypoint>";
+			result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
+			result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
+			result = result + "<name>" + comment.waypoints[j].name + "</name>";
+			result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
+			result = result + "</waypoint>";
+		}
+		result = result + "</waypoints>";
+		result = result + "</comment>";
+		
+		return result;
+	}
+	
 	function getComments(filtered) {
 		var filteredComments = new Array();
 		var commentKeys = GM_listValues();
@@ -5458,9 +5826,24 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
+	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
+		GM_deleteValue  = function(key){
+			if(typeof(localStorageCache) === "undefined"){
+				var localStorageCache = {};
+			}
+			localStorageCache[key] = undefined;			
+			chrome.runtime.sendMessage({"setValue": undefined, "setKey": key}, function(){} );				
+		};
+	}
+	
 	window.addEventListener("message", function(e){
 		if(e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
+			for(name in data){
+				if(data[name] === "%%%undefined%%%"){
+					data[name] = undefined;
+				}
+			}
 			localStorageCache[Object.keys(data)[0]] = data[Object.keys(data)[0]];
 			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]}, function(){});
 		}
@@ -5477,7 +5860,7 @@ if (typeof (chrome) !== "undefined") {
 			var request = new XMLHttpRequest ();
 			request.onreadystatechange = function(data) { 
 				if (request.readyState == 4) {
-					if (request.status == 200){
+					if (request.status.toString().substr(0,1) === "2"){
 						if(rdata.onload){
 							rdata.onload(request);
 						}
