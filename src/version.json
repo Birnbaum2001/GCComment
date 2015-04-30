@@ -1,6 +1,17 @@
 {
-	"latestVersion":86,
-	"changes":[{
+	"latestVersion":88,
+	"changes":[
+	{
+		"version": 88,
+		"date": "2014-07-3",
+		"change": "<ul><li>Made comments shareable</li><li>Add an archive button to the cache page</li><li>Fix a problem with FireFox 39</li></ul>"
+	},
+	{
+		"version": 87,
+		"date": "2014-07-3",
+		"change": "<ul><li>Mostly changes for chrome</li></ul>"
+	},
+	{
 		"version": 86,
 		"date": "2014-07-3",
 		"change": "<ul><li>fix: many bug and made chrome working again</li></ul>"
