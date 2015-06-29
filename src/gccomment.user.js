@@ -1939,7 +1939,7 @@ function doDropboxAction(fnOnSuccess) {
 	function gccommentOnSharingPage(){
 		$('#btnAddToGcc').removeClass("forceHide");
 		window.addEventListener("message", function(e){
-			if(e.data.indexOf("GCC_Share_") === 0){
+			if(e.data && e.data.indexOf("GCC_Share_") === 0){
 				var data = JSON.parse(e.data.replace("GCC_Share_", ""));
 				console.log("Recived data from sharing site");
 				
@@ -5837,7 +5837,7 @@ if (typeof (chrome) !== "undefined") {
 	}
 	
 	window.addEventListener("message", function(e){
-		if(e.data.indexOf("GCC_Storage_") === 0){
+		if(e.data && e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
 			for(name in data){
 				if(data[name] === "%%%undefined%%%"){
@@ -5918,9 +5918,8 @@ if (typeof (chrome) !== "undefined") {
 		updateCheck();
 	});  
 } else {
-	window.addEventListener("message", function(e){
-	
-		if(e.data.indexOf("GCC_Storage_") === 0){
+	window.addEventListener("message", function(e){	
+		if(e.data && e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));		
 			GM_setValue(Object.keys(data)[0], data[Object.keys(data)[0]]);
 		}
