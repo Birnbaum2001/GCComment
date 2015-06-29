@@ -2118,16 +2118,25 @@ function doDropboxAction(fnOnSuccess) {
 
 					saveFinalCoords();
 					if (GM_getValue(AUTO_UPDATE_GS_FINAL) == 1) {
-						$.pageMethod("/seek/cache_details.aspx/ResetUserCoordinate", JSON.stringify({
-							dto : {
-								ut : unsafeWindow.userToken
-							}
-					}), function(response) {
-						var r = JSON.parse(response.d);
-							if (r.status == "success") {
-								window.location.reload();
-							}
-						});
+						var pageMethodCaller =  function(userToken){ 						
+							$.pageMethod("/seek/cache_details.aspx/ResetUserCoordinate", JSON.stringify({
+								dto : {
+									ut : userToken
+								}
+							}), function(response) {
+								var r = JSON.parse(response.d);
+									if (r.status == "success") {
+										window.location.reload();
+									}
+							});
+						};
+					
+						if(browser === "FireFox"){							
+							appendScript("text", "(" + pageMethodCaller.toString() + ")('" + unsafeWindow.userToken.replace(/'/g,"%27") + "'.replace('%27','\\''));");
+						}
+						else{
+							pageMethodCaller(unsafeWindow.userToken);
+						}
 					}
 				}
 			}, false);
@@ -2724,21 +2733,31 @@ function doDropboxAction(fnOnSuccess) {
 					log("debug", "saveToCacheNote: cache note identical - nothing to do");
 					return;
 				}
-
-				$.pageMethod("/seek/cache_details.aspx/SetUserCacheNote", JSON.stringify({
+				var pageMethodCaller = function(data){ 					
+					$.pageMethod("/seek/cache_details.aspx/SetUserCacheNote", data, function(r) {
+						var r = JSON.parse(r.d);
+						if (!r.success == true) {
+							log("info", "failed while saving comment to cache note");
+							return;
+						}
+						
+						$("#cache_note").text(text);
+					});	
+				};
+				
+				var dataString = JSON.stringify({
 					dto :{
 						et : text,
 						ut : unsafeWindow.userToken
 					}
-				}), function(r) {
-					var r = JSON.parse(r.d);
-					if (!r.success == true) {
-						log("info", "failed while saving comment to cache note");
-						return;
-					}
-					
-					$("#cache_note").text(text);
-				});				
+				});
+				
+				if(browser === "FireFox"){
+					appendScript("text", "(" + pageMethodCaller.toString() + ")('" + dataString.replace(/'/g,"%27") + "'.replace('%27','\\''));");
+				}
+				else{
+					pageMethodCaller(dataString);
+				}
 			}
 		}
 	};
@@ -3912,7 +3931,16 @@ function doDropboxAction(fnOnSuccess) {
 				saveToCacheNote(currentComment);
 				
 				if (GM_getValue(AUTO_UPDATE_GS_FINAL) == 1) {
-					$.pageMethod("/seek/cache_details.aspx/SetUserCoordinate", JSON.stringify({
+					var pageMethodCaller = function(data){
+						$.pageMethod("/seek/cache_details.aspx/SetUserCoordinate", data, function(r) {
+							var r = JSON.parse(r.d);
+							if (r.status == "success") {
+								window.location.reload();
+							}
+						});						 
+					};		
+					
+					var dataString = JSON.stringify({
 						dto : {
 							data : {
 								lat : fin[0],
@@ -3920,12 +3948,14 @@ function doDropboxAction(fnOnSuccess) {
 							},
 							ut : unsafeWindow.userToken
 						}
-					}), function(r) {
-						var r = JSON.parse(r.d);
-						if (r.status == "success") {
-							window.location.reload();
-						}
 					});
+					
+					if(browser === "FireFox"){						
+						appendScript("text", "(" + pageMethodCaller.toString() + ")('" + dataString.replace(/'/g,"%27") + "'.replace('%27','\\''));");
+					}
+					else{
+						pageMethodCaller(dataString);
+					}
 				}
 			} else {
 				error = fin[0];
@@ -5826,7 +5856,7 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
-	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
+	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue.toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
 		GM_deleteValue  = function(key){
 			if(typeof(localStorageCache) === "undefined"){
 				var localStorageCache = {};
