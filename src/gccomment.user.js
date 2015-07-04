@@ -517,7 +517,11 @@ var mainCode = function(){
 		archived_filter_include_archived : "include archived",
 		archived_filter_only_archived : "only archived",
 		shareImportNew : "A site wants to import a new comment:\n%name%\nAllow?",
-		shareImportOverride : "A site wants to override one of your comments:\n%name%\nAllow?"
+		shareImportOverride : "A site wants to override one of your comments:\n%name%\nAllow?",
+		gistNotice : "If you share comments as links GCComment will uploaded them as secret anonymous gists (they are not public, but also not deleteable)",
+		gistNoticeMoreInfo : "[More info]",
+		gistNoticeHide : "[Do not show again]",
+		gistNoticeLink : "https://github.com/lukeIam/gcc/wiki/ShareLinksGerman#mehr-informationen-zum-teilen-von-kommentaren-als-links"
 	};
 	languages[SETTINGS_LANGUAGE_DE] = {
 		mycomments : "Meine Kommentare",
@@ -665,7 +669,11 @@ var mainCode = function(){
 		archived_filter_include_archived : "archivierte einschließen",
 		archived_filter_only_archived : "nur archivierte",
 		shareImportNew : "Eine Seite möchte einen neuen Kommentar importieren:\n%name%\nErlauben?",
-		shareImportOverride : "Eine Seite möchte einen deiner Kommentare überschreiben:\n%name%\nErlauben?"
+		shareImportOverride : "Eine Seite möchte einen deiner Kommentare überschreiben:\n%name%\nErlauben?",
+		gistNotice : "Wenn Kommentare als Link geteilt werden, läd GCComment diese als geheime und anonyme Gists hoch (diese sind nicht öffentlich, können aber auch nicht gelöscht werden)",
+		gistNoticeMoreInfo : "[Mehr Informationen]",
+		gistNoticeHide : "[Zeige diesen Hinweis nicht mehr]",
+		gistNoticeLink : "https://github.com/lukeIam/gcc/wiki/ShareLinksGerman#mehr-informationen-zum-teilen-von-kommentaren-als-links"
 	};
 	var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 	var lang = languages[SETTINGS_LANGUAGE_EN];
@@ -717,6 +725,16 @@ var mainCode = function(){
 		homelat = GM_getValue('HOMELAT');
 		homelng = GM_getValue('HOMELNG');
 
+		//add gist banner
+		if(! GM_getValue("gistNoticeHidden", false)){
+			$('#Navigation').after('<div id="gistNotice" style="text-align: center; background-color: #C2E0FF;"> <span>'+lang.gistNotice+'</span><br><a style="font-weight: bold;" target="_blank" href="'+lang.gistNoticeLink+'"><span>'+lang.gistNoticeMoreInfo+'</span></a><br><a style="cursor: pointer; font-weight: bold;" id="gistNoticeHide"><span>'+lang.gistNoticeHide+'</span></a></div>');
+			
+			$('#gistNoticeHide').click(function(){
+				GM_setValue("gistNoticeHidden", true);
+				$('#gistNotice').slideUp("fast"); 
+			});
+		}
+		
 		// starting the GCC
 		log('debug', 'found URL: ' + document.URL);
 		if ((document.URL.search("cache_details\.aspx") >= 0) || (document.URL.search("\/geocache\/GC") >= 0)) {
