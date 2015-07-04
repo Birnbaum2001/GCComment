@@ -4,6 +4,9 @@
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
 // @include			/^https?://lukeiam.github.io/gcc/.*$/
+// @include			/^https://api.dropbox.com/.*$/
+// @include			/^https://gist.github.com/.*$/
+// @include			/^https://api.github.com/.*$/
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
@@ -364,7 +367,9 @@ var mainCode = function(){
 	
 	var commentIconShare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVQ4T32TTYtSURjH/8e3MvVqQ5PjFJNvODJiJojgB3DRSnBnX8GFG1tJCxlx4cKNhBsLFxIuBEGEdm3cubJBpIF8SWocNSfHqaYCPXEOKN65MA883MM99/k9L//7kHq9TrFlq9UKlFKsn+FwmGzf3zwTBjCbzZv3LHBt/X4foVCIA14cv6fvXj2XwDYAlpX52mQyGUajEYLBIGHBBw+1GE5+4iaE1Go1UQWEEMjlcu4qlQqJ0ic8MWqxK6gwXfzDl7EYQqrVKrXZbOj1emDBSqUSOp0OVqsVL9+ewLynw67hLnpnc1j3DZjO/2BwfrWphFQqFWq328FKZs6yarVaxN98hMUkwHhfjf7octOaxaTH+Mc1+qMFh5ByuUwdDgeGwyEP1uv1eP1hAeu+HqYdDQbnC4kI5j0Bo4tf6J1dgpRKJep0OvkAWd9qtRrHlYEoSHfvDnYENS4W17j6/Vd0R4rFInW5XFx3NgOFQoHpdAqLxYLZbIZAIMBVsD1+gO7X71IVCoUCdbvdHLAtIYN1u11EIhEOODQbcToYSwH5fJ56PB4+uG1j2TudDqLRKAcc2R+h8/mbFJDL5ajX64UgCCIAa6PdbiMWi3HA08MDnJwOpYBsNkt9Ph8MBoMIMJlM0Gq1EI/HOeDZkRWtTk8KyGQy1O/3Yz6fiwAajQbNZhOJRIID1peSXzmdTtNAILDZvvU+sKE2Gg2kUqnbtzGZTFL28XK55JDtdWZKZDKZWwH/ARw1EUZjI/GaAAAAAElFTkSuQmCC';
 	var linkIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAUNSURBVHhe1ZvNK3xRGMfPDDErSUqThbIg/gRZKAt2io2dGpSXLESxUhYWpNiQ15UiRSkL7xJCCUXelpQkykZRXu5vnvM7hzN3njv33Dsz5977qW/NuM+Zeb7fc+feO+cOnxaGeJDX11eyuLhILi8vyfv7O8nJySElJSWkoqKCVUgCAXiJ+/t7LS8vDybNUK2trazaHE8FMDo6iho20s/PDxtpjGcC6O/vR02a6fv7m70CjicCsGueK1YIrg8gXvNcRiG4OoBEmefCQnBtALLmOzs7tZGREXQbJv2B0ZUByJpfW1tjIzQ6u1gNJjEE1wUga351dZWN+OPz8xOtxcRxVQDxmOd8fX2hY/Sqr6+n9a4JIBHmObIhAK4IIJHmOTIfh/B3CecDSIZ5jtmBsb293dkAkmmeMzMzg74mqLa2VvOHHzjC4OAg6erqYs+MCZ/qrH/FFXh+fmaPogkEAuEYHGBjYwOdEb3E87wdrq+v0dflonsgq1UK1oxe8ez2wNXVFfq6om5vb9UHMDw8jDYjSm9+Z2dHOz4+Zs/MMZt5UHp6Oq1VHkBBQQHaEJdofn19PWp7+DPNtuLIzDzo6OiI1isPAGuGSzS/vLyM1oCMkDUPpz+OawIoLS1lFbHNg7a2tljlHzK7PYhfAnNcE8D8/DzdbmYetLCwQGs5sjOvNw8oDwAOPvrGZmdn6TYZ8yAR2ZkPhUJsRCTKA6irq4tobG5ujv5d1vz4+DitB+zu9iLKA3h6evptzOrMDw0N0Xognt1eRHkAQHl5uTYxMUEf2zEf724vkpQAZG5IAE7OPCdhAfT19WnBYDCqkcrKSu3s7IxV/eH0zHPiDmBlZQVtQq/8/Hw2wrr5/f19rbq6Gq3Ry4p5IK4ABgYG0CYwTU9P0zFWzR8eHqLbMcnu9iK2A5BdzADZPdrD9Tq2HZPVmefYCsCKeavneVUzz7EcgIqZl10wATU2NtIxdrEUgBXzsBYHWDUPlJWVoTV6TU5OshH2kQ5A1vzS0hIbYc885+7uTqupqYmqzczM1Lq7u1lV/EgFIGte9vu8KMw8Rqx7/PFgGoAK89vb2/R3P04QMwAV5sWj/cHBAf2bSgwDkDUvLl1vbm6iNXpx8/rzvLgqpAo0ADvmAaxGL2zmRakm6h3t7PYAfOHB6kRx83t7e+h20MfHB61RRUQAds0DcNrCarm4eSA1NRWtAb28vLAqNfwGMDY2hjakF2aek5GRgY4RzZ+fn6M1XKqh7/j4+Ig2o1cs8wAshAQCgYgxU1NTbKv5YkZKSgqrVAcNoKioCG1IlJl5kYuLC3pGEJFZzGhra2PV6iBw0MGaEWXFPIbsMpYTEPi6ijXDlexb1FzwQ2gnID09PWhDIHEN3g6y5hsaGtgI9cCvNNCmQG9vb6zMOolevU0W/mAwGO4Dp6mpiT2yxs3NDSkuLmbPjAmFQiR8lmDPHOLk5ASdGa7m5maWlRxemXkOPfRiDYqSDUHWvN0FzGRAA5C5BDYLIRk3LVTwe/LNzs5GGxZlFILXdnuRiKsPn8+HNi6qpaWFVf/HqzPPibr8gutxzIAouMcPyN4Wc+PMc6ICAPx+P2rEjtxsHkADABIRglt3exHDAACZj4OR3D7znJgBAHb2BC/MPMc0ACArKws1iqmjo4ON8gZSAQC9vb2oYS64ZXV6esqqvYPlf5/f3d2lenh4IGlpaaSwsJBUVVWR3NxcVuElCPkH5Y60i7z5JBsAAAAASUVORK5CYII=';
-
+	var linkIconSmall = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABO0lEQVR42pWUz2rCQBDGQ4wevHkUIpicerc9Su8K7Ts1iGf/HNqrr+AD2IvSUrWnngX7Am0FifXQfls+4SskWXfgB5nszmTm29l4nps1wQocwQFMQNUxh+eDBPyAHdjz+RmUXRKNGPgNYnBF3/BwToIADBiwAaGsXUplVrvjxndqpBaBr3MS1aX8BngBU66FbNOs9W2JzBdTcA1mDFqysg39HqjkJbigoMY6YM6gR1a2pT8GpTxhT5qkTLKmvwBtaXVY1MpANt5KJa9MmtJP+NHMYRvJ6TREE1NJl/tMu62isU9kTpo8nZMmN6wktp3MUib2b9iCIJjyfSittmyJjrw7UUalW9HEauYWf4KavAtlToZ5wv5X2fcnDHhjskgmduxyq83/5ImBH3J3ejxNJyujsnsRtl809ln2C3fcZBrgCT7NAAAAAElFTkSuQmCC';
+	
+	
 	var languages = [];
 	languages[SETTINGS_LANGUAGE_EN] = {
 		mycomments : "My comments",
@@ -435,11 +440,13 @@ var mainCode = function(){
 		export_toDropbox : "Export all to Dropbox",
 		export_toDropboxEnterFileName : "Please enter the file name",
 		export_toDropboxPerformFilteredExport : "Perform filtered export to Dropbox",
+		export_toGistPerformFilteredExport : "Perform filtered export as shareable link",
 		export_toServer_result : "The server said",
 		import_explain : "You can import backups that were previously exported using GCComment. The only file formatted supported right now is GCC, i.e., GCComments own file format. After pressing the 'Execute Import' button, the import will be parsed. Comments will be imported, unless there is already a comment with a newer time stamp. So more recent comments cannot be overwritten by older backups.",
 		import_choose : "Choose GCC file to import from (*.gcc):",
 		import_fromServer : "Load from server",
 		import_fromDropbox : "Load from Dropbox",
+		import_fromGist : "Load from link",
 		import_fromDropboxCheckForFiles : "Check on Dropbox",
 		import_perform : "Execute import",
 		import_close : "Close import window",
@@ -581,11 +588,13 @@ var mainCode = function(){
 		export_toDropbox : "Alle zur Dropbox exportieren",
 		export_toDropboxEnterFileName : "Bitte Dateinamen eingeben",
 		export_toDropboxPerformFilteredExport : "Gefilterten Export zu Dropbox durchführen",
+		export_toGistPerformFilteredExport : "Gefilterter Export als teilbarer Link",
 		export_toServer_result : "Der Server sagte",
 		import_explain : "Es können Sicherungskopien importiert werden, die zuvor von GCComment exportiert wurden. Es wird nur das GCComment-eigene Dateiformat unterstützt (*.gcc). Nach dem Drücken des 'Import durchführen'-Knopf wird der Import geprüft. Die Kommentare werden importiert solange nicht schon ein Kommentar mit einem neueren Zeitstempel vorhanden ist. Daher können aktuellere Kommentare nicht durch ältere überschrieben werden.",
 		import_choose : "Wähle GCC-Datei zum Importieren (*.gcc):",
 		import_fromServer : "Lade vom Server",
 		import_fromDropbox : "Lade von Dropbox",
+		import_fromGist : "Lade von Link",
 		import_fromDropboxCheckForFiles : "Prüfe in Dropbox",
 		import_perform : "Import durchführen",
 		import_close : "Importfenster schließen",
@@ -1329,6 +1338,14 @@ var mainCode = function(){
 			exportDropboxButton.addEventListener('click', performFilteredDropboxExport, false);
 			exportDropboxButton.setAttribute('style', 'margin:5px');
 			exportDiv.appendChild(exportDropboxButton);
+			
+			exportGistButton = document.createElement('input');
+			exportGistButton.setAttribute('type', 'button');
+			exportGistButton.setAttribute('value', lang.export_toGistPerformFilteredExport);
+			exportGistButton.addEventListener('click', performFilteredGistExport, false);
+			exportGistButton.setAttribute('style', 'margin:5px');
+			exportDiv.appendChild(exportGistButton);
+
 
 			dropboxExportLink = document.createElement('input');
 			dropboxExportLink.setAttribute('type', 'button');
@@ -1392,9 +1409,29 @@ var mainCode = function(){
 			dropboxImportLink.setAttribute('value', lang.import_fromDropbox);
 			dropboxImportLink.addEventListener('mouseup', loadFromDropbox, false);
 			importDiv.appendChild(dropboxImportLink);
-
+			
+			importDiv.appendChild(document.createElement('br'));
+			
+			gistImportLink = document.createElement('input');
+			gistImportLink.setAttribute('id', 'gistImportLink');			
+			gistImportLink.setAttribute('type', '');
+			gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");
+			gistImportLink.setAttribute('style', "margin-right: 0.5em; width: 25em; color: darkgray;");
+			importDiv.appendChild(gistImportLink);
+			$('#gistImportLink').before('<img  style="height: 18px; width: 18px; vertical-align: middle; margin-right: 0.5em; margin-bottom: 0.2em;" src="'+linkIconSmall+'"></img>');
+			
+			gistImportLinkButton = document.createElement('input');
+			gistImportLinkButton.setAttribute('id', 'gistImportLinkButton');
+			gistImportLinkButton.setAttribute('type', 'button');
+			gistImportLinkButton.setAttribute('value', lang.import_fromGist);
+			gistImportLinkButton.addEventListener('mouseup', loadFromGist, false);
+			importDiv.appendChild(gistImportLinkButton);
+			
+			importDiv.appendChild(document.createElement('br'));
+			
 			importText = document.createElement('textarea');
 			importText.setAttribute('id', 'gccommentimporttextarea');
+			importText.setAttribute('style', 'margin-top: 0.5em;');
 			importText.cols = 100;
 			importText.rows = 10;
 			importDiv.appendChild(importText);
@@ -1568,6 +1605,43 @@ function loadFromDropbox() {
 			importText.value = data;
 		});
 	});
+}
+
+function loadFromGist() {
+		gistImportLinkButton.parentNode.insertBefore(waitingTag, gistImportLinkButton);
+		waitingTag.setAttribute('style', 'display:inline');
+		waitingTag.setAttribute('src', waitingGif);
+		
+		var id = $('#gistImportLink')[0].value.trim().replace("http://","").replace("gcc.lukeIam.de","").replace(/\//g,"").replace(/#/g,"").toLowerCase();		
+		
+		if(id === "" || id.indexOf("gccc") != 0 || id==="gccc"){
+			$('#gistImportLink')[0].value = "http://gcc.lukeIam.de#gccc";
+			waitingTag.setAttribute('style', 'display:none');
+			return;
+		}
+		
+		id = id.substr(4);
+		
+		gistShare.getComment(id).done(function (files) {
+			if(files.length > 0){
+				waitingTag.setAttribute("src", successIcon);
+				setTimeout(function() {
+					$("#waiting").fadeOut('slow', function() {
+					});
+				}, 5000);
+
+				importText.value = files[0].content;
+			}
+			else{
+				waitingTag.setAttribute("src", errorIcon);
+				log("debug", "No data"); // Something went wrong.			
+				return;
+			}
+		}).fail(function(error){
+			waitingTag.setAttribute("src", errorIcon);
+			log("debug", error); // Something went wrong.			
+			return;
+		});	
 }
 
 function doDropboxAction(fnOnSuccess) {
@@ -3815,7 +3889,8 @@ function doDropboxAction(fnOnSuccess) {
 			var d = new $.Deferred();
 			GM_xmlhttpRequest({url: gistApiUrl+"/"+id,
 				onload: function(e){d.resolve(JSON.parse(e.responseText));},
-				onerror: function(e){d.reject(e.statusText);}
+				onerror: function(e){d.reject(e.statusText);},
+				method: "GET"
 			});
 			
 			return d.promise();	
@@ -4727,6 +4802,78 @@ function doDropboxAction(fnOnSuccess) {
 		}
 	}
 
+	function performFilteredGistExport() {
+		var exportType = $('#exportTypeSelector option:selected').text();
+		var data = null;
+		
+		if (exportType === "GCC") {
+			data = xmlversion + buildGCCExportString(true);
+		} else if (exportType === "CSV") {
+			data = exportToCSV();
+		} else if (exportType === "HTML") {
+			data = exportToHTML();
+		} else if (exportType === "GPX") {
+			data = exportToGPX();
+		} else if (exportType === "KML") {
+			data = exportToKML();
+		} else if (exportType === "JSON") {
+			data = exportToJSON();
+		}
+
+		if (data) {
+			var fileNameSuggest = "" + createTimeString(new Date(), true) + "_filteredExport."
+					+ exportType.toLowerCase();
+			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
+			
+			if (fileName) {
+			doDropboxAction(function(client) {
+				exportGistButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
+
+				gist.uploadNewGist(data, fileName, "GCC Export ("+ createTimeString(new Date(), true) +")")
+				.done(function (result) {
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);					
+					
+					if($('shareParagraph').length <= 0){
+						$('#exportDiv').append('<p style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" id="shareLink"></input></p>');
+					}			
+					$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
+					$('#shareParagraph').slideDown({
+						done:(function(){
+							$('#shareLink').select();
+						})
+					});
+					
+					log("debug", "Export to Gist successful");					
+				}).fail(function (jqXHR, textStatus) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", textStatus + " - " + jqXHR.responseText);	
+				});
+				
+				client.writeFile(fileName, data, function(error, stat) {
+					if (error) {
+						waitingTag.setAttribute("src", errorIcon);
+						log("debug", error); // Something went wrong.
+						return;
+					}
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+
+					log("debug", "Export to dropbox successful");
+				});
+				});
+			}
+		}
+	}
+	
 	function performFilteredExport() {
 		var exportType = $('#exportTypeSelector option:selected').text();
 		var parentElement = $('#exportDiv')[0];
