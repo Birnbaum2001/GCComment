@@ -14,7 +14,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			88
+// @version			89
 // @author			Birnbaum2001, lukeIam
 // ==/UserScript==
 
@@ -51,7 +51,7 @@
  */
 
 // version information
-var version = "88";
+var version = "89";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
