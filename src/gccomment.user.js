@@ -4843,8 +4843,7 @@ function doDropboxAction(fnOnSuccess) {
 					+ exportType.toLowerCase();
 			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
 			
-			if (fileName) {
-			doDropboxAction(function(client) {
+			if (fileName) {			
 				exportGistButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
 				waitingTag.setAttribute('style', 'display:inline');
 				waitingTag.setAttribute('src', waitingGif);
@@ -4886,8 +4885,7 @@ function doDropboxAction(fnOnSuccess) {
 					}, 5000);
 
 					log("debug", "Export to dropbox successful");
-				});
-				});
+				});				
 			}
 		}
 	}
