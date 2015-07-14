@@ -1691,6 +1691,7 @@ function doDropboxAction(fnOnSuccess) {
 		window.$('#patchResultDiv').empty();
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(gccString, "text/xml");
+		xmlDoc.normalize();
 		var urls = xmlDoc.getElementsByTagName('url');
 		var gpx = xmlDoc.getElementsByTagName('gpx')[0];
 		var toRemove = new Array();
@@ -1870,6 +1871,7 @@ function doDropboxAction(fnOnSuccess) {
 
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(gccString, "text/xml");
+		xmlDoc.normalize();
 
 		var parseStatus = document.createElement('p');
 		parseStatus.innerHTML = 'The file ' + filename + " contains " + xmlDoc.getElementsByTagName('wpt').length
@@ -4869,6 +4871,7 @@ function doDropboxAction(fnOnSuccess) {
 		// log("debug", "parsing..." + importText.value);
 		var parser = new DOMParser();
 		var xmlDoc = parser.parseFromString(importText.value, "text/xml");
+		xmlDoc.normalize();
 		var comments = xmlDoc.getElementsByTagName('comment');
 		var resultImported = "";
 		var resultNotImported = "  ";
