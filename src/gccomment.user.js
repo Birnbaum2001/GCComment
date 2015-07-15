@@ -4870,21 +4870,6 @@ function doDropboxAction(fnOnSuccess) {
 				}).fail(function (jqXHR, textStatus) {
 					waitingTag.setAttribute("src", errorIcon);
 					log("debug", textStatus + " - " + jqXHR.responseText);	
-				});
-				
-				client.writeFile(fileName, data, function(error, stat) {
-					if (error) {
-						waitingTag.setAttribute("src", errorIcon);
-						log("debug", error); // Something went wrong.
-						return;
-					}
-					waitingTag.setAttribute("src", successIcon);
-					setTimeout(function() {
-						$("#waiting").fadeOut('slow', function() {
-						});
-					}, 5000);
-
-					log("debug", "Export to dropbox successful");
 				});				
 			}
 		}
