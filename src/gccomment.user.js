@@ -366,7 +366,9 @@ var mainCode = function(){
 	var archiveRemove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMNSURBVDjLdZNLaFx1GMV/d+bO3DtJxkwSSWNq05YkrTVa04qIiOiiRIxgE2ohhUIKRQQFBcGiIiJiFaGIYEFERFy5dCE1pQ8JIbSEJhG66GM6idOk6Uwyec7zztz7/z4XlSw0nvXhx4FzjqWqbKXb517rQeRzFY2ryPv7Bkf+3Mpn/RuQHDncqqLvqMjbLZ2DCVNZZjV9uaii36uRr58Yunx/S8Cd8wMRVT2hIqfi2/u6tu17nZAYiplJIk6YpdQo6/em7qrIGRX5sXd4vLIJSJ4f6EP0Y6ep94Vtjx3BbeoGrRGs3eGv0dPsePx5QnU7qZZyLKamKORuTqgxpw++MfGbdXvk8E+IDD/cNWS5zU/iFZbZyN3E1Ir4pQyOVaWtYy94a4QbOgi5cfKZJIupKcprd3+x1cjxPYfOWn5hmWJmFKnlcco5yvkM+fkFDg59SyRWD6U0Wkph5ZO0tO+nsRmmf589aqtISbEao65DvLmDSu4GdU0JEk0xYpTBmwMTBW8BKvOUsxMU01dwdx1BjZRsFQEBrCiRxm4iThxvaRIpLhEJg1WegZBSy16ikF8niCUg6qB+gIpgqxEe9GBAq2DX47YeIIjGcL0VJHuRDb9A4DZgnDhSrkGgSC1AjcFWYx4UqgbEBymDVrEbthNv28PG6iR+yGVlIsfKtTm8xXVCD0VpfY5/EojEQpEIEINgBaQK4oGpgttOoLA6sUIt6/L08Q9xdvdQuX6BG+OX8IP1+pAaGZsd+4bK2hw47RCuA1MD9QFBfSFzJUn3S0dxZ0axfj5G3eyv7Opopja3HthizKuF+fHhW+mxU82dh7oe3d9POL4XyinwSpiqj1mr4bbthv73Nidsf/oIIU+czSlP//Bsq4q8q0bean9qINHe2w++R37+KtOffckzrwxSP3eOaiVLGSjkw9yaYeE/Z7p29kCPGvlIRY51vnjSqiylmb/4B3be0x0tgWWH7lHIBaQXw8b39BPr/+589UxPn4p8gEhURb7ierWntHr/zbCxdpqwLih89/KF4Iu/AXSvuZLBEiNYAAAAAElFTkSuQmCC';
 	
 	var commentIconShare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVQ4T32TTYtSURjH/8e3MvVqQ5PjFJNvODJiJojgB3DRSnBnX8GFG1tJCxlx4cKNhBsLFxIuBEGEdm3cubJBpIF8SWocNSfHqaYCPXEOKN65MA883MM99/k9L//7kHq9TrFlq9UKlFKsn+FwmGzf3zwTBjCbzZv3LHBt/X4foVCIA14cv6fvXj2XwDYAlpX52mQyGUajEYLBIGHBBw+1GE5+4iaE1Go1UQWEEMjlcu4qlQqJ0ic8MWqxK6gwXfzDl7EYQqrVKrXZbOj1emDBSqUSOp0OVqsVL9+ewLynw67hLnpnc1j3DZjO/2BwfrWphFQqFWq328FKZs6yarVaxN98hMUkwHhfjf7octOaxaTH+Mc1+qMFh5ByuUwdDgeGwyEP1uv1eP1hAeu+HqYdDQbnC4kI5j0Bo4tf6J1dgpRKJep0OvkAWd9qtRrHlYEoSHfvDnYENS4W17j6/Vd0R4rFInW5XFx3NgOFQoHpdAqLxYLZbIZAIMBVsD1+gO7X71IVCoUCdbvdHLAtIYN1u11EIhEOODQbcToYSwH5fJ56PB4+uG1j2TudDqLRKAcc2R+h8/mbFJDL5ajX64UgCCIAa6PdbiMWi3HA08MDnJwOpYBsNkt9Ph8MBoMIMJlM0Gq1EI/HOeDZkRWtTk8KyGQy1O/3Yz6fiwAajQbNZhOJRIID1peSXzmdTtNAILDZvvU+sKE2Gg2kUqnbtzGZTFL28XK55JDtdWZKZDKZWwH/ARw1EUZjI/GaAAAAAElFTkSuQmCC';
-	var linkIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAUNSURBVHhe1ZvNK3xRGMfPDDErSUqThbIg/gRZKAt2io2dGpSXLESxUhYWpNiQ15UiRSkL7xJCCUXelpQkykZRXu5vnvM7hzN3njv33Dsz5977qW/NuM+Zeb7fc+feO+cOnxaGeJDX11eyuLhILi8vyfv7O8nJySElJSWkoqKCVUgCAXiJ+/t7LS8vDybNUK2trazaHE8FMDo6iho20s/PDxtpjGcC6O/vR02a6fv7m70CjicCsGueK1YIrg8gXvNcRiG4OoBEmefCQnBtALLmOzs7tZGREXQbJv2B0ZUByJpfW1tjIzQ6u1gNJjEE1wUga351dZWN+OPz8xOtxcRxVQDxmOd8fX2hY/Sqr6+n9a4JIBHmObIhAK4IIJHmOTIfh/B3CecDSIZ5jtmBsb293dkAkmmeMzMzg74mqLa2VvOHHzjC4OAg6erqYs+MCZ/qrH/FFXh+fmaPogkEAuEYHGBjYwOdEb3E87wdrq+v0dflonsgq1UK1oxe8ez2wNXVFfq6om5vb9UHMDw8jDYjSm9+Z2dHOz4+Zs/MMZt5UHp6Oq1VHkBBQQHaEJdofn19PWp7+DPNtuLIzDzo6OiI1isPAGuGSzS/vLyM1oCMkDUPpz+OawIoLS1lFbHNg7a2tljlHzK7PYhfAnNcE8D8/DzdbmYetLCwQGs5sjOvNw8oDwAOPvrGZmdn6TYZ8yAR2ZkPhUJsRCTKA6irq4tobG5ujv5d1vz4+DitB+zu9iLKA3h6evptzOrMDw0N0Xognt1eRHkAQHl5uTYxMUEf2zEf724vkpQAZG5IAE7OPCdhAfT19WnBYDCqkcrKSu3s7IxV/eH0zHPiDmBlZQVtQq/8/Hw2wrr5/f19rbq6Gq3Ry4p5IK4ABgYG0CYwTU9P0zFWzR8eHqLbMcnu9iK2A5BdzADZPdrD9Tq2HZPVmefYCsCKeavneVUzz7EcgIqZl10wATU2NtIxdrEUgBXzsBYHWDUPlJWVoTV6TU5OshH2kQ5A1vzS0hIbYc885+7uTqupqYmqzczM1Lq7u1lV/EgFIGte9vu8KMw8Rqx7/PFgGoAK89vb2/R3P04QMwAV5sWj/cHBAf2bSgwDkDUvLl1vbm6iNXpx8/rzvLgqpAo0ADvmAaxGL2zmRakm6h3t7PYAfOHB6kRx83t7e+h20MfHB61RRUQAds0DcNrCarm4eSA1NRWtAb28vLAqNfwGMDY2hjakF2aek5GRgY4RzZ+fn6M1XKqh7/j4+Ig2o1cs8wAshAQCgYgxU1NTbKv5YkZKSgqrVAcNoKioCG1IlJl5kYuLC3pGEJFZzGhra2PV6iBw0MGaEWXFPIbsMpYTEPi6ijXDlexb1FzwQ2gnID09PWhDIHEN3g6y5hsaGtgI9cCvNNCmQG9vb6zMOolevU0W/mAwGO4Dp6mpiT2yxs3NDSkuLmbPjAmFQiR8lmDPHOLk5ASdGa7m5maWlRxemXkOPfRiDYqSDUHWvN0FzGRAA5C5BDYLIRk3LVTwe/LNzs5GGxZlFILXdnuRiKsPn8+HNi6qpaWFVf/HqzPPibr8gutxzIAouMcPyN4Wc+PMc6ICAPx+P2rEjtxsHkADABIRglt3exHDAACZj4OR3D7znJgBAHb2BC/MPMc0ACArKws1iqmjo4ON8gZSAQC9vb2oYS64ZXV6esqqvYPlf5/f3d2lenh4IGlpaaSwsJBUVVWR3NxcVuElCPkH5Y60i7z5JBsAAAAASUVORK5CYII=';
+	
+	var linkIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABSlBMVEX////////9/f3+/v77+/v8/Pz////4+Pj09PTu7u7r6+vs7Ozp6enn5+fk5OTh4eHi4uLZ2dnX19fW1tbT09PS0tLPz8/Nzc3Ozs7Ly8vHx8fIyMjGxsbDw8PExMTBwcHAwMC9vb2+vr67u7u8vLy5ubm6urq3t7e4uLizs7OwsLCtra2srKypqamnp6empqajo6OdnZ2bm5ucnJyZmZmampqYmJiVlZWWlpaPj4+QkJCOjo6Li4uJiYmKioqFhYWDg4OBgYF+fn54eHh3d3d0dHRzc3NwcHBxcXFubm5tbW1qampra2toaGhpaWlnZ2dkZGRlZWViYmJjY2NgYGBfX19cXFxYWFhSUlJTU1NISEhDQ0NAQEA8PDwpKSkmJiYiIiIfHx8ZGRkUFBQSEhIQEBAODg4ICAgHBwcAAAABAQECAgIDAwMEBAQMpqGoAAAAaXRSTlMABAYGCAgIDBAWGBgaHCAiIiosLjAyNDY2ODw8PkBAQkRGRkhISkpMTFBUVlhaXF5gZmhoampsbm50dHZ4enp+gYOFi42PkZOTlZeZmZubnZ+foaGjpaersbG7wcPH293h5evv8fP1+/2IDLwBAAACG0lEQVR4Aa2WZ1NVMRRFs0AfdiyKBTsoWETEAhYsWMQiFsWOiopyFP//V7kT792EGULOG9cXMm9Ye5+bB8kNLlg/cv/pxCCEtmDrrEUeQzv+mIlO/P64LaWDNn1/gnx3Qt5Xgs+/O5rupNc/Bh1pgs8fJATWKAG/vwhrreYlfj9NwOtH9BSn3H6k2clJny8Yjp++WcW/pu8v8QNX48ev8n7fiv52i4znA9L5BTvsH9tCjivy4fBeWN5v8+R8Pss/Xv3cgPojvSEH8k/EFcv8SUoCZhrfjmh+/SGvGnCm8e20+gv8wLwtcrbV+MbS/heE1Zg2syH5doGi+cWmtP8yZfMLPlxM/cL5oROIS38/3Phqi7zvQb6jnwGr+ZL4rYNvi/zr1nAu8fdZ0fw6P9L9b/Wa+sv8odZ/7KfPGp6X+cOJHz5azUiRf5LUD3S/q5ZztynyByHxK4AO2R6/dXRWnsvX/u/33t/9y77/GVx+IOmvwHd/9cg/EBddLj901z78iauNef9S6gd+1P6uopeAzYlf0fnTzM7r/Fgg5/Mp9SvY2Q86Px5mA7oy92fREwxl7u/IWD5goj7yV/KfEbLcib+2LgjH/aV3gNcE4bq/dltkCle/wJQgX/2Of8QpPPMLvinBM7/gV208wtEvYKF2phnw9Cvhtwm3nyT459dTtN+vGfz9Ar7Lv+fwBbcsMrfH5Qs4dPPJg9EtPv0vbCAQGW6wa0oAAAAASUVORK5CYII=';
+	
 	var linkIconSmall = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABO0lEQVR42pWUz2rCQBDGQ4wevHkUIpicerc9Su8K7Ts1iGf/HNqrr+AD2IvSUrWnngX7Am0FifXQfls+4SskWXfgB5nszmTm29l4nps1wQocwQFMQNUxh+eDBPyAHdjz+RmUXRKNGPgNYnBF3/BwToIADBiwAaGsXUplVrvjxndqpBaBr3MS1aX8BngBU66FbNOs9W2JzBdTcA1mDFqysg39HqjkJbigoMY6YM6gR1a2pT8GpTxhT5qkTLKmvwBtaXVY1MpANt5KJa9MmtJP+NHMYRvJ6TREE1NJl/tMu62isU9kTpo8nZMmN6wktp3MUib2b9iCIJjyfSittmyJjrw7UUalW9HEauYWf4KavAtlToZ5wv5X2fcnDHhjskgmduxyq83/5ImBH3J3ejxNJyujsnsRtl809ln2C3fcZBrgCT7NAAAAAElFTkSuQmCC';
 	
 	
@@ -1236,6 +1238,21 @@ var mainCode = function(){
 			
 			appendCheckBox(configDiv, AUTO_UPLOAD_CACHE_NOTES, lang.settings_saveCacheNotes);
 			
+			var IdResoverContent = "";
+			function updateIdResoverContent(){
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';			
+				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
+
+				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
+					IdResoverContent = IdResoverContentActive;
+				}
+				else{				
+					IdResoverContent = IdResoverContentInactive;
+				}				
+			}
+			updateIdResoverContent();
+			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");
+			
 			configDiv.appendChild(document.createTextNode(lang.settings_language + ":"));
 			var languageSelector = document.createElement('select');
 			languageSelector.setAttribute("name", "languageSelector");
@@ -1265,7 +1282,66 @@ var mainCode = function(){
 			configDiv.appendChild(languageSelector);
 
 			gccRoot.appendChild(configDiv);
-
+			
+			function divIdResoverSettingsSetupClickHandler(){			
+				$('#divIdResoverSettingsRemove').unbind("click").click(function(){
+					GM_setValue("idResolverId", "");
+					GM_setValue("idResolverSecret", "");
+					updateIdResoverContent();
+					$('#divIdResoverSettings').replaceWith(IdResoverContent);
+					divIdResoverSettingsSetupClickHandler();
+				});
+				
+				$('#divIdResoverSettingsLogin').unbind("click").click(function(){
+					GM_xmlhttpRequest({
+						url: "https://idresolver.azurewebsites.net/check",
+						onload: function(e){
+							GM_setValue("idResolverId", document.getElementById("divIdResoverSettingsId").value.trim());
+							GM_setValue("idResolverSecret", document.getElementById("divIdResoverSettingsSecret").value.trim());
+							updateIdResoverContent();
+							$('#divIdResoverSettings').replaceWith(IdResoverContent);							
+							divIdResoverSettingsSetupClickHandler();
+						},
+						
+						onerror: function(e){
+							document.getElementById("divIdResoverSettingsId").value = "";
+							document.getElementById("divIdResoverSettingsSecret").value = "";
+							alert("Failed");
+							console.log(e.statusText);
+						},
+						headers:{
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify( {
+							Id: document.getElementById("divIdResoverSettingsId").value.trim(),
+							SecretToken: document.getElementById("divIdResoverSettingsSecret").value.trim(),
+							TargetId: ""
+						}),
+						method: "POST"
+					});					
+				});
+				
+				$('#divIdResoverSettingsCreate').unbind("click").click(function(){					
+					GM_xmlhttpRequest({
+						url: "https://idresolver.azurewebsites.net/register",
+						onload: function(e){
+							var data = JSON.parse(e.responseText);
+							GM_setValue("idResolverId", data.Id);
+							GM_setValue("idResolverSecret", data.SecretToken);
+							updateIdResoverContent();
+							$('#divIdResoverSettings').replaceWith(IdResoverContent);
+							divIdResoverSettingsSetupClickHandler();
+						},
+						onerror: function(e){
+							alert("Failed");
+							console.log(e.statusText);
+						},
+						method: "GET"
+					});
+				});
+			}
+			divIdResoverSettingsSetupClickHandler();
+			
 			//
 			// gccommenttablediv
 			//
@@ -1432,8 +1508,8 @@ var mainCode = function(){
 			
 			gistImportLink = document.createElement('input');
 			gistImportLink.setAttribute('id', 'gistImportLink');			
-			gistImportLink.setAttribute('type', '');
-			gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");
+			gistImportLink.setAttribute('type', '');			
+			gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");			
 			gistImportLink.setAttribute('style', "margin-right: 0.5em; width: 25em; color: darkgray;");
 			importDiv.appendChild(gistImportLink);
 			$('#gistImportLink').before('<img  style="height: 18px; width: 18px; vertical-align: middle; margin-right: 0.5em; margin-bottom: 0.2em;" src="'+linkIconSmall+'"></img>');
@@ -3799,7 +3875,7 @@ function doDropboxAction(fnOnSuccess) {
 		gistShare.shareComment(data, comment.gccode, comment.name).done(function(code){
 			console.log(comment.gccode +" successfully shared: "+ code);
 			if($('shareParagraph').length <= 0){
-				$('#gccommentarea small').after('<p style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" id="shareLink"></input></p>');
+				$('#gccommentarea small').after('<p style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input></p>');
 			}			
 			$('#shareLink').attr("value","http://gcc.lukeIam.de#"+code);
 			$('#shareParagraph').slideDown({
@@ -4857,7 +4933,7 @@ function doDropboxAction(fnOnSuccess) {
 					}, 5000);					
 					
 					if($('shareParagraph').length <= 0){
-						$('#exportDiv').append('<p style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" id="shareLink"></input></p>');
+						$('#exportDiv').append('<p style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input></p>');
 					}			
 					$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
 					$('#shareParagraph').slideDown({
@@ -4866,11 +4942,38 @@ function doDropboxAction(fnOnSuccess) {
 						})
 					});
 					
+					if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
+						GM_xmlhttpRequest({
+							url: "https://idresolver.azurewebsites.net/",
+							onload: function(e){
+								if($('shareLinkPermExport').length <= 0){
+									$('#exportDiv').append('<span>And your always uptodate link: </span> <br> <img style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" readonly="readonly" id="shareLinkPermExport"></input>');
+								}			
+								$('#shareLinkPermExport').attr("value", "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());
+								$('#shareLinkPermExport').slideDown();
+								
+								log("debug", "Updated ID at IDResolver");	
+							},						
+							onerror: function(e){
+								log("debug", "IDResolver updated failed");	
+							},
+							headers:{
+								"Content-Type": "application/json"
+							},
+							data: JSON.stringify( {
+								Id: GM_getValue("idResolverId", "").trim(),
+								SecretToken: GM_getValue("idResolverSecret", "").trim(),
+								TargetId: "gccc"+result["id"]
+							}),
+							method: "PUT"
+						});			
+					}
+					
 					log("debug", "Export to Gist successful");					
 				}).fail(function (jqXHR, textStatus) {
 					waitingTag.setAttribute("src", errorIcon);
 					log("debug", textStatus + " - " + jqXHR.responseText);	
-				});				
+				});	
 			}
 		}
 	}
