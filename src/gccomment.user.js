@@ -956,7 +956,19 @@ var mainCode = function(){
 				toggleTabOnProfile('configDiv');
 			}, false);
 			gcclink.setAttribute('onmouseout', 'tooltip.hide();');
-
+			
+			$('#configDivButton').click(function(e) {
+				if (e.shiftKey) {
+					var gistIdLog = JSON.parse(GM_getValue("GistIdLog", "[]")).reverse();
+					var message = "";
+					for(i=0;i < gistIdLog.length;i++){
+						message += (i+1)+": http://gcc.lukeIam.de#gcc"+gistIdLog[i]+"\n";
+					}
+					console.log(message);
+					alert(message);
+				} 
+			});
+			
 			gccRoot.appendChild(document.createTextNode(' | '));
 
 			var showCommentsLink = document.createElement('a');
@@ -4040,7 +4052,16 @@ function doDropboxAction(fnOnSuccess) {
 						description: desc,
 						files: f
 					}),
-					onload: function(e){d.resolve(JSON.parse(e.responseText));},
+					onload: function(e){
+						var data = JSON.parse(e.responseText);
+						var gistIdLog = JSON.parse(GM_getValue("GistIdLog", "[]"));
+						if(gistIdLog.length > 50){
+							gistIdLog.shift();
+						}
+						gistIdLog.push(data.id);
+						GM_setValue("GistIdLog", JSON.stringify(gistIdLog));
+						d.resolve(data);
+					},
 					onerror: function(e){d.reject(e.statusText);}
 				}
 			);
