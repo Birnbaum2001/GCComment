@@ -1508,8 +1508,13 @@ var mainCode = function(){
 			
 			gistImportLink = document.createElement('input');
 			gistImportLink.setAttribute('id', 'gistImportLink');			
-			gistImportLink.setAttribute('type', '');			
-			gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");			
+			gistImportLink.setAttribute('type', '');
+			if(GM_getValue("idResolverId", "") !== ""){
+				gistImportLink.setAttribute('value', "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());				
+			}
+			else{
+				gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");
+			}			
 			gistImportLink.setAttribute('style', "margin-right: 0.5em; width: 25em; color: darkgray;");
 			importDiv.appendChild(gistImportLink);
 			$('#gistImportLink').before('<img  style="height: 18px; width: 18px; vertical-align: middle; margin-right: 0.5em; margin-bottom: 0.2em;" src="'+linkIconSmall+'"></img>');
@@ -1704,38 +1709,58 @@ function loadFromDropbox() {
 function loadFromGist() {
 		gistImportLinkButton.parentNode.insertBefore(waitingTag, gistImportLinkButton);
 		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
+		waitingTag.setAttribute('src', waitingGif);	
 		
-		var id = $('#gistImportLink')[0].value.trim().replace("http://","").replace("gcc.lukeIam.de","").replace(/\//g,"").replace(/#/g,"").toLowerCase();		
-		
-		if(id === "" || id.indexOf("gccc") != 0 || id==="gccc"){
-			$('#gistImportLink')[0].value = "http://gcc.lukeIam.de#gccc";
-			waitingTag.setAttribute('style', 'display:none');
-			return;
-		}
-		
-		id = id.substr(4);
-		
-		gistShare.getComment(id).done(function (files) {
-			if(files.length > 0){
-				waitingTag.setAttribute("src", successIcon);
-				setTimeout(function() {
-					$("#waiting").fadeOut('slow', function() {
-					});
-				}, 5000);
-
-				importText.value = files[0].content;
-			}
-			else{
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", "No data"); // Something went wrong.			
+		var loadCommentFunction = function(id){
+			if(id === "" || id.indexOf("gccc") != 0 || id==="gccc"){
+				$('#gistImportLink')[0].value = "http://gcc.lukeIam.de#gccc";
+				waitingTag.setAttribute('style', 'display:none');
 				return;
 			}
-		}).fail(function(error){
-			waitingTag.setAttribute("src", errorIcon);
-			log("debug", error); // Something went wrong.			
-			return;
-		});	
+			
+			id = id.substr(4);
+			
+			gistShare.getComment(id).done(function (files) {
+				if(files.length > 0){
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+
+					importText.value = files[0].content;
+				}
+				else{
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", "No data"); // Something went wrong.			
+					return;
+				}
+			}).fail(function(error){
+				waitingTag.setAttribute("src", errorIcon);
+				log("debug", error); // Something went wrong.			
+				return;
+			});
+		};
+		
+		var possibleId = $('#gistImportLink')[0].value.trim().replace("http://","").replace("gcc.lukeIam.de","").replace("gccs.lukeIam.de","").replace(/\//g,"").replace(/#/g,"").toLowerCase();
+		
+		if(possibleId.indexOf("-") !== -1){
+			GM_xmlhttpRequest({
+				url: "https://idresolver.azurewebsites.net/"+possibleId,
+				onload: function(e){
+					log("debug", "IDResolver ID found");						
+					loadCommentFunction(e.responseText.replace(/"/g, "").trim());					
+				},						
+				onerror: function(e){
+					log("debug", "IDResolver ID not found");
+					waitingTag.setAttribute("src", errorIcon);					
+				},
+				method: "GET"
+			});
+		}
+		else{
+			loadCommentFunction(possibleId);
+		}
 }
 
 function doDropboxAction(fnOnSuccess) {
