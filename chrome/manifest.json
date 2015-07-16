@@ -15,6 +15,7 @@
 		"https://raw.githubusercontent.com/",
 		"https://gist.github.com/",
 		"https://api.github.com/",
+		"https://idresolver.azurewebsites.net/",
         "storage"
 	],
    "converted_from_user_script": true,
