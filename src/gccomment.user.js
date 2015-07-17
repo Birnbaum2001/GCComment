@@ -10,6 +10,9 @@
 // @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
 // @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
+// @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.qrcode.min.js
+// @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.nyroModal.custom.min.js
+// @resource     	nyroModalCss https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/nyroModal.css
 // @grant				GM_getValue
 // @grant				GM_setValue
 // @grant				GM_deleteValue
@@ -723,7 +726,11 @@ var mainCode = function(){
 		// register own CSS styles
 		appendCSS("text", "a.gccselect {padding-bottom:5px;background-color:#EBECED;outline:1px solid #D7D7D7}",
 				null);
-
+				
+		if(typeof(nyroModalCss) !== "undefined"){
+			appendCSS("text", nyroModalCss);
+		}
+		
 		homelat = GM_getValue('HOMELAT');
 		homelng = GM_getValue('HOMELNG');
 
@@ -1252,7 +1259,7 @@ var mainCode = function(){
 			
 			var IdResoverContent = "";
 			function updateIdResoverContent(){
-				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';			
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';			
 				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
 
 				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
@@ -1263,7 +1270,7 @@ var mainCode = function(){
 				}				
 			}
 			updateIdResoverContent();
-			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");
+			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");			
 			
 			configDiv.appendChild(document.createTextNode(lang.settings_language + ":"));
 			var languageSelector = document.createElement('select');
@@ -1294,6 +1301,19 @@ var mainCode = function(){
 			configDiv.appendChild(languageSelector);
 
 			gccRoot.appendChild(configDiv);
+
+			setTimeout(function(){
+				$('#shareLinkPermQR').qrcode({
+					width: $('#shareLinkPermQR').width(),
+					height: $('#shareLinkPermQR').height(),
+					text: "http://gccs.lukeIam.de#"+GM_getValue("idResolverId", "")
+				}).parent().nyroModal();
+				$('#shareLinkPermQRBig').qrcode({
+					width: $('#shareLinkPermQRBig').width(),
+					height: $('#shareLinkPermQRBig').height(),
+					text: "http://gccs.lukeIam.de#"+GM_getValue("idResolverId", "")
+				});
+			},1000);
 			
 			function divIdResoverSettingsSetupClickHandler(){			
 				$('#divIdResoverSettingsRemove').unbind("click").click(function(){
@@ -1313,6 +1333,17 @@ var mainCode = function(){
 							updateIdResoverContent();
 							$('#divIdResoverSettings').replaceWith(IdResoverContent);							
 							divIdResoverSettingsSetupClickHandler();
+														
+							$('#shareLinkPermQR').qrcode({
+								width: $('#shareLinkPermQR').width(),
+								height: $('#shareLinkPermQR').height(),
+								text: "http://gccs.lukeIam.de#"+document.getElementById("divIdResoverSettingsId").value.trim()
+							}).parent().nyroModal();
+							$('#shareLinkPermQRBig').qrcode({
+								width: $('#shareLinkPermQRBig').width(),
+								height: $('#shareLinkPermQRBig').height(),
+								text: "http://gccs.lukeIam.de#"+document.getElementById("divIdResoverSettingsId").value.trim()
+							});	
 						},
 						
 						onerror: function(e){
@@ -3912,9 +3943,22 @@ function doDropboxAction(fnOnSuccess) {
 		gistShare.shareComment(data, comment.gccode, comment.name).done(function(code){
 			console.log(comment.gccode +" successfully shared: "+ code);
 			if($('shareParagraph').length <= 0){
-				$('#gccommentarea small').after('<p style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input></p>');
+				$('#gccommentarea small').after('<div style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input><a href="#shareLinkQRBig"><div id="shareLinkQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkQRBig"></div></div></div>');
 			}			
+			
 			$('#shareLink').attr("value","http://gcc.lukeIam.de#"+code);
+			$('#shareLinkQR').qrcode({
+				width: $('#shareLinkQR').width(),
+				height: $('#shareLinkQR').height(),
+				text: "http://gcc.lukeIam.de#"+code
+			}).parent().nyroModal();
+			$('#shareLinkQRBig').qrcode({
+				width: $('#shareLinkQRBig').width(),
+				height: $('#shareLinkQRBig').height(),
+				text: "http://gcc.lukeIam.de#"+code
+			});
+	
+			
 			$('#shareParagraph').slideDown({
 				done:(function(){
 					$('#shareLink').select();
@@ -4978,10 +5022,20 @@ function doDropboxAction(fnOnSuccess) {
 						});
 					}, 5000);					
 					
-					if($('shareParagraph').length <= 0){
-						$('#exportDiv').append('<p style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input></p>');
+					if($('#shareParagraph').length <= 0){
+						$('#exportDiv').append('<div style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input> <a href="#shareParagraphQRBig"> <div id="shareParagraphQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;" ></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareParagraphQRBig"></div></div></div>');
 					}			
 					$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
+					$('#shareParagraphQR').qrcode({
+						width: $('#shareParagraphQR').width(),
+						height: $('#shareParagraphQR').height(),
+						text: "http://gcc.lukeIam.de#"+result["id"]
+					}).parent().nyroModal();
+					$('#shareParagraphQRBig').qrcode({
+						width: $('#shareParagraphQRBig').width(),
+						height: $('#shareParagraphQRBig').height(),
+						text: "http://gcc.lukeIam.de#"+result["id"]
+					});
 					$('#shareParagraph').slideDown({
 						done:(function(){
 							$('#shareLink').select();
@@ -4992,10 +5046,21 @@ function doDropboxAction(fnOnSuccess) {
 						GM_xmlhttpRequest({
 							url: "https://idresolver.azurewebsites.net/",
 							onload: function(e){
-								if($('shareLinkPermExport').length <= 0){
-									$('#exportDiv').append('<span>And your always uptodate link: </span> <br> <img style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" readonly="readonly" id="shareLinkPermExport"></input>');
+								if($('#shareLinkPermExport').length <= 0){
+									$('#exportDiv').append('<span>And your always uptodate link: </span> <br> <img style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" readonly="readonly" id="shareLinkPermExport"></input><a href="#shareLinkPermExportQRBig"> <div id="shareLinkPermExportQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermExportQRBig"></div></div>');
 								}			
 								$('#shareLinkPermExport').attr("value", "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());
+								$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
+								$('#shareLinkPermExportQR').qrcode({
+									width: $('#shareLinkPermExportQR').width(),
+									height: $('#shareLinkPermExportQR').height(),
+									text: "http://gccs.lukeIam.de#"+result["id"]
+								}).parent().nyroModal();
+								$('#shareLinkPermExportQRBig').qrcode({
+									width: $('#shareLinkPermExportQRBig').width(),
+									height: $('#shareLinkPermExportQRBig').height(),
+									text: "http://gccs.lukeIam.de#"+result["id"]
+								});
 								$('#shareLinkPermExport').slideDown();
 								
 								log("debug", "Updated ID at IDResolver");	
@@ -6216,14 +6281,19 @@ if (typeof (chrome) !== "undefined") {
 		};
 	}
 	
-	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js"];
+	var element = document.createElement('style');
+	element.setAttribute('type', 'text/css');	
+	element.setAttribute('src', chrome.extension.getURL("nyroModal.css"));
+	document.getElementsByTagName('head')[0].appendChild(element);
+	
+	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js", "jquery.qrcode.min.js", "jquery.nyroModal.custom.min.js"];
 
 	for (var i = 0; i < scriptsToInject.length; i++) {
 		var script = document.createElement('script');
 		script.setAttribute('type', 'text/javascript');
 		script.src = chrome.extension.getURL(scriptsToInject[i]);
 		document.getElementsByTagName('head')[0].appendChild(script);
-	}
+	}	
 
 	var localStorageCache;
 	var dfd = new jQuery.Deferred();
