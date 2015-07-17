@@ -19,7 +19,7 @@
         "storage"
 	],
    "converted_from_user_script": true,
-   "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js"],
+   "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js", "jquery.qrcode.min.js", "jquery.nyroModal.custom.min.js", "nyroModal.css"],
    "background": {
 		"scripts": ["background.js"]
    },
