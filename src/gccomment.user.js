@@ -2727,11 +2727,9 @@ function doDropboxAction(fnOnSuccess) {
 					return map;
 				};
 				
-				if(browser === "Chrome"){
-					$('#map_preview_canvas').replaceWith('<div style="width: 228px; height: 175px;" class="TopSpacing" id="map_preview_canvas"></div>');
-					$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
-					$('#map_canvas2').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas2"></div>');
-					setStaticMaps();
+					if(browser === "Chrome"){						
+						$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');						
+						setStaticMap();
 					}
 				};
 				
