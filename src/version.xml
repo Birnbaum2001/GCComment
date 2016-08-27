@@ -3,6 +3,11 @@
 	<gccommentlatestversion>89</gccommentlatestversion>
 	<changelist>
 		<change>
+			<version>90</version>
+			<date>2016-08-27</date>
+			<content>&lt;ul&gt; &lt;li&gt;Fix: race condition on main map initialization (with GCVote)&lt;/li&gt; &lt;li&gt;Fix: custom map on cache page is broken&lt;/li&gt; &lt;li&gt;Add: Import and Export your comments by a shareable link (using gist)</content>
+		</change>
+		<change>
 			<version>89</version>
 			<date>2015-04-30</date>
 			<content>&lt;ul&gt; &lt;li&gt;Fixed: Problems with GCVote&lt;/li&gt; &lt;li&gt;Fixed: no auto correct of cache coordinate with FireFox&lt;/li&gt; &lt;li&gt;Fixed: no page reload after automatic correction of the cache coordinates with FireFox</content>
