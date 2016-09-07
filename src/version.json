@@ -2,6 +2,11 @@
 	"latestVersion":89,
 	"changes":[
 	{
+		"version": 90,
+		"date": "2016-08-27",
+		"change": "<ul><li>Fix: race condition on main map initialization (with GCVote)</li><li>Fix: custom map on cache page is broken</li><li>Add: Import and Export your comments by a shareable link (using gist)</li></ul>"
+	},
+	{
 		"version": 89,
 		"date": "2015-07-04",
 		"change": "<ul><li>Fixed: Problems with GCVote</li><li>Fixed: no auto correct of cache coordinate with FireFox</li><li>Fixed: no page reload after automatic correction of the cache coordinates with FireFox</li></ul>"

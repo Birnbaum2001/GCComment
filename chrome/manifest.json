@@ -13,10 +13,13 @@
         "https://api.dropbox.com/",
         "https://api-content.dropbox.com/",
 		"https://raw.githubusercontent.com/",
+		"https://gist.github.com/",
+		"https://api.github.com/",
+		"https://idresolver.azurewebsites.net/",
         "storage"
 	],
    "converted_from_user_script": true,
-   "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js"],
+   "web_accessible_resources": ["jquery.dataTables.js", "dropbox.min.js", "jquery.qrcode.min.js", "jquery.nyroModal.custom.min.js", "nyroModal.css"],
    "background": {
 		"scripts": ["background.js"]
    },
@@ -24,5 +27,5 @@
    "description": "Add comments to your geocaches on geocaching.com.", 
    "homepage_url": "https://github.com/Birnbaum2001/GCComment",
    "name": "GCComment",
-   "version": "8.9"
+   "version": "9.0"
 }
