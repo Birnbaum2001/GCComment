@@ -1,6 +1,11 @@
 {
-	"latestVersion":89,
+	"latestVersion":90,
 	"changes":[
+	{
+		"version": 91,
+		"date": "2017-12-18",
+		"change": "<ul><li>Fix: Work with Tampermonkey and FF 57</li></ul>"
+	},
 	{
 		"version": 90,
 		"date": "2016-08-27",
