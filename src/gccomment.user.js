@@ -7,9 +7,9 @@
 // @include			/^https://api.dropbox.com/.*$/
 // @include			/^https://gist.github.com/.*$/
 // @include			/^https://api.github.com/.*$/
-// @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
-// @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
+// @require			https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/2.5.13/Dropbox-sdk.min.js
+// @require			https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
+// @require			https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js
 // @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.qrcode.min.js
 // @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.nyroModal.custom.min.js
 // @resource     	nyroModalCss https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/nyroModal.css
@@ -20,41 +20,11 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
+// @icon         	https://https://raw.githubusercontent.com/ramirezhr/GCComment/resources/icon.png
 // @version			91
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
-/*
- History
- - 2010-04-02 22:00 started hacking a bit
- - 2010-04-02 23:30 worked :)
- - 2010-04-03 0:25 changed saving by GCCode to GUID
- - 2010-04-03 0:58 included icon to show on overview pages (copied some code from gcvote for
- branching depending on URL)
- - 2010-04-03 1:15 hotfix. changed GUID parser from substring to substr because full detail
- URLs contain more than just the GUID after guid=
- - 2010-04-05 0:44 kind of tooltips are created by mouseover
- - 2010-04-05 0:47 weniger Zeilen, wenn kommentar vorhanden, dann gleich auftoggeln
- - 2010-04-05 0:50 Notizblock in Suchseite
- - 2010-04-05 12:11 comment-list & delete function
- - 2010-04-06 hotfix for nullpointer in detailpage without existing comment
- - 2010-04-29 added some icons and changed detailpage to readonly and editmode
- - 2010-04-30 integrated real tooltips
- - 2010-05-02 content for tooltips is loaded when tooltips are shown
- - 2010-05-02 added timestamp to new comments
- - 2010-05-02 added check for updates
- - 2010-05-04 added import/export, cancel editing, copy from gcnote
- - 2010-05-17 small improvements by Schatzjäger2 ('hand' mousepointer and action on mouseout instead of mouseover
- - 2010-05-19 exchanged save and delete buttons and inserted javascript popup to confirm deletion
- - 2010-05-24 import/export handles XML characters
- - 2010-06-16 fixed gc layout update on cache detail page
- - 2010-06-20 implemented first version of server sync
- - 2010-07-31 cleaner code style (comment as object), waiting for gctour to finish before inserting comments
- - 2010-08-05 comments can be categorized and filtered on overview table
- - 2010-08-13 stats on gccomment-icon, server storage available, delete all button
- - further comments and changelog on http://userscripts.org/scripts/show/75959 ... not anymore. 
- Visit github
- */
 
 // version information
 var version = "91";
@@ -1490,6 +1460,15 @@ var mainCode = function(){
 			dropboxExportLink.setAttribute('value', lang.export_toDropbox);
 			dropboxExportLink.addEventListener('mouseup', storeToDropbox, false);
 			exportDiv.appendChild(dropboxExportLink);
+			
+			// Dropbox Auth Link
+		    var dropboxAuthLinkExport = document.createElement('a');
+			dropboxAuthLinkExport.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLinkExport.setAttribute('style','display: none');
+		    dropboxAuthLinkExport.setAttribute('id','dropboxAuthLinkExport');
+			dropboxAuthLinkExport.appendChild(document.createTextNode('Auth with DropBox'));
+			exportDiv.appendChild(dropboxAuthLinkExport);
+			
 
 			gccRoot.appendChild(exportDiv);
 
@@ -1530,6 +1509,7 @@ var mainCode = function(){
 			importDiv.appendChild(document.createElement('br'));
 
 			dropboxCheck = document.createElement('input');
+			dropboxCheck.setAttribute('id', 'dropboxCheck');
 			dropboxCheck.setAttribute('type', 'button');
 			dropboxCheck.setAttribute('value', lang.import_fromDropboxCheckForFiles);
 			dropboxCheck.addEventListener('mouseup', checkDropbox, false);
@@ -1546,6 +1526,14 @@ var mainCode = function(){
 			dropboxImportLink.setAttribute('value', lang.import_fromDropbox);
 			dropboxImportLink.addEventListener('mouseup', loadFromDropbox, false);
 			importDiv.appendChild(dropboxImportLink);
+			
+			// Dropbox Auth Link
+			var dropboxAuthLink = document.createElement('a');
+			dropboxAuthLink.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLink.setAttribute('style','display: none');
+		    dropboxAuthLink.setAttribute('id','dropboxAuthLinkImport');
+			dropboxAuthLink.appendChild(document.createTextNode('Auth with DropBox'));
+			importDiv.appendChild(dropboxAuthLink);
 			
 			importDiv.appendChild(document.createElement('br'));
 			
@@ -1651,105 +1639,165 @@ var mainCode = function(){
 				toggleDeleteAllFilterOptions();
 		}
 	}
+	
+	var dropbox_client = null;
 
+	// Dropbox Access Token Hilfsfunktion.
+    (function(window){
+        window.utils = {
+            parseQueryString: function(str) {
+                var ret = Object.create(null);
+                if (typeof str !== 'string') return ret;
+                str = str.trim().replace(/^(\?|#|&)/, '');
+                if (!str) return ret;
+                str.split('&').forEach(function(param) {
+                    var parts = param.replace(/\+/g, ' ').split('=');
+                    // Firefox (pre 40) decodes `%3D` to `=` (https://github.com/sindresorhus/query-string/pull/37)
+                    var key = parts.shift();
+                    var val = parts.length > 0 ? parts.join('=') : undefined;
+                    key = decodeURIComponent(key);
+                    // missing `=` should be `null`: (http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters)
+                    val = val === undefined ? null : decodeURIComponent(val);
+                    if (ret[key] === undefined) ret[key] = val;
+                    else if (Array.isArray(ret[key])) ret[key].push(val);
+                    else ret[key] = [ret[key], val];
+                });
+                return ret;
+            }
+        };
+    })(window);
+
+// Checken ob ein Access Token übergeben wurde und dies auch für GCC ist.
+    log("debug", "Dropbox Access Token suchen");
+    var Db_Access_Token = utils.parseQueryString(window.location.hash).access_token;
+    var AppId = utils.parseQueryString(window.location.search).AppId;
+	log("debug", Db_Access_Token);
+	log("debug", AppId);
+    if (AppId == 'GCComment') { 
+		if (Db_Access_Token) {
+			// zurück von DB mit Access Token, speichern und weiter
+			GM_setValue('Db_Access_Token', Db_Access_Token);
+		} else {
+			// Maybe the user denies Access (this is mostly an unwanted click), so show him, that he
+			// has refused to give us access to his dropbox and that he can re-auth if he want to.
+			error = utils.parseQueryString(window.location.hash).error_description;
+			if (error) alert('We received the following error from dropbox: "' + error + '" If you think this is a mistake, you can try to re-authenticate in the sync menue of GClh.');
+		}
+	}
 	function checkDropbox() {
-	doDropboxAction(function(client) {
-		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
+		doDropboxAction()
+            .done(function(){
+				dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
 
-		client.readdir("/", function(error, directoryEntries) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					checkDropbox();
+				dropbox_client.filesListFolder({path: ''})
+				.then(function(response) {
+					directoryEntries = response.entries;
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+					$('#dropboxSelect').empty();
+					if (directoryEntries.length > 0)
+						$('#dropboxImportLink').removeAttr('disabled');
+						var filteredDirectoryEntries = new Array();
+						for (var index = 0; index < directoryEntries.length; index++) {
+							var gccMatch = directoryEntries[index].name.match(/\.gcc$/);
+							if (gccMatch)
+								filteredDirectoryEntries.push(directoryEntries[index].name);
+						}
+						filteredDirectoryEntries.sort().reverse();
+						for (var count = 0; count < filteredDirectoryEntries.length; count++) {
+							$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
+						}
+						log("debug", "reading dir entries on dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				$("#waiting").fadeOut('slow', function() {
+            })
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+        });
+		
+	}
+			
+	function storeToDropbox() {
+		 doDropboxAction()
+            .done(function(){
+            	dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
+		
+				dropbox_client.filesUpload({
+					path: '/' + createTimeString(new Date(), true) + '_backup-all.gcc',
+					contents: xmlversion + buildGCCExportString(false),
+					mode: 'overwrite',
+					autorename: false,
+					mute: false
+					})
+				.then(function(response) {
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						window.$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+
+					log("debug", "Export to dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-			}, 5000);
-			$('#dropboxSelect').empty();
-			if (directoryEntries.length > 0)
-				$('#dropboxImportLink').removeAttr('disabled');
+			
+			
+			})
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+            });
+		
+	}
 
-			var filteredDirectoryEntries = new Array();
-			for (var index = 0; index < directoryEntries.length; index++) {
-				var gccMatch = directoryEntries[index].match(/\.gcc$/);
-				if (gccMatch)
-					filteredDirectoryEntries.push(directoryEntries[index]);
-			}
-			filteredDirectoryEntries.sort().reverse();
-
-			for (var count = 0; count < filteredDirectoryEntries.length; count++) {
-				$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
-			}
-
-			log("debug", "reading dir entries on dropbox successful");
-		});
-		});
-			}
-
-function storeToDropbox() {
-	doDropboxAction(function(client) {
-		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
-
-		client.writeFile("" + createTimeString(new Date(), true) + "_backup-all.gcc", xmlversion
-				+ buildGCCExportString(false), function(error, stat) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					storeToDropbox();
+	function loadFromDropbox() {
+		 doDropboxAction()
+            .done(function(){
+				dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
+		
+				var select = document.getElementById('dropboxSelect');
+				var fileName = select.options[select.selectedIndex].text;
+		
+				dropbox_client.filesDownload({path: '/' + fileName})
+				.then(function(response) {
+					reader = new FileReader();
+					reader.addEventListener("loadend", function(){
+						importText.value = reader.result;
+					});
+					reader.readAsText(response.fileBlob);
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				window.$("#waiting").fadeOut('slow', function() {
-				});
-			}, 5000);
+			})
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+            });
+	}
 
-			log("debug", "Export to dropbox successful");
-		});
-		});
-			}
-
-function loadFromDropbox() {
-	doDropboxAction(function(client) {
-		dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
-
-		var select = document.getElementById('dropboxSelect');
-		var fileName = select.options[select.selectedIndex].text;
-
-		client.readFile(fileName, function(error, data) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					loadFromDropbox();
-				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				$("#waiting").fadeOut('slow', function() {
-				});
-			}, 5000);
-
-			importText.value = data;
-		});
-	});
-}
-
-function loadFromGist() {
+	function loadFromGist() {
 		gistImportLinkButton.parentNode.insertBefore(waitingTag, gistImportLinkButton);
 		waitingTag.setAttribute('style', 'display:inline');
 		waitingTag.setAttribute('src', waitingGif);	
@@ -1806,48 +1854,45 @@ function loadFromGist() {
 		}
 }
 
-function doDropboxAction(fnOnSuccess) {
-	log("debug", "Creating DB client");
-	var client = new Dropbox.Client({
-		key : "xb38rim9eiyriq7",
-		sandbox : true
-	});
+	function DropboxShowAuthLink() {
+        var APP_Key = 'w23bgpsespnddow';
+        dropbox_auth_link = new Dropbox({clientId: APP_Key});
+        Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+        Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+        Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+        Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
 
-	log("debug", "Defining Redirect Authdriver");
-	client.authDriver(new Dropbox.AuthDriver.Redirect({
-		rememberUser : true,
-		redirectUrl : "https://www.geocaching.com/my/default.aspx"
-	}));
+		// Import Seite
+        $(Db_AuthLinkImport).show();
+		dropboxImportLink.setAttribute('disabled', 'disabled');
+ 		dropboxCheck.setAttribute('disabled', 'disabled');
+ 		dropboxSelect.setAttribute('disabled', 'disabled');		
+		
+		// Export Seite 
+		$(Db_AuthLinkExport).show();
+		dropboxExportLink.setAttribute('disabled', 'disabled');
+ 		exportDropboxButton.setAttribute('disabled', 'disabled');
+}
+				  
+	function doDropboxAction() {
+        var deferred = $.Deferred();
+        Db_Access_Token = GM_getValue('Db_Access_Token');
+        if (Db_Access_Token) {
+            dropbox_client = new Dropbox({accessToken: Db_Access_Token});
 
-	log("debug", "Trying non interactive auth");
-	client.authenticate({
-		interactive : false
-	}, function(noninteractiveerror, client) {
-		if (noninteractiveerror) {
-			log("debug", 'There was an error during non interactive auth: ' + JSON.stringify(noninteractiveerror));
-		}
-
-		log("debug", "non interactive auth result: " + client.isAuthenticated());
-		if (client.isAuthenticated()) {
-			log("debug", "Non interactive auth success.");
-			fnOnSuccess(client);
-		} else {
-			log("debug", "non interactive auth failed. trying interactive auth");
-			client.reset();
-			client.authenticate(function(interactiveerror, client) {
-				if (interactiveerror) {
-					log("debug", 'There was an error during interactive auth: ' + JSON.stringify(interactiveerror));
-				}
-
-				console.log("interactive auth result: " + client.isAuthenticated());
-				if (client.isAuthenticated()) {
-					log("debug", "Interactive auth success.");
-					fnOnSuccess(client);
-				}
-			});
-		}
-	});
-
+            dropbox_client.usersGetCurrentAccount()
+                .then(function(response) {
+                    deferred.resolve();
+                })
+                .catch(function(error) {
+					log("debug", error);
+                    deferred.reject();
+                });
+        } else {
+            dropbox_client = null;
+            deferred.reject();
+        }
+        return deferred.promise();
 	}
 
 	function toggleExportFilterOptions() {
@@ -2616,6 +2661,11 @@ function doDropboxAction(fnOnSuccess) {
 		if (hookTBody) {
 			var mysteryRow = document.createElement('div');
 			mysteryRow.setAttribute('class', 'LocationData');
+			
+			// Wish from st3phan76 - Issue #19
+			mysteryRow.setAttribute('style', 'margin: -10px -13px 0px -13px');
+			//
+			
 			hookTBody.parentNode.insertBefore(mysteryRow, hookTBody);
 			var mysteryData = document.createElement('td');
 			mysteryRow.appendChild(mysteryData);
@@ -4942,7 +4992,7 @@ function doDropboxAction(fnOnSuccess) {
 
 	function performFilteredDropboxExport() {
 		var exportType = $('#exportTypeSelector option:selected').text();
-	var data = null;
+		var data = null;
 		if (exportType === "GCC") {
 			data = xmlversion + buildGCCExportString(true);
 		} else if (exportType === "CSV") {
@@ -4962,26 +5012,42 @@ function doDropboxAction(fnOnSuccess) {
 					+ exportType.toLowerCase();
 			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
 			if (fileName) {
-			doDropboxAction(function(client) {
-				exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
-				waitingTag.setAttribute('style', 'display:inline');
-				waitingTag.setAttribute('src', waitingGif);
-
-				client.writeFile(fileName, data, function(error, stat) {
-					if (error) {
-						waitingTag.setAttribute("src", errorIcon);
-						log("debug", error); // Something went wrong.
-						return;
-					}
+			
+				doDropboxAction()
+				.done(function(){
+					exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
+					waitingTag.setAttribute('style', 'display:inline');
+					waitingTag.setAttribute('src', waitingGif);
+		
+				dropbox_client.filesUpload({
+					path: '/' + fileName,
+					contents: data,
+					mode: 'overwrite',
+					autorename: false,
+					mute: false
+					})
+				.then(function(response) {
 					waitingTag.setAttribute("src", successIcon);
 					setTimeout(function() {
-						$("#waiting").fadeOut('slow', function() {
+						window.$("#waiting").fadeOut('slow', function() {
 						});
 					}, 5000);
 
 					log("debug", "Export to dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				});
+			
+			
+				})
+				.fail(function(){
+				// kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+					DropboxShowAuthLink();
+				});			
+			
+			
 			}
 		}
 	}
