@@ -20,7 +20,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @icon         	https://https://raw.githubusercontent.com/ramirezhr/GCComment/resources/icon.png
+// @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/resources/icon.png
 // @version			91
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
