@@ -4,7 +4,6 @@ the map.
 
 Install the script :
 
-New Firefox (WebExtesnions) see: https://github.com/Birnbaum2001/GCComment/issues/20#issuecomment-347021332  
 Firefox: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js  
 Chrome: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip  
 Opera: https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.crx

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>89</gccommentlatestversion>
+	<gccommentlatestversion>91</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>91</version>
+			<date>2017-12-27</date>
+			<content>&lt;ul&gt; &lt;li&gt;Fix: Work with Tampermonkey and FF 57&lt;/li&gt; &lt;li&gt;Dropbox works again&lt;/li&gt; &lt;li&gt;some libs updated</content>
+		</change>
 		<change>
 			<version>90</version>
 			<date>2016-08-27</date>

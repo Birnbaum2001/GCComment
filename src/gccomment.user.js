@@ -7,9 +7,9 @@
 // @include			/^https://api.dropbox.com/.*$/
 // @include			/^https://gist.github.com/.*$/
 // @include			/^https://api.github.com/.*$/
-// @require			http://cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.3/dropbox.js
-// @require			https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
-// @require			https://cdn.datatables.net/1.10.6/js/jquery.dataTables.min.js
+// @require			https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/2.5.13/Dropbox-sdk.min.js
+// @require			https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
+// @require			https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js
 // @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.qrcode.min.js
 // @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.nyroModal.custom.min.js
 // @resource     	nyroModalCss https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/nyroModal.css
@@ -20,44 +20,14 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
-// @version			90
-// @author			Birnbaum2001, lukeIam
+// @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
+// @version			91
+// @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
-/*
- History
- - 2010-04-02 22:00 started hacking a bit
- - 2010-04-02 23:30 worked :)
- - 2010-04-03 0:25 changed saving by GCCode to GUID
- - 2010-04-03 0:58 included icon to show on overview pages (copied some code from gcvote for
- branching depending on URL)
- - 2010-04-03 1:15 hotfix. changed GUID parser from substring to substr because full detail
- URLs contain more than just the GUID after guid=
- - 2010-04-05 0:44 kind of tooltips are created by mouseover
- - 2010-04-05 0:47 weniger Zeilen, wenn kommentar vorhanden, dann gleich auftoggeln
- - 2010-04-05 0:50 Notizblock in Suchseite
- - 2010-04-05 12:11 comment-list & delete function
- - 2010-04-06 hotfix for nullpointer in detailpage without existing comment
- - 2010-04-29 added some icons and changed detailpage to readonly and editmode
- - 2010-04-30 integrated real tooltips
- - 2010-05-02 content for tooltips is loaded when tooltips are shown
- - 2010-05-02 added timestamp to new comments
- - 2010-05-02 added check for updates
- - 2010-05-04 added import/export, cancel editing, copy from gcnote
- - 2010-05-17 small improvements by Schatzjäger2 ('hand' mousepointer and action on mouseout instead of mouseover
- - 2010-05-19 exchanged save and delete buttons and inserted javascript popup to confirm deletion
- - 2010-05-24 import/export handles XML characters
- - 2010-06-16 fixed gc layout update on cache detail page
- - 2010-06-20 implemented first version of server sync
- - 2010-07-31 cleaner code style (comment as object), waiting for gctour to finish before inserting comments
- - 2010-08-05 comments can be categorized and filtered on overview table
- - 2010-08-13 stats on gccomment-icon, server storage available, delete all button
- - further comments and changelog on http://userscripts.org/scripts/show/75959 ... not anymore. 
- Visit github
- */
 
 // version information
-var version = "90";
+var version = "91";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
@@ -768,25 +738,25 @@ var mainCode = function(){
 			if(browser === "Chrome"){
 				mysteryMoverOnMapPage();
 			}
-			else if(browser === "FireFox" && window.wrappedJSObject){
-				//FireFox in GM-Context
-				
-				var localStorageCache = {};
-
-				var allKeys = GM_listValues();
-				for (var i = 0; i < allKeys.length; i++) {
-					localStorageCache[allKeys[i]] = GM_getValue(allKeys[i], null);
-				}		
-				
-				var code = document.createElement('script');
-				code.setAttribute('type', 'text/javascript');				
-				code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
-				code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
-				code.textContent += "\"));(";
-				code.textContent += mainCode.toString();
-				code.textContent += ")();";
-				document.getElementsByTagName('head')[0].appendChild(code);
-			}
+//			else if(browser === "FireFox" && window.wrappedJSObject){
+//				//FireFox in GM-Context
+//				
+//				var localStorageCache = {};
+//
+//				var allKeys = GM_listValues();
+//				for (var i = 0; i < allKeys.length; i++) {
+//					localStorageCache[allKeys[i]] = GM_getValue(allKeys[i], null);
+//				}		
+//				
+//				var code = document.createElement('script');
+//				code.setAttribute('type', 'text/javascript');				
+//				code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
+//				code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
+//				code.textContent += "\"));(";
+//				code.textContent += mainCode.toString();
+//				code.textContent += ")();";
+//				document.getElementsByTagName('head')[0].appendChild(code);
+//			}
 			else{
 				mysteryMoverOnMapPage();
 			}
@@ -894,8 +864,8 @@ var mainCode = function(){
 			appendCSS('table.dataTable{width:100%;margin:0 auto;clear:both;border-collapse:separate;border-spacing:0}table.dataTable thead th,table.dataTable tfoot th{font-weight:700}table.dataTable thead th,table.dataTable thead td{padding:10px 18px;border-bottom:1px solid #111}table.dataTable thead th:active,table.dataTable thead td:active{outline:none}table.dataTable tfoot th,table.dataTable tfoot td{padding:10px 18px 6px;border-top:1px solid #111}table.dataTable thead .sorting_asc,table.dataTable thead .sorting_desc,table.dataTable thead .sorting{cursor:pointer;*cursor:hand}table.dataTable thead .sorting{background:url(../images/sort_both.png) no-repeat center right}table.dataTable thead .sorting_asc{background:url(../images/sort_asc.png) no-repeat center right}table.dataTable thead .sorting_desc{background:url(../images/sort_desc.png) no-repeat center right}table.dataTable thead .sorting_asc_disabled{background:url(../images/sort_asc_disabled.png) no-repeat center right}table.dataTable thead .sorting_desc_disabled{background:url(../images/sort_desc_disabled.png) no-repeat center right}table.dataTable tbody tr{background-color:#fff}table.dataTable tbody tr.selected{background-color:#b0bed9}table.dataTable tbody th,table.dataTable tbody td{padding:8px 10px}table.dataTable.row-border tbody th,table.dataTable.row-border tbody td,table.dataTable.display tbody th,table.dataTable.display tbody td{border-top:1px solid #ddd}table.dataTable.row-border tbody tr:first-child th,table.dataTable.row-border tbody tr:first-child td,table.dataTable.display tbody tr:first-child th,table.dataTable.display tbody tr:first-child td{border-top:none}table.dataTable.cell-border tbody th,table.dataTable.cell-border tbody td{border-top:1px solid #ddd;border-right:1px solid #ddd}table.dataTable.cell-border tbody tr th:first-child,table.dataTable.cell-border tbody tr td:first-child{border-left:1px solid #ddd}table.dataTable.cell-border tbody tr:first-child th,table.dataTable.cell-border tbody tr:first-child td{border-top:none}table.dataTable.stripe tbody tr.odd,table.dataTable.display tbody tr.odd{background-color:#f9f9f9}table.dataTable.stripe tbody tr.odd.selected,table.dataTable.display tbody tr.odd.selected{background-color:#abb9d3}table.dataTable.hover tbody tr:hover,table.dataTable.hover tbody tr.odd:hover,table.dataTable.hover tbody tr.even:hover,table.dataTable.display tbody tr:hover,table.dataTable.display tbody tr.odd:hover,table.dataTable.display tbody tr.even:hover{background-color:#f5f5f5}table.dataTable.hover tbody tr:hover.selected,table.dataTable.hover tbody tr.odd:hover.selected,table.dataTable.hover tbody tr.even:hover.selected,table.dataTable.display tbody tr:hover.selected,table.dataTable.display tbody tr.odd:hover.selected,table.dataTable.display tbody tr.even:hover.selected{background-color:#a9b7d1}table.dataTable.order-column tbody tr > .sorting_1,table.dataTable.order-column tbody tr > .sorting_2,table.dataTable.order-column tbody tr > .sorting_3,table.dataTable.display tbody tr > .sorting_1,table.dataTable.display tbody tr > .sorting_2,table.dataTable.display tbody tr > .sorting_3{background-color:#f9f9f9}table.dataTable.order-column tbody tr.selected > .sorting_1,table.dataTable.order-column tbody tr.selected > .sorting_2,table.dataTable.order-column tbody tr.selected > .sorting_3,table.dataTable.display tbody tr.selected > .sorting_1,table.dataTable.display tbody tr.selected > .sorting_2,table.dataTable.display tbody tr.selected > .sorting_3{background-color:#acbad4}table.dataTable.display tbody tr.odd > .sorting_1,table.dataTable.order-column.stripe tbody tr.odd > .sorting_1{background-color:#f1f1f1}table.dataTable.display tbody tr.odd > .sorting_2,table.dataTable.order-column.stripe tbody tr.odd > .sorting_2{background-color:#f3f3f3}table.dataTable.display tbody tr.odd > .sorting_3,table.dataTable.order-column.stripe tbody tr.odd > .sorting_3{background-color:#f5f5f5}table.dataTable.display tbody tr.odd.selected > .sorting_1,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_1{background-color:#a6b3cd}table.dataTable.display tbody tr.odd.selected > .sorting_2,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_2{background-color:#a7b5ce}table.dataTable.display tbody tr.odd.selected > .sorting_3,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_3{background-color:#a9b6d0}table.dataTable.display tbody tr.even > .sorting_1,table.dataTable.order-column.stripe tbody tr.even > .sorting_1{background-color:#f9f9f9}table.dataTable.display tbody tr.even > .sorting_2,table.dataTable.order-column.stripe tbody tr.even > .sorting_2{background-color:#fbfbfb}table.dataTable.display tbody tr.even > .sorting_3,table.dataTable.order-column.stripe tbody tr.even > .sorting_3{background-color:#fdfdfd}table.dataTable.display tbody tr.even.selected > .sorting_1,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_1{background-color:#acbad4}table.dataTable.display tbody tr.even.selected > .sorting_2,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_2{background-color:#adbbd6}table.dataTable.display tbody tr.even.selected > .sorting_3,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_3{background-color:#afbdd8}table.dataTable.display tbody tr:hover > .sorting_1,table.dataTable.display tbody tr.odd:hover > .sorting_1,table.dataTable.display tbody tr.even:hover > .sorting_1,table.dataTable.order-column.hover tbody tr:hover > .sorting_1,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_1,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_1{background-color:#eaeaea}table.dataTable.display tbody tr:hover > .sorting_2,table.dataTable.display tbody tr.odd:hover > .sorting_2,table.dataTable.display tbody tr.even:hover > .sorting_2,table.dataTable.order-column.hover tbody tr:hover > .sorting_2,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_2,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_2{background-color:#ebebeb}table.dataTable.display tbody tr:hover > .sorting_3,table.dataTable.display tbody tr.odd:hover > .sorting_3,table.dataTable.display tbody tr.even:hover > .sorting_3,table.dataTable.order-column.hover tbody tr:hover > .sorting_3,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_3,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_3{background-color:#eee}table.dataTable.display tbody tr:hover.selected > .sorting_1,table.dataTable.display tbody tr.odd:hover.selected > .sorting_1,table.dataTable.display tbody tr.even:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_1{background-color:#a1aec7}table.dataTable.display tbody tr:hover.selected > .sorting_2,table.dataTable.display tbody tr.odd:hover.selected > .sorting_2,table.dataTable.display tbody tr.even:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_2{background-color:#a2afc8}table.dataTable.display tbody tr:hover.selected > .sorting_3,table.dataTable.display tbody tr.odd:hover.selected > .sorting_3,table.dataTable.display tbody tr.even:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_3{background-color:#a4b2cb}table.dataTable.no-footer{border-bottom:1px solid #111}table.dataTable.nowrap th,table.dataTable.nowrap td{white-space:nowrap}table.dataTable.compact thead th,table.dataTable.compact thead td{padding:5px 9px}table.dataTable.compact tfoot th,table.dataTable.compact tfoot td{padding:5px 9px 3px}table.dataTable.compact tbody th,table.dataTable.compact tbody td{padding:4px 5px}table.dataTable th.dt-left,table.dataTable td.dt-left{text-align:left}table.dataTable th.dt-center,table.dataTable td.dt-center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable th.dt-right,table.dataTable td.dt-right{text-align:right}table.dataTable th.dt-justify,table.dataTable td.dt-justify{text-align:justify}table.dataTable th.dt-nowrap,table.dataTable td.dt-nowrap{white-space:nowrap}table.dataTable thead th.dt-head-left,table.dataTable thead td.dt-head-left,table.dataTable tfoot th.dt-head-left,table.dataTable tfoot td.dt-head-left{text-align:left}table.dataTable thead th.dt-head-center,table.dataTable thead td.dt-head-center,table.dataTable tfoot th.dt-head-center,table.dataTable tfoot td.dt-head-center{text-align:center}table.dataTable thead th.dt-head-right,table.dataTable thead td.dt-head-right,table.dataTable tfoot th.dt-head-right,table.dataTable tfoot td.dt-head-right{text-align:right}table.dataTable thead th.dt-head-justify,table.dataTable thead td.dt-head-justify,table.dataTable tfoot th.dt-head-justify,table.dataTable tfoot td.dt-head-justify{text-align:justify}table.dataTable thead th.dt-head-nowrap,table.dataTable thead td.dt-head-nowrap,table.dataTable tfoot th.dt-head-nowrap,table.dataTable tfoot td.dt-head-nowrap{white-space:nowrap}table.dataTable tbody th.dt-body-left,table.dataTable tbody td.dt-body-left{text-align:left}table.dataTable tbody th.dt-body-center,table.dataTable tbody td.dt-body-center{text-align:center}table.dataTable tbody th.dt-body-right,table.dataTable tbody td.dt-body-right{text-align:right}table.dataTable tbody th.dt-body-justify,table.dataTable tbody td.dt-body-justify{text-align:justify}table.dataTable tbody th.dt-body-nowrap,table.dataTable tbody td.dt-body-nowrap{white-space:nowrap}table.dataTable,table.dataTable th,table.dataTable td{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.dataTables_wrapper{position:relative;clear:both;*zoom:1;zoom:1}.dataTables_wrapper .dataTables_length{float:left}.dataTables_wrapper .dataTables_filter{float:right;text-align:right}.dataTables_wrapper .dataTables_filter input{margin-left:.5em}.dataTables_wrapper .dataTables_info{clear:both;float:left;padding-top:.755em}.dataTables_wrapper .dataTables_paginate{float:right;text-align:right;padding-top:.25em}.dataTables_wrapper .dataTables_paginate .paginate_button{box-sizing:border-box;display:inline-block;min-width:1.5em;padding:.5em 1em;margin-left:2px;text-align:center;text-decoration:none!important;cursor:pointer;*cursor:hand;color:#333!important;border:1px solid transparent}.dataTables_wrapper .dataTables_paginate .paginate_button.current,.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{color:#333!important;border:1px solid #cacaca;background-color:#fff;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,white),color-stop(100%,gainsboro));background:-webkit-linear-gradient(top,white 0%,gainsboro 100%);background:-moz-linear-gradient(top,white 0%,gainsboro 100%);background:-ms-linear-gradient(top,white 0%,gainsboro 100%);background:-o-linear-gradient(top,white 0%,gainsboro 100%);background:linear-gradient(to bottom,white 0%,gainsboro 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{cursor:default;color:#666!important;border:1px solid transparent;background:transparent;box-shadow:none}.dataTables_wrapper .dataTables_paginate .paginate_button:hover{color:#fff!important;border:1px solid #111;background-color:#585858;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#585858),color-stop(100%,#111));background:-webkit-linear-gradient(top,#585858 0%,#111 100%);background:-moz-linear-gradient(top,#585858 0%,#111 100%);background:-ms-linear-gradient(top,#585858 0%,#111 100%);background:-o-linear-gradient(top,#585858 0%,#111 100%);background:linear-gradient(to bottom,#585858 0%,#111 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button:active{outline:none;background-color:#2b2b2b;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#2b2b2b),color-stop(100%,#0c0c0c));background:-webkit-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-moz-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-ms-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-o-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:linear-gradient(to bottom,#2b2b2b 0%,#0c0c0c 100%);box-shadow:inset 0 0 3px #111}.dataTables_wrapper .dataTables_processing{position:absolute;top:50%;left:50%;width:100%;height:40px;margin-left:-50%;margin-top:-25px;padding-top:20px;text-align:center;font-size:1.2em;background-color:#fff;background:-webkit-gradient(linear,left top,right top,color-stop(0%,rgba(255,255,255,0)),color-stop(25%,rgba(255,255,255,0.9)),color-stop(75%,rgba(255,255,255,0.9)),color-stop(100%,rgba(255,255,255,0)));background:-webkit-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-moz-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-ms-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-o-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:linear-gradient(to right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%)}.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter,.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_processing,.dataTables_wrapper .dataTables_paginate{color:#333}.dataTables_wrapper .dataTables_scroll{clear:both}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{*margin-top:-1px;-webkit-overflow-scrolling:touch}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody th > div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody td > div.dataTables_sizing{height:0;overflow:hidden;margin:0!important;padding:0!important}.dataTables_wrapper.no-footer .dataTables_scrollBody{border-bottom:1px solid #111}.dataTables_wrapper.no-footer div.dataTables_scrollHead table,.dataTables_wrapper.no-footer div.dataTables_scrollBody table{border-bottom:none}.dataTables_wrapper:after{visibility:hidden;display:block;content:"";clear:both;height:0}@media screen and (max-width: 767px){.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_paginate{float:none;text-align:center}.dataTables_wrapper .dataTables_paginate{margin-top:.5em}}@media screen and (max-width: 640px){.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter{float:none;text-align:center}.dataTables_wrapper .dataTables_filter{margin-top:.5em}}');
 		}
 		else{
-			appendScript('src', 'http://cdn.datatables.net/1.10.1/js/jquery.dataTables.js');
-			appendCSS('src', 'http://cdn.datatables.net/1.10.1/css/jquery.dataTables.css');
+			appendScript('src', 'https://cdn.datatables.net/1.10.6/js/jquery.dataTables.js');
+			appendCSS('src', 'https://cdn.datatables.net/1.10.6/css/jquery.dataTables.css');
 		}
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
@@ -1490,6 +1460,15 @@ var mainCode = function(){
 			dropboxExportLink.setAttribute('value', lang.export_toDropbox);
 			dropboxExportLink.addEventListener('mouseup', storeToDropbox, false);
 			exportDiv.appendChild(dropboxExportLink);
+			
+			// Dropbox Auth Link
+		    var dropboxAuthLinkExport = document.createElement('a');
+			dropboxAuthLinkExport.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLinkExport.setAttribute('style','display: none');
+		    dropboxAuthLinkExport.setAttribute('id','dropboxAuthLinkExport');
+			dropboxAuthLinkExport.appendChild(document.createTextNode('Auth with DropBox'));
+			exportDiv.appendChild(dropboxAuthLinkExport);
+			
 
 			gccRoot.appendChild(exportDiv);
 
@@ -1530,6 +1509,7 @@ var mainCode = function(){
 			importDiv.appendChild(document.createElement('br'));
 
 			dropboxCheck = document.createElement('input');
+			dropboxCheck.setAttribute('id', 'dropboxCheck');
 			dropboxCheck.setAttribute('type', 'button');
 			dropboxCheck.setAttribute('value', lang.import_fromDropboxCheckForFiles);
 			dropboxCheck.addEventListener('mouseup', checkDropbox, false);
@@ -1546,6 +1526,14 @@ var mainCode = function(){
 			dropboxImportLink.setAttribute('value', lang.import_fromDropbox);
 			dropboxImportLink.addEventListener('mouseup', loadFromDropbox, false);
 			importDiv.appendChild(dropboxImportLink);
+			
+			// Dropbox Auth Link
+			var dropboxAuthLink = document.createElement('a');
+			dropboxAuthLink.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLink.setAttribute('style','display: none');
+		    dropboxAuthLink.setAttribute('id','dropboxAuthLinkImport');
+			dropboxAuthLink.appendChild(document.createTextNode('Auth with DropBox'));
+			importDiv.appendChild(dropboxAuthLink);
 			
 			importDiv.appendChild(document.createElement('br'));
 			
@@ -1651,105 +1639,165 @@ var mainCode = function(){
 				toggleDeleteAllFilterOptions();
 		}
 	}
+	
+	var dropbox_client = null;
 
+	// Dropbox Access Token Hilfsfunktion.
+    (function(window){
+        window.utils = {
+            parseQueryString: function(str) {
+                var ret = Object.create(null);
+                if (typeof str !== 'string') return ret;
+                str = str.trim().replace(/^(\?|#|&)/, '');
+                if (!str) return ret;
+                str.split('&').forEach(function(param) {
+                    var parts = param.replace(/\+/g, ' ').split('=');
+                    // Firefox (pre 40) decodes `%3D` to `=` (https://github.com/sindresorhus/query-string/pull/37)
+                    var key = parts.shift();
+                    var val = parts.length > 0 ? parts.join('=') : undefined;
+                    key = decodeURIComponent(key);
+                    // missing `=` should be `null`: (http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters)
+                    val = val === undefined ? null : decodeURIComponent(val);
+                    if (ret[key] === undefined) ret[key] = val;
+                    else if (Array.isArray(ret[key])) ret[key].push(val);
+                    else ret[key] = [ret[key], val];
+                });
+                return ret;
+            }
+        };
+    })(window);
+
+// Checken ob ein Access Token übergeben wurde und dies auch für GCC ist.
+    log("debug", "Dropbox Access Token suchen");
+    var Db_Access_Token = utils.parseQueryString(window.location.hash).access_token;
+    var AppId = utils.parseQueryString(window.location.search).AppId;
+	log("debug", Db_Access_Token);
+	log("debug", AppId);
+    if (AppId == 'GCComment') { 
+		if (Db_Access_Token) {
+			// zurück von DB mit Access Token, speichern und weiter
+			GM_setValue('Db_Access_Token', Db_Access_Token);
+		} else {
+			// Maybe the user denies Access (this is mostly an unwanted click), so show him, that he
+			// has refused to give us access to his dropbox and that he can re-auth if he want to.
+			error = utils.parseQueryString(window.location.hash).error_description;
+			if (error) alert('We received the following error from dropbox: "' + error + '" If you think this is a mistake, you can try to re-authenticate in the sync menue of GClh.');
+		}
+	}
 	function checkDropbox() {
-	doDropboxAction(function(client) {
-		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
+		doDropboxAction()
+            .done(function(){
+				dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
 
-		client.readdir("/", function(error, directoryEntries) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					checkDropbox();
+				dropbox_client.filesListFolder({path: ''})
+				.then(function(response) {
+					directoryEntries = response.entries;
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+					$('#dropboxSelect').empty();
+					if (directoryEntries.length > 0)
+						$('#dropboxImportLink').removeAttr('disabled');
+						var filteredDirectoryEntries = new Array();
+						for (var index = 0; index < directoryEntries.length; index++) {
+							var gccMatch = directoryEntries[index].name.match(/\.gcc$/);
+							if (gccMatch)
+								filteredDirectoryEntries.push(directoryEntries[index].name);
+						}
+						filteredDirectoryEntries.sort().reverse();
+						for (var count = 0; count < filteredDirectoryEntries.length; count++) {
+							$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
+						}
+						log("debug", "reading dir entries on dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				$("#waiting").fadeOut('slow', function() {
+            })
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+        });
+		
+	}
+			
+	function storeToDropbox() {
+		 doDropboxAction()
+            .done(function(){
+            	dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
+		
+				dropbox_client.filesUpload({
+					path: '/' + createTimeString(new Date(), true) + '_backup-all.gcc',
+					contents: xmlversion + buildGCCExportString(false),
+					mode: 'overwrite',
+					autorename: false,
+					mute: false
+					})
+				.then(function(response) {
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						window.$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+
+					log("debug", "Export to dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-			}, 5000);
-			$('#dropboxSelect').empty();
-			if (directoryEntries.length > 0)
-				$('#dropboxImportLink').removeAttr('disabled');
+			
+			
+			})
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+            });
+		
+	}
 
-			var filteredDirectoryEntries = new Array();
-			for (var index = 0; index < directoryEntries.length; index++) {
-				var gccMatch = directoryEntries[index].match(/\.gcc$/);
-				if (gccMatch)
-					filteredDirectoryEntries.push(directoryEntries[index]);
-			}
-			filteredDirectoryEntries.sort().reverse();
-
-			for (var count = 0; count < filteredDirectoryEntries.length; count++) {
-				$('#dropboxSelect').append('<option>' + filteredDirectoryEntries[count] + '</option>');
-			}
-
-			log("debug", "reading dir entries on dropbox successful");
-		});
-		});
-			}
-
-function storeToDropbox() {
-	doDropboxAction(function(client) {
-		dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
-
-		client.writeFile("" + createTimeString(new Date(), true) + "_backup-all.gcc", xmlversion
-				+ buildGCCExportString(false), function(error, stat) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					storeToDropbox();
+	function loadFromDropbox() {
+		 doDropboxAction()
+            .done(function(){
+				dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
+				waitingTag.setAttribute('style', 'display:inline');
+				waitingTag.setAttribute('src', waitingGif);
+		
+				var select = document.getElementById('dropboxSelect');
+				var fileName = select.options[select.selectedIndex].text;
+		
+				dropbox_client.filesDownload({path: '/' + fileName})
+				.then(function(response) {
+					reader = new FileReader();
+					reader.addEventListener("loadend", function(){
+						importText.value = reader.result;
+					});
+					reader.readAsText(response.fileBlob);
+					waitingTag.setAttribute("src", successIcon);
+					setTimeout(function() {
+						$("#waiting").fadeOut('slow', function() {
+						});
+					}, 5000);
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				window.$("#waiting").fadeOut('slow', function() {
-				});
-			}, 5000);
+			})
+            .fail(function(){
+            // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+              DropboxShowAuthLink();
+            });
+	}
 
-			log("debug", "Export to dropbox successful");
-		});
-		});
-			}
-
-function loadFromDropbox() {
-	doDropboxAction(function(client) {
-		dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
-		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);
-
-		var select = document.getElementById('dropboxSelect');
-		var fileName = select.options[select.selectedIndex].text;
-
-		client.readFile(fileName, function(error, data) {
-			if (error) {
-				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.
-				client.signOut(function(error) {
-					loadFromDropbox();
-				});
-				return;
-			}
-			waitingTag.setAttribute("src", successIcon);
-			setTimeout(function() {
-				$("#waiting").fadeOut('slow', function() {
-				});
-			}, 5000);
-
-			importText.value = data;
-		});
-	});
-}
-
-function loadFromGist() {
+	function loadFromGist() {
 		gistImportLinkButton.parentNode.insertBefore(waitingTag, gistImportLinkButton);
 		waitingTag.setAttribute('style', 'display:inline');
 		waitingTag.setAttribute('src', waitingGif);	
@@ -1806,48 +1854,45 @@ function loadFromGist() {
 		}
 }
 
-function doDropboxAction(fnOnSuccess) {
-	log("debug", "Creating DB client");
-	var client = new Dropbox.Client({
-		key : "xb38rim9eiyriq7",
-		sandbox : true
-	});
+	function DropboxShowAuthLink() {
+        var APP_Key = 'w23bgpsespnddow';
+        dropbox_auth_link = new Dropbox({clientId: APP_Key});
+        Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+        Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+        Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+        Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
 
-	log("debug", "Defining Redirect Authdriver");
-	client.authDriver(new Dropbox.AuthDriver.Redirect({
-		rememberUser : true,
-		redirectUrl : "https://www.geocaching.com/my/default.aspx"
-	}));
+		// Import Seite
+        $(Db_AuthLinkImport).show();
+		dropboxImportLink.setAttribute('disabled', 'disabled');
+ 		dropboxCheck.setAttribute('disabled', 'disabled');
+ 		dropboxSelect.setAttribute('disabled', 'disabled');		
+		
+		// Export Seite 
+		$(Db_AuthLinkExport).show();
+		dropboxExportLink.setAttribute('disabled', 'disabled');
+ 		exportDropboxButton.setAttribute('disabled', 'disabled');
+}
+				  
+	function doDropboxAction() {
+        var deferred = $.Deferred();
+        Db_Access_Token = GM_getValue('Db_Access_Token');
+        if (Db_Access_Token) {
+            dropbox_client = new Dropbox({accessToken: Db_Access_Token});
 
-	log("debug", "Trying non interactive auth");
-	client.authenticate({
-		interactive : false
-	}, function(noninteractiveerror, client) {
-		if (noninteractiveerror) {
-			log("debug", 'There was an error during non interactive auth: ' + JSON.stringify(noninteractiveerror));
-		}
-
-		log("debug", "non interactive auth result: " + client.isAuthenticated());
-		if (client.isAuthenticated()) {
-			log("debug", "Non interactive auth success.");
-			fnOnSuccess(client);
-		} else {
-			log("debug", "non interactive auth failed. trying interactive auth");
-			client.reset();
-			client.authenticate(function(interactiveerror, client) {
-				if (interactiveerror) {
-					log("debug", 'There was an error during interactive auth: ' + JSON.stringify(interactiveerror));
-				}
-
-				console.log("interactive auth result: " + client.isAuthenticated());
-				if (client.isAuthenticated()) {
-					log("debug", "Interactive auth success.");
-					fnOnSuccess(client);
-				}
-			});
-		}
-	});
-
+            dropbox_client.usersGetCurrentAccount()
+                .then(function(response) {
+                    deferred.resolve();
+                })
+                .catch(function(error) {
+					log("debug", error);
+                    deferred.reject();
+                });
+        } else {
+            dropbox_client = null;
+            deferred.reject();
+        }
+        return deferred.promise();
 	}
 
 	function toggleExportFilterOptions() {
@@ -2616,6 +2661,11 @@ function doDropboxAction(fnOnSuccess) {
 		if (hookTBody) {
 			var mysteryRow = document.createElement('div');
 			mysteryRow.setAttribute('class', 'LocationData');
+			
+			// Wish from st3phan76 - Issue #19
+			mysteryRow.setAttribute('style', 'margin: -10px -13px 0px -13px');
+			//
+			
 			hookTBody.parentNode.insertBefore(mysteryRow, hookTBody);
 			var mysteryData = document.createElement('td');
 			mysteryRow.appendChild(mysteryData);
@@ -4942,7 +4992,7 @@ function doDropboxAction(fnOnSuccess) {
 
 	function performFilteredDropboxExport() {
 		var exportType = $('#exportTypeSelector option:selected').text();
-	var data = null;
+		var data = null;
 		if (exportType === "GCC") {
 			data = xmlversion + buildGCCExportString(true);
 		} else if (exportType === "CSV") {
@@ -4962,26 +5012,42 @@ function doDropboxAction(fnOnSuccess) {
 					+ exportType.toLowerCase();
 			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
 			if (fileName) {
-			doDropboxAction(function(client) {
-				exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
-				waitingTag.setAttribute('style', 'display:inline');
-				waitingTag.setAttribute('src', waitingGif);
-
-				client.writeFile(fileName, data, function(error, stat) {
-					if (error) {
-						waitingTag.setAttribute("src", errorIcon);
-						log("debug", error); // Something went wrong.
-						return;
-					}
+			
+				doDropboxAction()
+				.done(function(){
+					exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
+					waitingTag.setAttribute('style', 'display:inline');
+					waitingTag.setAttribute('src', waitingGif);
+		
+				dropbox_client.filesUpload({
+					path: '/' + fileName,
+					contents: data,
+					mode: 'overwrite',
+					autorename: false,
+					mute: false
+					})
+				.then(function(response) {
 					waitingTag.setAttribute("src", successIcon);
 					setTimeout(function() {
-						$("#waiting").fadeOut('slow', function() {
+						window.$("#waiting").fadeOut('slow', function() {
 						});
 					}, 5000);
 
 					log("debug", "Export to dropbox successful");
+				})
+				.catch(function(error) {
+					waitingTag.setAttribute("src", errorIcon);
+					log("debug", error); // Something went wrong.
 				});
-				});
+			
+			
+				})
+				.fail(function(){
+				// kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
+					DropboxShowAuthLink();
+				});			
+			
+			
 			}
 		}
 	}
