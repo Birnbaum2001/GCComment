@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name				GCComment
-// @namespace		http://www.birnbaum2001.com/gccomment
+// @namespace		https://geoclub.de/forum/viewtopic.php?f=117&t=44631
 // @description	Add comments to your geocaches on geocaching.com.
 // @include			/^https?://.*geocaching\.com/.*$/
 // @include			/^https?://lukeiam.github.io/gcc/.*$/
