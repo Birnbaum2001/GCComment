@@ -1,10 +1,10 @@
 {
-	"latestVersion":90,
+	"latestVersion":91,
 	"changes":[
 	{
 		"version": 91,
 		"date": "2017-12-18",
-		"change": "<ul><li>Fix: Work with Tampermonkey and FF 57</li></ul>"
+		"change": "<ul><li>Fix: Work with Tampermonkey and FF 57</li><li>Fix: Dropbox works again</li><li>some libs updated</li></ul>"
 	},
 	{
 		"version": 90,
