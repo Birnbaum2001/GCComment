@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>91</gccommentlatestversion>
+	<gccommentlatestversion>92</gccommentlatestversion>
 	<changelist>
 		<change>
+			<version>92</version>
+			<date>2018-01-01</date>
+			<content>Update for Chrome and for future Tampermonkey Support for Chrome</content></change><change>
 			<version>91</version>
 			<date>2017-12-27</date>
 			<content>&lt;ul&gt; &lt;li&gt;Fix: Work with Tampermonkey and FF 57&lt;/li&gt; &lt;li&gt;Dropbox works again&lt;/li&gt; &lt;li&gt;some libs updated</content>
@@ -232,5 +235,6 @@
 			<date>2010-08-13</date>
 			<content>&lt;ul&gt;&lt;li&gt;server storage available (see documentation above)&lt;/li&gt;&lt;li&gt;delete-all button&lt;/li&gt;&lt;li&gt;tooltip with some stats on GCComment-icon&lt;/li&gt;&lt;/ul&gt;</content>
 		</change>
+		
 	</changelist>
 </gccomment>

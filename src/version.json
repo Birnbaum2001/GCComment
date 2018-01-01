@@ -1,6 +1,11 @@
 {
-	"latestVersion":91,
+	"latestVersion":92,
 	"changes":[
+	{
+		"version": 92,
+		"date": "2018-01-01",
+		"change": "<ul><li>Update for Chrome and for future Tampermonkey Support for Chrome</li></ul>"
+	},
 	{
 		"version": 91,
 		"date": "2017-12-18",
@@ -41,7 +46,7 @@
 	},{
 		"version":82,
 		"date": "2014-05-16",
-		"change":"<ul><li>fix: script include to run also on https links to gs.com</li> <li>fix: remove another emoji when patching GPX</li> <li>new: import/export as JSON</li> </ul>","date":"2014-05-16"
+		"change":"<ul><li>fix: script include to run also on https links to gs.com</li> <li>fix: remove another emoji when patching GPX</li> <li>new: import/export as JSON</li> </ul>"
 	},
 	{
 		"version":81,
