@@ -2894,7 +2894,7 @@ var mainCode = function(){
 							// check if the table is already present and add, if not
 							var wpttable = document.getElementById('ctl00_ContentBody_Waypoints');
 							if (!wpttable) {
-								var table = $('<table id="ctl00_ContentBody_Waypoints" class="Table"><thead><tr><th class="AlignCenter" scope="col"><th scope="col">   </th><th scope="col">   </th><th scope="col"> Prefix </th><th scope="col"> Lookup </th><th scope="col"> Name </th><th scope="col"> Coordinate </th><th scope="col">   </th></tr></thead><tbody></tbody></table>');
+								var table = $('<table id="ctl00_ContentBody_Waypoints" class="Table"><thead><tr><th scope="col">   </th><th scope="col">   </th><th scope="col"> Prefix </th><th scope="col"> Lookup </th><th scope="col"> Name </th><th scope="col" id="wptCoordHeader"> Coordinate </th></tr></thead><tbody></tbody></table>');
 								$('#ctl00_ContentBody_bottomSection > p:first').after(table);
 							}
 							$('#ctl00_ContentBody_Waypoints > tbody').append(row);// .append("<tr/>");
@@ -2905,7 +2905,7 @@ var mainCode = function(){
 				&& ((currentComment.waypoints && (currentComment.waypoints.length > 0)) || (currentComment.lng && currentComment.lng))) {
 			var wpttable = document.getElementById('ctl00_ContentBody_Waypoints');
 			if (!wpttable) {
-				var table = $('<table id="ctl00_ContentBody_Waypoints" class="Table"><thead><tr><th class="AlignCenter" scope="col"><th scope="col">   </th><th scope="col">   </th><th scope="col"> Prefix </th><th scope="col"> Lookup </th><th scope="col"> Name </th><th scope="col"> Coordinate </th><th scope="col">   </th></tr></thead><tbody></tbody></table>');
+				var table = $('<table id="ctl00_ContentBody_Waypoints" class="Table"><thead><tr><th scope="col">   </th><th scope="col">   </th><th scope="col"> Prefix </th><th scope="col"> Lookup </th><th scope="col"> Name </th><th scope="col" id="wptCoordHeader"> Coordinate </th></tr></thead><tbody></tbody></table>');
 				$('#ctl00_ContentBody_bottomSection > p:first').after(table);
 				wpttable = table[0];
 			}
@@ -3052,10 +3052,10 @@ var mainCode = function(){
 		var wpttr = document.createElement('tr');
 		wpttr.setAttribute('id', 'wptrow_' + data.prefix);
 		wpttr.setAttribute('class', 'customWaypointRow');
-		var wpttd = document.createElement('td');
-		wpttd.setAttribute('class', 'AlignCenter');
-		wpttd.setAttribute('isHidden', 'false');
-		wpttr.appendChild(wpttd);
+//		var wpttd = document.createElement('td');
+//		wpttd.setAttribute('class', 'AlignCenter');
+		wpttr.setAttribute('isHidden', 'false');
+//		wpttr.appendChild(wpttd);
 
 		wpttd = document.createElement('td');
 		var wptViewable = document.createElement('img');
