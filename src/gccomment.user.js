@@ -21,16 +21,15 @@
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			92
+// @version			93
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
 // version information
-var version = "92";
+var version = "93";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
-var updateurlChrome = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/dist/GCComment.zip';
 
 var browser = "unknown";
 if (typeof (chrome) !== "undefined") {
@@ -58,48 +57,7 @@ var mainCode = function(){
 		jQuery = window.jQuery;
 	}	
 	
-	if((typeof(GM_getValue) === "undefined" || (browser === "Chrome" && (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){	
-		GM_getValue = function(key, defaultValue){
-			var value = localStorageCache[key];
-			if(typeof(value) === "undefined"){
-				return defaultValue;
-			}
-			if(value === "false"){
-				return false;
-			}
-			else if(value === "true"){
-				return true;
-			}
-			else{
-				return value;
-			}
-		};
-	}
-	
-	if((typeof(GM_setValue) === "undefined"|| (browser === "Chrome" && (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_setValue = function(key, value){
-			localStorageCache[key] = value;
-			var data = {};
-			data[key] = value;
-			window.postMessage("GCC_Storage_" + JSON.stringify(data), "*");
-		};
-	}	
-	
-	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue .toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_deleteValue  = function(key){			
-			localStorageCache[key] = undefined;	
-			var data = {};
-			data[key] = "%%%undefined%%%";			
-			window.postMessage("GCC_Storage_" + JSON.stringify(data), "*");	
-		};
-	}
-	
-	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_listValues = function(){			
-			return Object.keys(localStorageCache);
-		};
-	}	
-	
+		
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
 		GM_log = function(message){
 			return console.log(message);
@@ -109,53 +67,7 @@ var mainCode = function(){
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
 	}
-	
-	if(typeof(GM_xmlhttpRequest) === "undefined" || (browser === "Chrome" && (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1))) {
-		GM_xmlhttpRequest = function(rdata){
-			var request = new XMLHttpRequest ();
-			request.onreadystatechange = function(data) { 
-				if (request.readyState == 4) {
-					if (request.status.toString().substr(0,1) === "2"){
-						if(rdata.onload){
-							rdata.onload(request);
-						}
-					}
-					else
-					{
-						if(rdata.onerror){
-							rdata.onerror(request);
-						}
-					}
-				}                
-			};
-			
-			request.open(rdata.method, rdata.url);
-
-			if (rdata.headers) {
-				for (var header in rdata.headers) {
-					if(header == "User-Agent" || header == "Origin" ||header == "Cookie" ||header == "Cookie2" ||header == "Referer"){
-						continue;
-					}
-					request.setRequestHeader(header, rdata.headers[header]);
-				}
-			}
-			
-			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
-		};
-	}
-	
-	if(browser === "Chrome" && location.protocol === "http" && !GM_getValue("ChromeStorageMigrated", false)){	
-		GM_log("Start chrome storage migration");
-		var allKeys = Object.keys(localStorage);
-		for(var i=0; i<allKeys.length; i++){
-			if(allKeys[i].indexOf('###gcc_') === 0 && GM_getValue(allKeys[i].substring(7), null) === null){				
-				GM_setValue(allKeys[i].substring(7), localStorage.getItem(allKeys[i], null));
-			}
-		}
-		GM_setValue("ChromeStorageMigrated", true);
-		GM_log("Chrome storage migration successful");
-	}
-	
+		
 	// thanks to Geggi
 	// Check for Scriptish bug in Fennec browser
 	GM_setValue("browser", "firefox");
@@ -735,31 +647,7 @@ var mainCode = function(){
 			gccommentOnProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
-			if(browser === "Chrome"){
 				mysteryMoverOnMapPage();
-			}
-//			else if(browser === "FireFox" && window.wrappedJSObject){
-//				//FireFox in GM-Context
-//				
-//				var localStorageCache = {};
-//
-//				var allKeys = GM_listValues();
-//				for (var i = 0; i < allKeys.length; i++) {
-//					localStorageCache[allKeys[i]] = GM_getValue(allKeys[i], null);
-//				}		
-//				
-//				var code = document.createElement('script');
-//				code.setAttribute('type', 'text/javascript');				
-//				code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
-//				code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
-//				code.textContent += "\"));(";
-//				code.textContent += mainCode.toString();
-//				code.textContent += ")();";
-//				document.getElementsByTagName('head')[0].appendChild(code);
-//			}
-			else{
-				mysteryMoverOnMapPage();
-			}
 		} else if (document.URL.search("sendtogps\.aspx") >= 0) {
 			log('debug', 'matched sendToGPS');
 			sendToGPS();
@@ -860,13 +748,9 @@ var mainCode = function(){
 
 	// GCComment auf der Profilseite
 	function gccommentOnProfilePage() {		
-		if(browser === "Chrome"){
-			appendCSS('table.dataTable{width:100%;margin:0 auto;clear:both;border-collapse:separate;border-spacing:0}table.dataTable thead th,table.dataTable tfoot th{font-weight:700}table.dataTable thead th,table.dataTable thead td{padding:10px 18px;border-bottom:1px solid #111}table.dataTable thead th:active,table.dataTable thead td:active{outline:none}table.dataTable tfoot th,table.dataTable tfoot td{padding:10px 18px 6px;border-top:1px solid #111}table.dataTable thead .sorting_asc,table.dataTable thead .sorting_desc,table.dataTable thead .sorting{cursor:pointer;*cursor:hand}table.dataTable thead .sorting{background:url(../images/sort_both.png) no-repeat center right}table.dataTable thead .sorting_asc{background:url(../images/sort_asc.png) no-repeat center right}table.dataTable thead .sorting_desc{background:url(../images/sort_desc.png) no-repeat center right}table.dataTable thead .sorting_asc_disabled{background:url(../images/sort_asc_disabled.png) no-repeat center right}table.dataTable thead .sorting_desc_disabled{background:url(../images/sort_desc_disabled.png) no-repeat center right}table.dataTable tbody tr{background-color:#fff}table.dataTable tbody tr.selected{background-color:#b0bed9}table.dataTable tbody th,table.dataTable tbody td{padding:8px 10px}table.dataTable.row-border tbody th,table.dataTable.row-border tbody td,table.dataTable.display tbody th,table.dataTable.display tbody td{border-top:1px solid #ddd}table.dataTable.row-border tbody tr:first-child th,table.dataTable.row-border tbody tr:first-child td,table.dataTable.display tbody tr:first-child th,table.dataTable.display tbody tr:first-child td{border-top:none}table.dataTable.cell-border tbody th,table.dataTable.cell-border tbody td{border-top:1px solid #ddd;border-right:1px solid #ddd}table.dataTable.cell-border tbody tr th:first-child,table.dataTable.cell-border tbody tr td:first-child{border-left:1px solid #ddd}table.dataTable.cell-border tbody tr:first-child th,table.dataTable.cell-border tbody tr:first-child td{border-top:none}table.dataTable.stripe tbody tr.odd,table.dataTable.display tbody tr.odd{background-color:#f9f9f9}table.dataTable.stripe tbody tr.odd.selected,table.dataTable.display tbody tr.odd.selected{background-color:#abb9d3}table.dataTable.hover tbody tr:hover,table.dataTable.hover tbody tr.odd:hover,table.dataTable.hover tbody tr.even:hover,table.dataTable.display tbody tr:hover,table.dataTable.display tbody tr.odd:hover,table.dataTable.display tbody tr.even:hover{background-color:#f5f5f5}table.dataTable.hover tbody tr:hover.selected,table.dataTable.hover tbody tr.odd:hover.selected,table.dataTable.hover tbody tr.even:hover.selected,table.dataTable.display tbody tr:hover.selected,table.dataTable.display tbody tr.odd:hover.selected,table.dataTable.display tbody tr.even:hover.selected{background-color:#a9b7d1}table.dataTable.order-column tbody tr > .sorting_1,table.dataTable.order-column tbody tr > .sorting_2,table.dataTable.order-column tbody tr > .sorting_3,table.dataTable.display tbody tr > .sorting_1,table.dataTable.display tbody tr > .sorting_2,table.dataTable.display tbody tr > .sorting_3{background-color:#f9f9f9}table.dataTable.order-column tbody tr.selected > .sorting_1,table.dataTable.order-column tbody tr.selected > .sorting_2,table.dataTable.order-column tbody tr.selected > .sorting_3,table.dataTable.display tbody tr.selected > .sorting_1,table.dataTable.display tbody tr.selected > .sorting_2,table.dataTable.display tbody tr.selected > .sorting_3{background-color:#acbad4}table.dataTable.display tbody tr.odd > .sorting_1,table.dataTable.order-column.stripe tbody tr.odd > .sorting_1{background-color:#f1f1f1}table.dataTable.display tbody tr.odd > .sorting_2,table.dataTable.order-column.stripe tbody tr.odd > .sorting_2{background-color:#f3f3f3}table.dataTable.display tbody tr.odd > .sorting_3,table.dataTable.order-column.stripe tbody tr.odd > .sorting_3{background-color:#f5f5f5}table.dataTable.display tbody tr.odd.selected > .sorting_1,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_1{background-color:#a6b3cd}table.dataTable.display tbody tr.odd.selected > .sorting_2,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_2{background-color:#a7b5ce}table.dataTable.display tbody tr.odd.selected > .sorting_3,table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_3{background-color:#a9b6d0}table.dataTable.display tbody tr.even > .sorting_1,table.dataTable.order-column.stripe tbody tr.even > .sorting_1{background-color:#f9f9f9}table.dataTable.display tbody tr.even > .sorting_2,table.dataTable.order-column.stripe tbody tr.even > .sorting_2{background-color:#fbfbfb}table.dataTable.display tbody tr.even > .sorting_3,table.dataTable.order-column.stripe tbody tr.even > .sorting_3{background-color:#fdfdfd}table.dataTable.display tbody tr.even.selected > .sorting_1,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_1{background-color:#acbad4}table.dataTable.display tbody tr.even.selected > .sorting_2,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_2{background-color:#adbbd6}table.dataTable.display tbody tr.even.selected > .sorting_3,table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_3{background-color:#afbdd8}table.dataTable.display tbody tr:hover > .sorting_1,table.dataTable.display tbody tr.odd:hover > .sorting_1,table.dataTable.display tbody tr.even:hover > .sorting_1,table.dataTable.order-column.hover tbody tr:hover > .sorting_1,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_1,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_1{background-color:#eaeaea}table.dataTable.display tbody tr:hover > .sorting_2,table.dataTable.display tbody tr.odd:hover > .sorting_2,table.dataTable.display tbody tr.even:hover > .sorting_2,table.dataTable.order-column.hover tbody tr:hover > .sorting_2,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_2,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_2{background-color:#ebebeb}table.dataTable.display tbody tr:hover > .sorting_3,table.dataTable.display tbody tr.odd:hover > .sorting_3,table.dataTable.display tbody tr.even:hover > .sorting_3,table.dataTable.order-column.hover tbody tr:hover > .sorting_3,table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_3,table.dataTable.order-column.hover tbody tr.even:hover > .sorting_3{background-color:#eee}table.dataTable.display tbody tr:hover.selected > .sorting_1,table.dataTable.display tbody tr.odd:hover.selected > .sorting_1,table.dataTable.display tbody tr.even:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_1,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_1{background-color:#a1aec7}table.dataTable.display tbody tr:hover.selected > .sorting_2,table.dataTable.display tbody tr.odd:hover.selected > .sorting_2,table.dataTable.display tbody tr.even:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_2,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_2{background-color:#a2afc8}table.dataTable.display tbody tr:hover.selected > .sorting_3,table.dataTable.display tbody tr.odd:hover.selected > .sorting_3,table.dataTable.display tbody tr.even:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_3,table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_3{background-color:#a4b2cb}table.dataTable.no-footer{border-bottom:1px solid #111}table.dataTable.nowrap th,table.dataTable.nowrap td{white-space:nowrap}table.dataTable.compact thead th,table.dataTable.compact thead td{padding:5px 9px}table.dataTable.compact tfoot th,table.dataTable.compact tfoot td{padding:5px 9px 3px}table.dataTable.compact tbody th,table.dataTable.compact tbody td{padding:4px 5px}table.dataTable th.dt-left,table.dataTable td.dt-left{text-align:left}table.dataTable th.dt-center,table.dataTable td.dt-center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable th.dt-right,table.dataTable td.dt-right{text-align:right}table.dataTable th.dt-justify,table.dataTable td.dt-justify{text-align:justify}table.dataTable th.dt-nowrap,table.dataTable td.dt-nowrap{white-space:nowrap}table.dataTable thead th.dt-head-left,table.dataTable thead td.dt-head-left,table.dataTable tfoot th.dt-head-left,table.dataTable tfoot td.dt-head-left{text-align:left}table.dataTable thead th.dt-head-center,table.dataTable thead td.dt-head-center,table.dataTable tfoot th.dt-head-center,table.dataTable tfoot td.dt-head-center{text-align:center}table.dataTable thead th.dt-head-right,table.dataTable thead td.dt-head-right,table.dataTable tfoot th.dt-head-right,table.dataTable tfoot td.dt-head-right{text-align:right}table.dataTable thead th.dt-head-justify,table.dataTable thead td.dt-head-justify,table.dataTable tfoot th.dt-head-justify,table.dataTable tfoot td.dt-head-justify{text-align:justify}table.dataTable thead th.dt-head-nowrap,table.dataTable thead td.dt-head-nowrap,table.dataTable tfoot th.dt-head-nowrap,table.dataTable tfoot td.dt-head-nowrap{white-space:nowrap}table.dataTable tbody th.dt-body-left,table.dataTable tbody td.dt-body-left{text-align:left}table.dataTable tbody th.dt-body-center,table.dataTable tbody td.dt-body-center{text-align:center}table.dataTable tbody th.dt-body-right,table.dataTable tbody td.dt-body-right{text-align:right}table.dataTable tbody th.dt-body-justify,table.dataTable tbody td.dt-body-justify{text-align:justify}table.dataTable tbody th.dt-body-nowrap,table.dataTable tbody td.dt-body-nowrap{white-space:nowrap}table.dataTable,table.dataTable th,table.dataTable td{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}.dataTables_wrapper{position:relative;clear:both;*zoom:1;zoom:1}.dataTables_wrapper .dataTables_length{float:left}.dataTables_wrapper .dataTables_filter{float:right;text-align:right}.dataTables_wrapper .dataTables_filter input{margin-left:.5em}.dataTables_wrapper .dataTables_info{clear:both;float:left;padding-top:.755em}.dataTables_wrapper .dataTables_paginate{float:right;text-align:right;padding-top:.25em}.dataTables_wrapper .dataTables_paginate .paginate_button{box-sizing:border-box;display:inline-block;min-width:1.5em;padding:.5em 1em;margin-left:2px;text-align:center;text-decoration:none!important;cursor:pointer;*cursor:hand;color:#333!important;border:1px solid transparent}.dataTables_wrapper .dataTables_paginate .paginate_button.current,.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{color:#333!important;border:1px solid #cacaca;background-color:#fff;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,white),color-stop(100%,gainsboro));background:-webkit-linear-gradient(top,white 0%,gainsboro 100%);background:-moz-linear-gradient(top,white 0%,gainsboro 100%);background:-ms-linear-gradient(top,white 0%,gainsboro 100%);background:-o-linear-gradient(top,white 0%,gainsboro 100%);background:linear-gradient(to bottom,white 0%,gainsboro 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{cursor:default;color:#666!important;border:1px solid transparent;background:transparent;box-shadow:none}.dataTables_wrapper .dataTables_paginate .paginate_button:hover{color:#fff!important;border:1px solid #111;background-color:#585858;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#585858),color-stop(100%,#111));background:-webkit-linear-gradient(top,#585858 0%,#111 100%);background:-moz-linear-gradient(top,#585858 0%,#111 100%);background:-ms-linear-gradient(top,#585858 0%,#111 100%);background:-o-linear-gradient(top,#585858 0%,#111 100%);background:linear-gradient(to bottom,#585858 0%,#111 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button:active{outline:none;background-color:#2b2b2b;background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#2b2b2b),color-stop(100%,#0c0c0c));background:-webkit-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-moz-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-ms-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:-o-linear-gradient(top,#2b2b2b 0%,#0c0c0c 100%);background:linear-gradient(to bottom,#2b2b2b 0%,#0c0c0c 100%);box-shadow:inset 0 0 3px #111}.dataTables_wrapper .dataTables_processing{position:absolute;top:50%;left:50%;width:100%;height:40px;margin-left:-50%;margin-top:-25px;padding-top:20px;text-align:center;font-size:1.2em;background-color:#fff;background:-webkit-gradient(linear,left top,right top,color-stop(0%,rgba(255,255,255,0)),color-stop(25%,rgba(255,255,255,0.9)),color-stop(75%,rgba(255,255,255,0.9)),color-stop(100%,rgba(255,255,255,0)));background:-webkit-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-moz-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-ms-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:-o-linear-gradient(left,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%);background:linear-gradient(to right,rgba(255,255,255,0) 0%,rgba(255,255,255,0.9) 25%,rgba(255,255,255,0.9) 75%,rgba(255,255,255,0) 100%)}.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter,.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_processing,.dataTables_wrapper .dataTables_paginate{color:#333}.dataTables_wrapper .dataTables_scroll{clear:both}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{*margin-top:-1px;-webkit-overflow-scrolling:touch}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody th > div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody td > div.dataTables_sizing{height:0;overflow:hidden;margin:0!important;padding:0!important}.dataTables_wrapper.no-footer .dataTables_scrollBody{border-bottom:1px solid #111}.dataTables_wrapper.no-footer div.dataTables_scrollHead table,.dataTables_wrapper.no-footer div.dataTables_scrollBody table{border-bottom:none}.dataTables_wrapper:after{visibility:hidden;display:block;content:"";clear:both;height:0}@media screen and (max-width: 767px){.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_paginate{float:none;text-align:center}.dataTables_wrapper .dataTables_paginate{margin-top:.5em}}@media screen and (max-width: 640px){.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter{float:none;text-align:center}.dataTables_wrapper .dataTables_filter{margin-top:.5em}}');
-		}
-		else{
 			appendScript('src', 'https://cdn.datatables.net/1.10.6/js/jquery.dataTables.js');
 			appendCSS('src', 'https://cdn.datatables.net/1.10.6/css/jquery.dataTables.css');
-		}
+
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
 				+ '.haveFinalIcon{margin-left:3px;width:14px}');
@@ -2181,8 +2065,7 @@ var mainCode = function(){
 
 					var gccActionDiv = document.createElement('div');
 					var markfound = appendCheckBox(gccActionDiv, AUTOMARKFOUND, lang.log_markfound);
-				// var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE,
-				// lang.log_movearchive);
+				    var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE, lang.log_movearchive);
 					submitButton.before(gccActionDiv);
 					var actionDiv = $(gccActionDiv).css('padding', '5px').css('border', 'solid 1px lightgray');
 					submitButton.appendTo(actionDiv);
@@ -6248,140 +6131,7 @@ var mainCode = function(){
 	}
 }
 
-if (typeof (chrome) !== "undefined") {
-	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
-		GM_log = function(message){
-			return console.log(message);
-		};
-	}
-	
-	if((typeof(GM_getValue) === "undefined"|| (browser === "Chrome" && (GM_getValue.toString && GM_getValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){	
-		GM_getValue = function(key, defaultValue){
-			if(typeof(localStorageCache) === "undefined" || typeof(localStorageCache[key]) === "undefined"){
-				return defaultValue;
-			}		
-			
-			var value = localStorageCache[key];
-			
-			if(value === "false"){
-				return false;
-			}
-			else if(value === "true"){
-				return true;
-			}
-			else{
-				return value;
-			}
-		};
-	}
-	
-	if((typeof(GM_setValue) === "undefined"|| (browser === "Chrome" && (GM_setValue.toString && GM_setValue.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_setValue = function(key, value){
-			if(typeof(localStorageCache) === "undefined"){
-				var localStorageCache = {};
-			}
-			localStorageCache[key] = value;			
-			chrome.runtime.sendMessage({"setValue": value, "setKey": key}, function(){} );				
-		};
-	}
-	
-	if((typeof(GM_deleteValue ) === "undefined"|| (browser === "Chrome" && (GM_deleteValue.toString && GM_deleteValue .toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_deleteValue  = function(key){
-			if(typeof(localStorageCache) === "undefined"){
-				var localStorageCache = {};
-			}
-			localStorageCache[key] = undefined;			
-			chrome.runtime.sendMessage({"setValue": undefined, "setKey": key}, function(){} );				
-		};
-	}
-	
-	window.addEventListener("message", function(e){
-		if(e.data && typeof(e.data) === "string" && e.data.indexOf("GCC_Storage_") === 0){
-			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
-			for(name in data){
-				if(data[name] === "%%%undefined%%%"){
-					data[name] = undefined;
-				}
-			}
-			localStorageCache[Object.keys(data)[0]] = data[Object.keys(data)[0]];
-			chrome.runtime.sendMessage({"setValue": data[Object.keys(data)[0]], "setKey": Object.keys(data)[0]}, function(){});
-		}
-	});	
-	
-	if((typeof(GM_listValues) === "undefined" || (browser === "Chrome" && (GM_listValues.toString && GM_listValues.toString().indexOf("not supported") !== -1))) && typeof(localStorage) !== "undefined"){
-		GM_listValues = function(){			
-			return Object.keys(localStorageCache);
-		};
-	}
-	
-	if(typeof(GM_xmlhttpRequest) === "undefined" || (browser === "Chrome" && (GM_xmlhttpRequest.toString && GM_xmlhttpRequest.toString().indexOf("not supported") !== -1))) {
-		GM_xmlhttpRequest = function(rdata){
-			var request = new XMLHttpRequest ();
-			request.onreadystatechange = function(data) { 
-				if (request.readyState == 4) {
-					if (request.status.toString().substr(0,1) === "2"){
-						if(rdata.onload){
-							rdata.onload(request);
-						}
-					}
-					else
-					{
-						if(rdata.onerror){
-							rdata.onerror(request);
-						}
-					}
-				}                
-			};
-			
-			request.open(rdata.method, rdata.url);
 
-			if (rdata.headers) {
-				for (var header in rdata.headers) {
-					if(header == "User-Agent" || header == "Origin" ||header == "Cookie" ||header == "Cookie2" ||header == "Referer"){
-						continue;
-					}
-					request.setRequestHeader(header, rdata.headers[header]);
-				}
-			}
-			
-			request.send(typeof(rdata.data) == 'undefined' ? null : rdata.data);              
-		};
-	}
-	
-	var element = document.createElement('style');
-	element.setAttribute('type', 'text/css');	
-	element.setAttribute('src', chrome.extension.getURL("nyroModal.css"));
-	document.getElementsByTagName('head')[0].appendChild(element);
-	
-	var scriptsToInject = ["jquery.dataTables.js", "dropbox.min.js", "jquery.qrcode.min.js", "jquery.nyroModal.custom.min.js"];
-
-	for (var i = 0; i < scriptsToInject.length; i++) {
-		var script = document.createElement('script');
-		script.setAttribute('type', 'text/javascript');
-		script.src = chrome.extension.getURL(scriptsToInject[i]);
-		document.getElementsByTagName('head')[0].appendChild(script);
-	}	
-
-	var localStorageCache;
-	var dfd = new jQuery.Deferred();
-	chrome.runtime.sendMessage({"getAllValues": ""}, function(data){
-		localStorageCache = data;
-		dfd.resolve();
-	});	
-	
-	dfd.done(function(){
-		var code = document.createElement('script');
-		code.setAttribute('type', 'text/javascript');
-		code.textContent = "var version = " + version + ";";
-		code.textContent += "var localStorageCache = JSON.parse(decodeURIComponent(\"";
-		code.textContent += encodeURIComponent(JSON.stringify(localStorageCache));
-		code.textContent += "\"));(";
-		code.textContent += mainCode.toString();
-		code.textContent += ")();";
-		document.getElementsByTagName('head')[0].appendChild(code);
-		updateCheck();
-	});  
-} else {
 	window.addEventListener("message", function(e){	
 		if(e.data && e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));		
@@ -6390,7 +6140,7 @@ if (typeof (chrome) !== "undefined") {
 	});
 	updateCheck();
 	mainCode();
-}
+
 
 function updateCheck(){
 	//Update check
