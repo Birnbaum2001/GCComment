@@ -1,6 +1,11 @@
 {
-	"latestVersion":92,
+	"latestVersion":93,
 	"changes":[
+	{
+		"version": 93,
+		"date": "2018-01-03",
+		"change": "<ul><li>Fix: Coords on Detailpage</li><li>Test: remove Emojis from GPX File</li></ul>"
+	},
 	{
 		"version": 92,
 		"date": "2018-01-01",

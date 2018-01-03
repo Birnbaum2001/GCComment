@@ -20,6 +20,7 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
+// @grant				GM_info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
 // @version			93
 // @author			Birnbaum2001, lukeIam, ramirez
@@ -36,10 +37,10 @@ if (typeof (chrome) !== "undefined") {
 	// Chrome detected
 	browser = "Chrome";
 } else {
-	browser = "FireFox";	
+	browser = "FireFox";
 }
 
-var mainCode = function(){	
+var mainCode = function(){
 	var $ = this.$||$||null;
 	var jQuery = this.jQuery||jQuery||null;
 
@@ -55,19 +56,19 @@ var mainCode = function(){
 	}
 	else if(typeof(jQuery) === "undefined" && typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
-	}	
-	
-		
+	}
+
+
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
 		GM_log = function(message){
 			return console.log(message);
 		};
-	}	
+	}
 
 	if(typeof(unsafeWindow) === "undefined"){
 		unsafeWindow = window;
 	}
-		
+
 	// thanks to Geggi
 	// Check for Scriptish bug in Fennec browser
 	GM_setValue("browser", "firefox");
@@ -249,14 +250,14 @@ var mainCode = function(){
 	var archive = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALnSURBVDjLfZNLaFx1HIW/e2fuzJ00w0ymkpQpiUKfMT7SblzU4kayELEptRChUEFEqKALUaRUV2YhlCLYjYq4FBeuiqZgC6FIQzBpEGpDkzHNs5PMTJtmHnfu6//7uSh2IYNnffg23zmWqtIpd395YwiRL1Q0qyIfD56cmOvUs/4LWJg40auiH6jI+7v3ncybdo2Hy9ebKvqNGrn03Nj1+x0Bi1dHHVV9W0U+ye4d2d83+Ca2GJrlGZx0gkppkkfrsysqclFFvh8++3v7CWDh6ugIohfSPcPH+w6fwu05ABoSby9yb3Kc/mePYXc9TdCqslWapVGdn1Zjxo++O33Fujtx4gdEzj61f8xyC8/jN2rsVOcxYZOoVSZtBewZOAT+NonuAWw3S728wFZpFm975cekGjlz8NXLVtSo0SxPImGdtFfFq5epr21wdOxrnMwuaC2jrRJWfYHdxRfIFeDWr0unkyrSUqxcyk2TLQzQrt6hqydPvidDBg/8VTAp8DegvYa3OU1z+SbuM6dQI62kioAAVgondwAnncWvzCDNCk4CLO9vsJVw8xqN+iPiTB5SaTSKURGSaoTHHgxoAMlduL1HiFMZXP8BsvkbO1GD2O3GpLOIF0KsSBijxmCrMY+FqgGJQDzQgGT3XrJ7DuI5EKZd4iDG+CHG84m8AIki1Ai2imRsx4FEBtQHCUB8MG1wi8QKGhjEC4mbAVHTx8kNYSuoiGurkRtLN76ivb0K6SIkusCEoBEgaCQYPyT2QhKpAXKHTiMmQ2lmChWZTrw32v9TsLOyVlu8Nhi2G4Vs32HsTC9IA2KPRuU2Erp097+O5RRYvz3H1r3JldivfY7IR0+mfOu7l3pV5EM1cq744mi+OPwaRD71tSk0Vsp3/uLB6s2minyrIpeOf7a00fFMf1w+MqRGzqvIW/teecdqV5a5P/8ncXv9ZxUdf/lCae5/3/hvpi4OjajIp4ikVOTLY+cXr3Tq/QPcssKNXib9yAAAAABJRU5ErkJggg==';
 	var archiveAdd = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMVSURBVDjLdZNLaFx1GEfPnZk7cyfNkElS0jTVKKRpE2PSpAhKHyqo2QhtShUiCPWBLhTdFKUUlxYUqggGxYqIbsSNFKQmVqMhTVujSQuhtnmMaR5NJs0kncz7ztz5f5+LgguNv/WPszkcS1XZbFPnDrUh8q6KRlTkrdYj/Vc3+1n/Bkz3H65T0TdV5PXapiNRU1jjztxgVkU/UyMfPtg7uLwpYGagx1bVF1Tk7ciO7p3bWp/BJ4ZsfAw75Gc1NsTGrfF5FTmtIl90Hhsp/AOYHujpRvSdUHXnwW0tR3Gqm0FLlJMz3Bw6xb0P7MdXcR/FXILbsXEyiRujasypva+Mfm9N9R/+EpFjW3f2Wk5NO25mjVTiBqaUxcvFCVlF6ht3g5vEX9mIz4mQjk9zOzZOPjn/TUCNPL/ryT7Ly6yRjQ8hpTShfIJ8Ok56cYm9vR9jh7dAbg7NxbDS09Q2dFBVA1d+mH02oCI5xaoKOiEiNY0UEtepqI4SrQ4TJg/uApgguEtQWCS/Mkp27hLO/UdRI7mAioAAVhC7qhk7FMFdHUOyq9h+sPJ/gU8prfxMJr1BORyFYAj1yqgIATXCXQ8GtAiBLTh1XZSDYRx3HVn5iZSXoexUYkIRJF+CsiKlMmoMATXmrlA1IB5IHrRIoHIHkfpdpO6M4fkcLiyFuLwWJu26lNwUB5MTtBghoCJhn20DYSivgxRBXDBFcBooK/yyEGTKruXxRx/inppmfv3zLOevXWByw630qZHh2eGPKCQXINQA/gowJVAPENQTflzw6GzZg/EZ9mx/CmN5PNK+j4s5z/KJMU9nFkdenRw4GZv//WsMQYjsBjsMCqbokcisY1uVHGp9A4DjT5yhqa4Do/j8n343b+o7X7oSHzvzbT4x48UnzrVj+Z1I48NY9lZEwnw1OkT1dpvh2bMcaOrhvfMvkimsc21yyv1PTH/0dbWpkZMq8lzTYy9bhdU5Pr84yPVomX0dB2iu72Jm5SqXJka4dTP1gfV/OV8+3datIicQCarI+8eXc/uB14AIkAE++a1v+cTfDyOvKVPjhy0AAAAASUVORK5CYII=';
 	var archiveRemove = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMNSURBVDjLdZNLaFx1GMV/d+bO3DtJxkwSSWNq05YkrTVa04qIiOiiRIxgE2ohhUIKRQQFBcGiIiJiFaGIYEFERFy5dCE1pQ8JIbSEJhG66GM6idOk6Uwyec7zztz7/z4XlSw0nvXhx4FzjqWqbKXb517rQeRzFY2ryPv7Bkf+3Mpn/RuQHDncqqLvqMjbLZ2DCVNZZjV9uaii36uRr58Yunx/S8Cd8wMRVT2hIqfi2/u6tu17nZAYiplJIk6YpdQo6/em7qrIGRX5sXd4vLIJSJ4f6EP0Y6ep94Vtjx3BbeoGrRGs3eGv0dPsePx5QnU7qZZyLKamKORuTqgxpw++MfGbdXvk8E+IDD/cNWS5zU/iFZbZyN3E1Ir4pQyOVaWtYy94a4QbOgi5cfKZJIupKcprd3+x1cjxPYfOWn5hmWJmFKnlcco5yvkM+fkFDg59SyRWD6U0Wkph5ZO0tO+nsRmmf589aqtISbEao65DvLmDSu4GdU0JEk0xYpTBmwMTBW8BKvOUsxMU01dwdx1BjZRsFQEBrCiRxm4iThxvaRIpLhEJg1WegZBSy16ikF8niCUg6qB+gIpgqxEe9GBAq2DX47YeIIjGcL0VJHuRDb9A4DZgnDhSrkGgSC1AjcFWYx4UqgbEBymDVrEbthNv28PG6iR+yGVlIsfKtTm8xXVCD0VpfY5/EojEQpEIEINgBaQK4oGpgttOoLA6sUIt6/L08Q9xdvdQuX6BG+OX8IP1+pAaGZsd+4bK2hw47RCuA1MD9QFBfSFzJUn3S0dxZ0axfj5G3eyv7Opopja3HthizKuF+fHhW+mxU82dh7oe3d9POL4XyinwSpiqj1mr4bbthv73Nidsf/oIIU+czSlP//Bsq4q8q0bean9qINHe2w++R37+KtOffckzrwxSP3eOaiVLGSjkw9yaYeE/Z7p29kCPGvlIRY51vnjSqiylmb/4B3be0x0tgWWH7lHIBaQXw8b39BPr/+589UxPn4p8gEhURb7ierWntHr/zbCxdpqwLih89/KF4Iu/AXSvuZLBEiNYAAAAAElFTkSuQmCC';
-	
+
 	var commentIconShare = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACNElEQVQ4T32TTYtSURjH/8e3MvVqQ5PjFJNvODJiJojgB3DRSnBnX8GFG1tJCxlx4cKNhBsLFxIuBEGEdm3cubJBpIF8SWocNSfHqaYCPXEOKN65MA883MM99/k9L//7kHq9TrFlq9UKlFKsn+FwmGzf3zwTBjCbzZv3LHBt/X4foVCIA14cv6fvXj2XwDYAlpX52mQyGUajEYLBIGHBBw+1GE5+4iaE1Go1UQWEEMjlcu4qlQqJ0ic8MWqxK6gwXfzDl7EYQqrVKrXZbOj1emDBSqUSOp0OVqsVL9+ewLynw67hLnpnc1j3DZjO/2BwfrWphFQqFWq328FKZs6yarVaxN98hMUkwHhfjf7octOaxaTH+Mc1+qMFh5ByuUwdDgeGwyEP1uv1eP1hAeu+HqYdDQbnC4kI5j0Bo4tf6J1dgpRKJep0OvkAWd9qtRrHlYEoSHfvDnYENS4W17j6/Vd0R4rFInW5XFx3NgOFQoHpdAqLxYLZbIZAIMBVsD1+gO7X71IVCoUCdbvdHLAtIYN1u11EIhEOODQbcToYSwH5fJ56PB4+uG1j2TudDqLRKAcc2R+h8/mbFJDL5ajX64UgCCIAa6PdbiMWi3HA08MDnJwOpYBsNkt9Ph8MBoMIMJlM0Gq1EI/HOeDZkRWtTk8KyGQy1O/3Yz6fiwAajQbNZhOJRIID1peSXzmdTtNAILDZvvU+sKE2Gg2kUqnbtzGZTFL28XK55JDtdWZKZDKZWwH/ARw1EUZjI/GaAAAAAElFTkSuQmCC';
-	
+
 	var linkIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABSlBMVEX////////9/f3+/v77+/v8/Pz////4+Pj09PTu7u7r6+vs7Ozp6enn5+fk5OTh4eHi4uLZ2dnX19fW1tbT09PS0tLPz8/Nzc3Ozs7Ly8vHx8fIyMjGxsbDw8PExMTBwcHAwMC9vb2+vr67u7u8vLy5ubm6urq3t7e4uLizs7OwsLCtra2srKypqamnp6empqajo6OdnZ2bm5ucnJyZmZmampqYmJiVlZWWlpaPj4+QkJCOjo6Li4uJiYmKioqFhYWDg4OBgYF+fn54eHh3d3d0dHRzc3NwcHBxcXFubm5tbW1qampra2toaGhpaWlnZ2dkZGRlZWViYmJjY2NgYGBfX19cXFxYWFhSUlJTU1NISEhDQ0NAQEA8PDwpKSkmJiYiIiIfHx8ZGRkUFBQSEhIQEBAODg4ICAgHBwcAAAABAQECAgIDAwMEBAQMpqGoAAAAaXRSTlMABAYGCAgIDBAWGBgaHCAiIiosLjAyNDY2ODw8PkBAQkRGRkhISkpMTFBUVlhaXF5gZmhoampsbm50dHZ4enp+gYOFi42PkZOTlZeZmZubnZ+foaGjpaersbG7wcPH293h5evv8fP1+/2IDLwBAAACG0lEQVR4Aa2WZ1NVMRRFs0AfdiyKBTsoWETEAhYsWMQiFsWOiopyFP//V7kT792EGULOG9cXMm9Ye5+bB8kNLlg/cv/pxCCEtmDrrEUeQzv+mIlO/P64LaWDNn1/gnx3Qt5Xgs+/O5rupNc/Bh1pgs8fJATWKAG/vwhrreYlfj9NwOtH9BSn3H6k2clJny8Yjp++WcW/pu8v8QNX48ev8n7fiv52i4znA9L5BTvsH9tCjivy4fBeWN5v8+R8Pss/Xv3cgPojvSEH8k/EFcv8SUoCZhrfjmh+/SGvGnCm8e20+gv8wLwtcrbV+MbS/heE1Zg2syH5doGi+cWmtP8yZfMLPlxM/cL5oROIS38/3Phqi7zvQb6jnwGr+ZL4rYNvi/zr1nAu8fdZ0fw6P9L9b/Wa+sv8odZ/7KfPGp6X+cOJHz5azUiRf5LUD3S/q5ZztynyByHxK4AO2R6/dXRWnsvX/u/33t/9y77/GVx+IOmvwHd/9cg/EBddLj901z78iauNef9S6gd+1P6uopeAzYlf0fnTzM7r/Fgg5/Mp9SvY2Q86Px5mA7oy92fREwxl7u/IWD5goj7yV/KfEbLcib+2LgjH/aV3gNcE4bq/dltkCle/wJQgX/2Of8QpPPMLvinBM7/gV208wtEvYKF2phnw9Cvhtwm3nyT459dTtN+vGfz9Ar7Lv+fwBbcsMrfH5Qs4dPPJg9EtPv0vbCAQGW6wa0oAAAAASUVORK5CYII=';
-	
+
 	var linkIconSmall = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAABO0lEQVR42pWUz2rCQBDGQ4wevHkUIpicerc9Su8K7Ts1iGf/HNqrr+AD2IvSUrWnngX7Am0FifXQfls+4SskWXfgB5nszmTm29l4nps1wQocwQFMQNUxh+eDBPyAHdjz+RmUXRKNGPgNYnBF3/BwToIADBiwAaGsXUplVrvjxndqpBaBr3MS1aX8BngBU66FbNOs9W2JzBdTcA1mDFqysg39HqjkJbigoMY6YM6gR1a2pT8GpTxhT5qkTLKmvwBtaXVY1MpANt5KJa9MmtJP+NHMYRvJ6TREE1NJl/tMu62isU9kTpo8nZMmN6wktp3MUib2b9iCIJjyfSittmyJjrw7UUalW9HEauYWf4KavAtlToZ5wv5X2fcnDHhjskgmduxyq83/5ImBH3J3ejxNJyujsnsRtl809ln2C3fcZBrgCT7NAAAAAElFTkSuQmCC';
-	
-	
+
+
 	var languages = [];
 	languages[SETTINGS_LANGUAGE_EN] = {
 		mycomments : "My comments",
@@ -608,24 +609,24 @@ var mainCode = function(){
 		// register own CSS styles
 		appendCSS("text", "a.gccselect {padding-bottom:5px;background-color:#EBECED;outline:1px solid #D7D7D7}",
 				null);
-				
+
 		if(typeof(nyroModalCss) !== "undefined"){
 			appendCSS("text", nyroModalCss);
 		}
-		
+
 		homelat = GM_getValue('HOMELAT');
 		homelng = GM_getValue('HOMELNG');
 
 		//add gist banner
 		if(! GM_getValue("gistNoticeHidden", false)){
 			$('#Navigation').after('<div id="gistNotice" style="text-align: center; background-color: #C2E0FF;"> <span>'+lang.gistNotice+'</span><br><a style="font-weight: bold;" target="_blank" href="'+lang.gistNoticeLink+'"><span>'+lang.gistNoticeMoreInfo+'</span></a><br><a style="cursor: pointer; font-weight: bold;" id="gistNoticeHide"><span>'+lang.gistNoticeHide+'</span></a></div>');
-			
+
 			$('#gistNoticeHide').click(function(){
 				GM_setValue("gistNoticeHidden", true);
-				$('#gistNotice').slideUp("fast"); 
+				$('#gistNotice').slideUp("fast");
 			});
 		}
-		
+
 		// starting the GCC
 		log('debug', 'found URL: ' + document.URL);
 		if ((document.URL.search("cache_details\.aspx") >= 0) || (document.URL.search("\/geocache\/GC") >= 0)) {
@@ -747,7 +748,7 @@ var mainCode = function(){
 	}
 
 	// GCComment auf der Profilseite
-	function gccommentOnProfilePage() {		
+	function gccommentOnProfilePage() {
 			appendScript('src', 'https://cdn.datatables.net/1.10.6/js/jquery.dataTables.js');
 			appendCSS('src', 'https://cdn.datatables.net/1.10.6/css/jquery.dataTables.css');
 
@@ -817,7 +818,7 @@ var mainCode = function(){
 				toggleTabOnProfile('configDiv');
 			}, false);
 			gcclink.setAttribute('onmouseout', 'tooltip.hide();');
-			
+
 			$('#configDivButton').click(function(e) {
 				if (e.shiftKey) {
 					var gistIdLog = JSON.parse(GM_getValue("GistIdLog", "[]")).reverse();
@@ -827,9 +828,9 @@ var mainCode = function(){
 					}
 					console.log(message);
 					alert(message);
-				} 
+				}
 			});
-			
+
 			gccRoot.appendChild(document.createTextNode(' | '));
 
 			var showCommentsLink = document.createElement('a');
@@ -1108,24 +1109,24 @@ var mainCode = function(){
 			appendCheckBox(configDiv, LAZY_TABLE_REFRESH, lang.settings_lazyTable);
 
 			appendCheckBox(configDiv, AUTO_UPDATE_GS_FINAL, lang.settings_syncWithGS);
-			
+
 			appendCheckBox(configDiv, AUTO_UPLOAD_CACHE_NOTES, lang.settings_saveCacheNotes);
-			
+
 			var IdResoverContent = "";
 			function updateIdResoverContent(){
-				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';			
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
 				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
 
 				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
 					IdResoverContent = IdResoverContentActive;
 				}
-				else{				
+				else{
 					IdResoverContent = IdResoverContentInactive;
-				}				
+				}
 			}
 			updateIdResoverContent();
-			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");			
-			
+			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");
+
 			configDiv.appendChild(document.createTextNode(lang.settings_language + ":"));
 			var languageSelector = document.createElement('select');
 			languageSelector.setAttribute("name", "languageSelector");
@@ -1168,8 +1169,8 @@ var mainCode = function(){
 					text: "http://gccs.lukeIam.de#"+GM_getValue("idResolverId", "")
 				});
 			},1000);
-			
-			function divIdResoverSettingsSetupClickHandler(){			
+
+			function divIdResoverSettingsSetupClickHandler(){
 				$('#divIdResoverSettingsRemove').unbind("click").click(function(){
 					GM_setValue("idResolverId", "");
 					GM_setValue("idResolverSecret", "");
@@ -1177,7 +1178,7 @@ var mainCode = function(){
 					$('#divIdResoverSettings').replaceWith(IdResoverContent);
 					divIdResoverSettingsSetupClickHandler();
 				});
-				
+
 				$('#divIdResoverSettingsLogin').unbind("click").click(function(){
 					GM_xmlhttpRequest({
 						url: "https://idresolver.azurewebsites.net/check",
@@ -1185,9 +1186,9 @@ var mainCode = function(){
 							GM_setValue("idResolverId", document.getElementById("divIdResoverSettingsId").value.trim());
 							GM_setValue("idResolverSecret", document.getElementById("divIdResoverSettingsSecret").value.trim());
 							updateIdResoverContent();
-							$('#divIdResoverSettings').replaceWith(IdResoverContent);							
+							$('#divIdResoverSettings').replaceWith(IdResoverContent);
 							divIdResoverSettingsSetupClickHandler();
-														
+
 							$('#shareLinkPermQR').qrcode({
 								width: $('#shareLinkPermQR').width(),
 								height: $('#shareLinkPermQR').height(),
@@ -1197,9 +1198,9 @@ var mainCode = function(){
 								width: $('#shareLinkPermQRBig').width(),
 								height: $('#shareLinkPermQRBig').height(),
 								text: "http://gccs.lukeIam.de#"+document.getElementById("divIdResoverSettingsId").value.trim()
-							});	
+							});
 						},
-						
+
 						onerror: function(e){
 							document.getElementById("divIdResoverSettingsId").value = "";
 							document.getElementById("divIdResoverSettingsSecret").value = "";
@@ -1215,10 +1216,10 @@ var mainCode = function(){
 							TargetId: ""
 						}),
 						method: "POST"
-					});					
+					});
 				});
-				
-				$('#divIdResoverSettingsCreate').unbind("click").click(function(){					
+
+				$('#divIdResoverSettingsCreate').unbind("click").click(function(){
 					GM_xmlhttpRequest({
 						url: "https://idresolver.azurewebsites.net/register",
 						onload: function(e){
@@ -1238,7 +1239,7 @@ var mainCode = function(){
 				});
 			}
 			divIdResoverSettingsSetupClickHandler();
-			
+
 			//
 			// gccommenttablediv
 			//
@@ -1329,7 +1330,7 @@ var mainCode = function(){
 			exportDropboxButton.addEventListener('click', performFilteredDropboxExport, false);
 			exportDropboxButton.setAttribute('style', 'margin:5px');
 			exportDiv.appendChild(exportDropboxButton);
-			
+
 			exportGistButton = document.createElement('input');
 			exportGistButton.setAttribute('type', 'button');
 			exportGistButton.setAttribute('value', lang.export_toGistPerformFilteredExport);
@@ -1344,7 +1345,7 @@ var mainCode = function(){
 			dropboxExportLink.setAttribute('value', lang.export_toDropbox);
 			dropboxExportLink.addEventListener('mouseup', storeToDropbox, false);
 			exportDiv.appendChild(dropboxExportLink);
-			
+
 			// Dropbox Auth Link
 		    var dropboxAuthLinkExport = document.createElement('a');
 			dropboxAuthLinkExport.setAttribute('href','https://www.dropbox.com/');
@@ -1352,7 +1353,7 @@ var mainCode = function(){
 		    dropboxAuthLinkExport.setAttribute('id','dropboxAuthLinkExport');
 			dropboxAuthLinkExport.appendChild(document.createTextNode('Auth with DropBox'));
 			exportDiv.appendChild(dropboxAuthLinkExport);
-			
+
 
 			gccRoot.appendChild(exportDiv);
 
@@ -1410,7 +1411,7 @@ var mainCode = function(){
 			dropboxImportLink.setAttribute('value', lang.import_fromDropbox);
 			dropboxImportLink.addEventListener('mouseup', loadFromDropbox, false);
 			importDiv.appendChild(dropboxImportLink);
-			
+
 			// Dropbox Auth Link
 			var dropboxAuthLink = document.createElement('a');
 			dropboxAuthLink.setAttribute('href','https://www.dropbox.com/');
@@ -1418,31 +1419,31 @@ var mainCode = function(){
 		    dropboxAuthLink.setAttribute('id','dropboxAuthLinkImport');
 			dropboxAuthLink.appendChild(document.createTextNode('Auth with DropBox'));
 			importDiv.appendChild(dropboxAuthLink);
-			
+
 			importDiv.appendChild(document.createElement('br'));
-			
+
 			gistImportLink = document.createElement('input');
-			gistImportLink.setAttribute('id', 'gistImportLink');			
+			gistImportLink.setAttribute('id', 'gistImportLink');
 			gistImportLink.setAttribute('type', '');
 			if(GM_getValue("idResolverId", "") !== ""){
-				gistImportLink.setAttribute('value', "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());				
+				gistImportLink.setAttribute('value', "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());
 			}
 			else{
 				gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");
-			}			
+			}
 			gistImportLink.setAttribute('style', "margin-right: 0.5em; width: 25em; color: darkgray;");
 			importDiv.appendChild(gistImportLink);
 			$('#gistImportLink').before('<img  style="height: 18px; width: 18px; vertical-align: middle; margin-right: 0.5em; margin-bottom: 0.2em;" src="'+linkIconSmall+'"></img>');
-			
+
 			gistImportLinkButton = document.createElement('input');
 			gistImportLinkButton.setAttribute('id', 'gistImportLinkButton');
 			gistImportLinkButton.setAttribute('type', 'button');
 			gistImportLinkButton.setAttribute('value', lang.import_fromGist);
 			gistImportLinkButton.addEventListener('mouseup', loadFromGist, false);
 			importDiv.appendChild(gistImportLinkButton);
-			
+
 			importDiv.appendChild(document.createElement('br'));
-			
+
 			importText = document.createElement('textarea');
 			importText.setAttribute('id', 'gccommentimporttextarea');
 			importText.setAttribute('style', 'margin-top: 0.5em;');
@@ -1523,7 +1524,7 @@ var mainCode = function(){
 				toggleDeleteAllFilterOptions();
 		}
 	}
-	
+
 	var dropbox_client = null;
 
 	// Dropbox Access Token Hilfsfunktion.
@@ -1557,7 +1558,7 @@ var mainCode = function(){
     var AppId = utils.parseQueryString(window.location.search).AppId;
 	log("debug", Db_Access_Token);
 	log("debug", AppId);
-    if (AppId == 'GCComment') { 
+    if (AppId == 'GCComment') {
 		if (Db_Access_Token) {
 			// zurück von DB mit Access Token, speichern und weiter
 			GM_setValue('Db_Access_Token', Db_Access_Token);
@@ -1607,16 +1608,16 @@ var mainCode = function(){
             // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
               DropboxShowAuthLink();
         });
-		
+
 	}
-			
+
 	function storeToDropbox() {
 		 doDropboxAction()
             .done(function(){
             	dropboxExportLink.parentNode.insertBefore(waitingTag, dropboxExportLink);
 				waitingTag.setAttribute('style', 'display:inline');
 				waitingTag.setAttribute('src', waitingGif);
-		
+
 				dropbox_client.filesUpload({
 					path: '/' + createTimeString(new Date(), true) + '_backup-all.gcc',
 					contents: xmlversion + buildGCCExportString(false),
@@ -1637,14 +1638,14 @@ var mainCode = function(){
 					waitingTag.setAttribute("src", errorIcon);
 					log("debug", error); // Something went wrong.
 				});
-			
-			
+
+
 			})
             .fail(function(){
             // kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
               DropboxShowAuthLink();
             });
-		
+
 	}
 
 	function loadFromDropbox() {
@@ -1653,10 +1654,10 @@ var mainCode = function(){
 				dropboxImportLink.parentNode.insertBefore(waitingTag, dropboxImportLink);
 				waitingTag.setAttribute('style', 'display:inline');
 				waitingTag.setAttribute('src', waitingGif);
-		
+
 				var select = document.getElementById('dropboxSelect');
 				var fileName = select.options[select.selectedIndex].text;
-		
+
 				dropbox_client.filesDownload({path: '/' + fileName})
 				.then(function(response) {
 					reader = new FileReader();
@@ -1684,17 +1685,17 @@ var mainCode = function(){
 	function loadFromGist() {
 		gistImportLinkButton.parentNode.insertBefore(waitingTag, gistImportLinkButton);
 		waitingTag.setAttribute('style', 'display:inline');
-		waitingTag.setAttribute('src', waitingGif);	
-		
+		waitingTag.setAttribute('src', waitingGif);
+
 		var loadCommentFunction = function(id){
 			if(id === "" || id.indexOf("gccc") != 0 || id==="gccc"){
 				$('#gistImportLink')[0].value = "http://gcc.lukeIam.de#gccc";
 				waitingTag.setAttribute('style', 'display:none');
 				return;
 			}
-			
+
 			id = id.substr(4);
-			
+
 			gistShare.getComment(id).done(function (files) {
 				if(files.length > 0){
 					waitingTag.setAttribute("src", successIcon);
@@ -1707,28 +1708,28 @@ var mainCode = function(){
 				}
 				else{
 					waitingTag.setAttribute("src", errorIcon);
-					log("debug", "No data"); // Something went wrong.			
+					log("debug", "No data"); // Something went wrong.
 					return;
 				}
 			}).fail(function(error){
 				waitingTag.setAttribute("src", errorIcon);
-				log("debug", error); // Something went wrong.			
+				log("debug", error); // Something went wrong.
 				return;
 			});
 		};
-		
+
 		var possibleId = $('#gistImportLink')[0].value.trim().replace("http://","").replace("gcc.lukeIam.de","").replace("gccs.lukeIam.de","").replace(/\//g,"").replace(/#/g,"").toLowerCase();
-		
+
 		if(possibleId.indexOf("-") !== -1){
 			GM_xmlhttpRequest({
 				url: "https://idresolver.azurewebsites.net/"+possibleId,
 				onload: function(e){
-					log("debug", "IDResolver ID found");						
-					loadCommentFunction(e.responseText.replace(/"/g, "").trim());					
-				},						
+					log("debug", "IDResolver ID found");
+					loadCommentFunction(e.responseText.replace(/"/g, "").trim());
+				},
 				onerror: function(e){
 					log("debug", "IDResolver ID not found");
-					waitingTag.setAttribute("src", errorIcon);					
+					waitingTag.setAttribute("src", errorIcon);
 				},
 				method: "GET"
 			});
@@ -1750,14 +1751,14 @@ var mainCode = function(){
         $(Db_AuthLinkImport).show();
 		dropboxImportLink.setAttribute('disabled', 'disabled');
  		dropboxCheck.setAttribute('disabled', 'disabled');
- 		dropboxSelect.setAttribute('disabled', 'disabled');		
-		
-		// Export Seite 
+ 		dropboxSelect.setAttribute('disabled', 'disabled');
+
+		// Export Seite
 		$(Db_AuthLinkExport).show();
 		dropboxExportLink.setAttribute('disabled', 'disabled');
  		exportDropboxButton.setAttribute('disabled', 'disabled');
 }
-				  
+
 	function doDropboxAction() {
         var deferred = $.Deferred();
         Db_Access_Token = GM_getValue('Db_Access_Token');
@@ -2016,16 +2017,20 @@ var mainCode = function(){
 
 		// remove emojis
 		if (GM_getValue(PATCHGPX_STRIP_EMOJIS)) {
-		    result = result.replace(/😄/g, "").replace(/😉/g, "").replace(/😀/g, "").replace(/👀/g, "").replace(
-					/😃/g, "").replace(/😜/g, "").replace(/😊/g, "");
+		    result = removeEmojis(result);
 		}
-		
+
 		// remove empty lines
 		result = result.replace(/[\r\n]\s*[\r\n](?! *<wpt)/g, "");
 
 		var patchFileName = filename.split(".gpx")[0] + "-patched.gpx";
 
 		openDownloadWindow(result, "application/gccomment;charset=utf-8", patchFileName, patchResult);
+	}
+
+	function removeEmojis (strip) {
+		var regex = /(?:[\u2700-\u27bf]|(?:\ud83c[\udde6-\uddff]){2}|[\ud800-\udbff][\udc00-\udfff]|[\u0023-\u0039]\ufe0f?\u20e3|\u3299|\u3297|\u303d|\u3030|\u24c2|\ud83c[\udd70-\udd71]|\ud83c[\udd7e-\udd7f]|\ud83c\udd8e|\ud83c[\udd91-\udd9a]|\ud83c[\udde6-\uddff]|\ud83c[\ude01-\ude02]|\ud83c\ude1a|\ud83c\ude2f|\ud83c[\ude32-\ude3a]|\ud83c[\ude50-\ude51]|\u203c|\u2049|[\u25aa-\u25ab]|\u25b6|\u25c0|[\u25fb-\u25fe]|\u00a9|\u00ae|\u2122|\u2139|\ud83c\udc04|[\u2600-\u26FF]|\u2b05|\u2b06|\u2b07|\u2b1b|\u2b1c|\u2b50|\u2b55|\u231a|\u231b|\u2328|\u23cf|[\u23e9-\u23f3]|[\u23f8-\u23fa]|\ud83c\udccf|\u2934|\u2935|[\u2190-\u21ff])/g;
+		return strip.replace(regex, '');
 	}
 
 	var download;
@@ -2108,23 +2113,23 @@ var mainCode = function(){
 			if(e.data && e.data.indexOf("GCC_Share_") === 0){
 				var data = JSON.parse(e.data.replace("GCC_Share_", ""));
 				console.log("Recived data from sharing site");
-				
+
 				if(typeof(data) === "undefined" || typeof(data.guid) === "undefined"
 					|| typeof(data.gccode) === "undefined" || typeof(data.name) === "undefined"){
 					console.log("Got invalid data from sharing site");
 					return;
 				}
-				
+
 				var msg = "";
-				
-				var oExisting = doLoadCommentFromGUID(data.guid);				
+
+				var oExisting = doLoadCommentFromGUID(data.guid);
 				if (oExisting) {
 					msg = lang.shareImportOverride.replace("%name%", oExisting.name + " (" + oExisting.gccode + ")");
 				}
 				else{
 					msg = lang.shareImportNew.replace("%name%", data.name + " (" + data.gccode + ")");
 				}
-				
+
 				if(confirm(msg)){
 					console.log("Share import confirmed by user");
 					doSaveCommentWTimeToGUID(data);
@@ -2134,9 +2139,9 @@ var mainCode = function(){
 					console.log("Share import denied by user");
 				}
 			}
-		});	
+		});
 	}
-	
+
 	function toggleTabOnProfile(tabid) {
 		log('debug', 'tabid ' + tabid);
 		// do specials
@@ -2210,13 +2215,13 @@ var mainCode = function(){
 			imgEdit.setAttribute('style', 'cursor:pointer');
 			EditComment.appendChild(imgEdit);
 			EditComment.addEventListener('mouseup', editComment, false);
-			
+
 			ShareComment = document.createElement('a');
 			var imgShare = document.createElement('img');
 			imgShare.src = commentIconShare;
 			imgShare.title = lang.detail_share;
 			imgShare.setAttribute('style', 'cursor:pointer');
-			ShareComment.appendChild(imgShare);			
+			ShareComment.appendChild(imgShare);
 			ShareComment.addEventListener('mouseup', function(){shareComment(currentCacheGUID);}, false);
 
 			EditCancelComment = document.createElement('a');
@@ -2284,7 +2289,7 @@ var mainCode = function(){
 
 					saveFinalCoords();
 					if (GM_getValue(AUTO_UPDATE_GS_FINAL) == 1) {
-						var pageMethodCaller =  function(userToken){ 						
+						var pageMethodCaller =  function(userToken){
 							$.pageMethod("/seek/cache_details.aspx/ResetUserCoordinate", JSON.stringify({
 								dto : {
 									ut : userToken
@@ -2296,8 +2301,8 @@ var mainCode = function(){
 									}
 							});
 						};
-					
-						if(browser === "FireFox"){							
+
+						if(browser === "FireFox"){
 							appendScript("text", "(" + pageMethodCaller.toString() + ")('" + unsafeWindow.userToken.replace(/'/g,"%27") + "'.replace('%27','\\''));");
 						}
 						else{
@@ -2312,8 +2317,8 @@ var mainCode = function(){
 			imgArchive.src = archiveAdd;
 			imgArchive.title = lang.table_addtoarchive;
 			imgArchive.setAttribute('style', 'cursor:pointer');
-			ArchiveComment.appendChild(imgArchive);			
-						
+			ArchiveComment.appendChild(imgArchive);
+
 			DeleteComment = document.createElement('a');
 		imgDelete = document.createElement('img');
 			imgDelete.src = commentIconDelete;
@@ -2369,25 +2374,25 @@ var mainCode = function(){
 					doSaveCommentToGUID(currentComment);
 				}
 			}
-			
+
 			var add2Archive = function(){
 				currentComment.archived = ARCHIVED;
 				doSaveCommentToGUID(currentComment);
 				updateArchiveIcon();
 			};
-			
+
 			var removeFromArchive = function(){
 				currentComment.archived = null;
 				doSaveCommentToGUID(currentComment);
 				updateArchiveIcon();
 			};
-			
+
 			var updateArchiveIcon = function(){
 				if(currentComment !== null && currentComment.archived === ARCHIVED){
 					imgArchive.src = archiveRemove;
 					imgArchive.title = lang.table_removefromarchive;
-					ArchiveComment.removeEventListener('mouseup', add2Archive);					
-					ArchiveComment.addEventListener('mouseup', removeFromArchive);					
+					ArchiveComment.removeEventListener('mouseup', add2Archive);
+					ArchiveComment.addEventListener('mouseup', removeFromArchive);
 				}
 				else{
 					imgArchive.src = archiveAdd;
@@ -2396,9 +2401,9 @@ var mainCode = function(){
 					ArchiveComment.addEventListener('mouseup', add2Archive);
 				}
 			};
-			
+
 			updateArchiveIcon();
-				
+
 			detailCommentDiv = document.createElement('div');
 			detailCommentDiv.setAttribute('name', 'mycomments');
 			var header = document.createElement('p');
@@ -2544,11 +2549,11 @@ var mainCode = function(){
 		if (hookTBody) {
 			var mysteryRow = document.createElement('div');
 			mysteryRow.setAttribute('class', 'LocationData');
-			
+
 			// Wish from st3phan76 - Issue #19
 			mysteryRow.setAttribute('style', 'margin: -10px -13px 0px -13px');
 			//
-			
+
 			hookTBody.parentNode.insertBefore(mysteryRow, hookTBody);
 			var mysteryData = document.createElement('td');
 			mysteryRow.appendChild(mysteryData);
@@ -2589,7 +2594,7 @@ var mainCode = function(){
 			if (currentComment && currentComment.lat && currentComment.lng) {
 				detailFinalInputLatLng.value = convertDec2DMS(currentComment.lat, currentComment.lng);
 			}
-			
+
 			if (currentComment
 					&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))
 					&& typeof(unsafeWindow.L)!=="undefined") {
@@ -2659,13 +2664,13 @@ var mainCode = function(){
 
 					return map;
 				};
-				
-					if(browser === "Chrome"){						
-						$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');						
+
+					if(browser === "Chrome"){
+						$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
 						setStaticMap();
 					}
 				};
-				
+
 				if(browser === "FireFox"){
 					var code = document.createElement('script');
 					code.setAttribute('type', 'text/javascript');
@@ -2677,7 +2682,7 @@ var mainCode = function(){
 					code.textContent += modifyCachePageMap.toString();
 					code.textContent += ")();";
 					document.getElementsByTagName('head')[0].appendChild(code);
-					
+
 				}
 				else{
 					modifyCachePageMap();
@@ -2708,7 +2713,7 @@ var mainCode = function(){
 
 		// check for waypoints header and add if not present
 		var waypointElement = document.getElementById('ctl00_ContentBody_WaypointsInfo');
-		if (!waypointElement) {			
+		if (!waypointElement) {
 			$('#ctl00_ContentBody_bottomSection > p:first').first().html('<span id="ctl00_ContentBody_WaypointsInfo" style="font-weight:bold;">Additional Waypoints</span><br>');
 		}
 
@@ -2863,7 +2868,7 @@ var mainCode = function(){
 				}
 			}
 		}
-	
+
 		//saveToCacheNote(currentComment);
 	}
 
@@ -2871,7 +2876,7 @@ var mainCode = function(){
 		if (!GM_getValue(AUTO_UPLOAD_CACHE_NOTES)) {
 			return;
 		}
-		
+
 		function getCacheNoteText(currentComment){
 			var result = "GCCNote:\n";
 
@@ -2880,11 +2885,11 @@ var mainCode = function(){
 			}
 			for (var j = 0; currentComment.waypoints && (j < currentComment.waypoints.length); j++) {
 				result += currentComment.waypoints[j].name+": "+currentComment.waypoints[j].coordinate+"\n";
-			}			
+			}
 			result += "\n"+currentComment.commentValue;
 			return result;
 		}
-	
+
 		if(currentComment){ //TODO: Setting
 			if($("#cache_note").children().length !== 0){
 				log("info", "saveToCacheNote failed: cache note is in edit mode");
@@ -2892,7 +2897,7 @@ var mainCode = function(){
 			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
 				log("info", "saveToCacheNote failed: cache note contains other text");
 			}
-			else{			
+			else{
 				var text = $.trim(getCacheNoteText(currentComment));
 				if (text.length > 500 ) {
 						text = text.substr(0, 500);
@@ -2902,25 +2907,25 @@ var mainCode = function(){
 					log("debug", "saveToCacheNote: cache note identical - nothing to do");
 					return;
 				}
-				var pageMethodCaller = function(data){ 					
+				var pageMethodCaller = function(data){
 					$.pageMethod("/seek/cache_details.aspx/SetUserCacheNote", data, function(r) {
 						var r = JSON.parse(r.d);
 						if (!r.success == true) {
 							log("info", "failed while saving comment to cache note");
 							return;
 						}
-						
+
 						$("#cache_note").text(text);
-					});	
+					});
 				};
-				
+
 				var dataString = JSON.stringify({
 					dto :{
 						et : text,
 						ut : unsafeWindow.userToken
 					}
 				});
-				
+
 				if(browser === "FireFox"){
 					appendScript("text", "(" + pageMethodCaller.toString() + ")('" + dataString.replace(/'/g,"%27") + "'.replace('%27','\\''));");
 				}
@@ -2930,7 +2935,7 @@ var mainCode = function(){
 			}
 		}
 	};
-	
+
 	function createAdditionalWaypointsRow(data) {
 		var wpttr = document.createElement('tr');
 		wpttr.setAttribute('id', 'wptrow_' + data.prefix);
@@ -3520,7 +3525,7 @@ var mainCode = function(){
 	else{
 		$('#gccommentoverviewtable').dataTable(oDataTableSettings);
 	}
-	
+
 
 		var filteredByString = filter;
 		if (filter === stateOptions[0]) {
@@ -3867,18 +3872,18 @@ var mainCode = function(){
 			detailCommentTextArea.focus();
 		}, 50);
 	}
-	
+
 	function shareComment(guid){
 		$('#shareParagraph').hide();
-		var comment = doLoadCommentFromGUID(guid);		
+		var comment = doLoadCommentFromGUID(guid);
 		var data = "<gccomment>"+commentToGCC(comment)+"</gccomment>"
-		
+
 		gistShare.shareComment(data, comment.gccode, comment.name).done(function(code){
 			console.log(comment.gccode +" successfully shared: "+ code);
 			if($('shareParagraph').length <= 0){
 				$('#gccommentarea small').after('<div style="display:none; margin-bottom: -1.0em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input><a href="#shareLinkQRBig"><div id="shareLinkQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkQRBig"></div></div></div>');
-			}			
-			
+			}
+
 			$('#shareLink').attr("value","http://gcc.lukeIam.de#"+code);
 			$('#shareLinkQR').qrcode({
 				width: $('#shareLinkQR').width(),
@@ -3890,19 +3895,19 @@ var mainCode = function(){
 				height: $('#shareLinkQRBig').height(),
 				text: "http://gcc.lukeIam.de#"+code
 			});
-	
-			
+
+
 			$('#shareParagraph').slideDown({
 				done:(function(){
 					$('#shareLink').select();
 				})
 			});
-			
+
 		}).fail(function(msg){
 			console.log("Sharing of " + comment.gccode + " failed: \n"+ msg);
-		});		
+		});
 	}
-	
+
 	var gistShare = new function () {
 		this.shareComment = function (data, gcid, name) {
 			var d = new $.Deferred();
@@ -3988,9 +3993,9 @@ var mainCode = function(){
 			});
 
 			return d.promise();
-		};		
+		};
 	};
-	
+
 	var gist = new function(){
 		var gistApiUrl = "https://api.github.com/gists";
 		this.getGist = function(id){
@@ -4000,27 +4005,27 @@ var mainCode = function(){
 				onerror: function(e){d.reject(e.statusText);},
 				method: "GET"
 			});
-			
-			return d.promise();	
+
+			return d.promise();
 		};
-		
+
 		this.uploadNewGist = function(data, filename, desc){
 			var d = new $.Deferred();
 			if(typeof(data) != "object"){
 				data = [data];
 			}
-			
+
 			if(typeof(filename) != "object"){
 				filename = [filename];
 			}
-			
+
 			var f = {};
 			for(i=0;i<filename.length&&i<data.length;i++){
 				f[filename[i]] = {
 					content:data[i]
 				};
 			}
-			
+
 			GM_xmlhttpRequest({
 					url: gistApiUrl,
 					method: "POST",
@@ -4042,8 +4047,8 @@ var mainCode = function(){
 					onerror: function(e){d.reject(e.statusText);}
 				}
 			);
-			
-			return d.promise();			
+
+			return d.promise();
 		};
 	};
 
@@ -4119,9 +4124,9 @@ var mainCode = function(){
 				// saveComment();
 				// detailCommentInputLatLng.value = cstr;
 				// log("info", "coordinatestring: " + cstr);
-				
+
 				saveToCacheNote(currentComment);
-				
+
 				if (GM_getValue(AUTO_UPDATE_GS_FINAL) == 1) {
 					var pageMethodCaller = function(data){
 						$.pageMethod("/seek/cache_details.aspx/SetUserCoordinate", data, function(r) {
@@ -4129,9 +4134,9 @@ var mainCode = function(){
 							if (r.status == "success") {
 								window.location.reload();
 							}
-						});						 
-					};		
-					
+						});
+					};
+
 					var dataString = JSON.stringify({
 						dto : {
 							data : {
@@ -4141,8 +4146,8 @@ var mainCode = function(){
 							ut : unsafeWindow.userToken
 						}
 					});
-					
-					if(browser === "FireFox"){						
+
+					if(browser === "FireFox"){
 						appendScript("text", "(" + pageMethodCaller.toString() + ")('" + dataString.replace(/'/g,"%27") + "'.replace('%27','\\''));");
 					}
 					else{
@@ -4243,7 +4248,7 @@ var mainCode = function(){
 
 		doSaveCommentToGUID(currentComment);
 		saveToCacheNote(currentComment);
-		
+
 		var clean = DEFAULTCOORDS;
 		if (currentComment.lat && currentComment.lng) {
 			clean = convertDec2DMS(currentComment.lat, currentComment.lng);
@@ -4304,8 +4309,8 @@ var mainCode = function(){
 			var row = $(event.target).parents('tr');
 			$('#gccommentoverviewtable').dataTable().fnDeleteRow(row[0]);
 		}
-	}	                                                                                     
-	
+	}
+
 	// ***
 	// *** MysteryMover
 	// ***
@@ -4695,7 +4700,7 @@ var mainCode = function(){
 		GM_setValue(LAST_EXPORT, "" + (new Date() - 0));
 		return result;
 	}
-	
+
 	function commentToGCC(comment){
 		var result = "";
 		result = result + "<comment>";
@@ -4748,10 +4753,10 @@ var mainCode = function(){
 		}
 		result = result + "</waypoints>";
 		result = result + "</comment>";
-		
+
 		return result;
 	}
-	
+
 	function getComments(filtered) {
 		var filteredComments = new Array();
 		var commentKeys = GM_listValues();
@@ -4895,13 +4900,13 @@ var mainCode = function(){
 					+ exportType.toLowerCase();
 			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
 			if (fileName) {
-			
+
 				doDropboxAction()
 				.done(function(){
 					exportDropboxButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
 					waitingTag.setAttribute('style', 'display:inline');
 					waitingTag.setAttribute('src', waitingGif);
-		
+
 				dropbox_client.filesUpload({
 					path: '/' + fileName,
 					contents: data,
@@ -4922,15 +4927,15 @@ var mainCode = function(){
 					waitingTag.setAttribute("src", errorIcon);
 					log("debug", error); // Something went wrong.
 				});
-			
-			
+
+
 				})
 				.fail(function(){
 				// kein Dropbox Token oder nicht authentifiziert, also zeige den Auth Link.
 					DropboxShowAuthLink();
-				});			
-			
-			
+				});
+
+
 			}
 		}
 	}
@@ -4938,7 +4943,7 @@ var mainCode = function(){
 	function performFilteredGistExport() {
 		var exportType = $('#exportTypeSelector option:selected').text();
 		var data = null;
-		
+
 		if (exportType === "GCC") {
 			data = xmlversion + buildGCCExportString(true);
 		} else if (exportType === "CSV") {
@@ -4957,8 +4962,8 @@ var mainCode = function(){
 			var fileNameSuggest = "" + createTimeString(new Date(), true) + "_filteredExport."
 					+ exportType.toLowerCase();
 			var fileName = prompt(lang.export_toDropboxEnterFileName, fileNameSuggest);
-			
-			if (fileName) {			
+
+			if (fileName) {
 				exportGistButton.parentNode.insertBefore(waitingTag, exportDropboxButton);
 				waitingTag.setAttribute('style', 'display:inline');
 				waitingTag.setAttribute('src', waitingGif);
@@ -4969,11 +4974,11 @@ var mainCode = function(){
 					setTimeout(function() {
 						$("#waiting").fadeOut('slow', function() {
 						});
-					}, 5000);					
-					
+					}, 5000);
+
 					if($('#shareParagraph').length <= 0){
 						$('#exportDiv').append('<div style="display:none; margin-bottom: 0.0em; margin-left: 0.5em;" id="shareParagraph"><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 25em; color: darkgray;" readonly="readonly" id="shareLink"></input> <a href="#shareParagraphQRBig"> <div id="shareParagraphQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;" ></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareParagraphQRBig"></div></div></div>');
-					}			
+					}
 					$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
 					$('#shareParagraphQR').qrcode({
 						width: $('#shareParagraphQR').width(),
@@ -4990,14 +4995,14 @@ var mainCode = function(){
 							$('#shareLink').select();
 						})
 					});
-					
+
 					if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
 						GM_xmlhttpRequest({
 							url: "https://idresolver.azurewebsites.net/",
 							onload: function(e){
 								if($('#shareLinkPermExport').length <= 0){
 									$('#exportDiv').append('<span>And your always uptodate link: </span> <br> <img style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" readonly="readonly" id="shareLinkPermExport"></input><a href="#shareLinkPermExportQRBig"> <div id="shareLinkPermExportQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermExportQRBig"></div></div>');
-								}			
+								}
 								$('#shareLinkPermExport').attr("value", "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());
 								$('#shareLink').attr("value","http://gcc.lukeIam.de#gccc" + result["id"]);
 								$('#shareLinkPermExportQR').qrcode({
@@ -5011,11 +5016,11 @@ var mainCode = function(){
 									text: "http://gccs.lukeIam.de#"+result["id"]
 								});
 								$('#shareLinkPermExport').slideDown();
-								
-								log("debug", "Updated ID at IDResolver");	
-							},						
+
+								log("debug", "Updated ID at IDResolver");
+							},
 							onerror: function(e){
-								log("debug", "IDResolver updated failed");	
+								log("debug", "IDResolver updated failed");
 							},
 							headers:{
 								"Content-Type": "application/json"
@@ -5026,18 +5031,18 @@ var mainCode = function(){
 								TargetId: "gccc"+result["id"]
 							}),
 							method: "PUT"
-						});			
+						});
 					}
-					
-					log("debug", "Export to Gist successful");					
+
+					log("debug", "Export to Gist successful");
 				}).fail(function (jqXHR, textStatus) {
 					waitingTag.setAttribute("src", errorIcon);
-					log("debug", textStatus + " - " + jqXHR.responseText);	
-				});	
+					log("debug", textStatus + " - " + jqXHR.responseText);
+				});
 			}
 		}
 	}
-	
+
 	function performFilteredExport() {
 		var exportType = $('#exportTypeSelector option:selected').text();
 		var parentElement = $('#exportDiv')[0];
@@ -5574,7 +5579,7 @@ var mainCode = function(){
 		// result = result.replace(/&#10;/g, "\n");
 		return result;
 	}
-	
+
 	// helper detailpage: macht aus dem Time-Long eine lesbare Zeitangabe
 	function createTimeString(time, simple) {
 		if (time < 0)
@@ -6124,7 +6129,7 @@ var mainCode = function(){
 	if (typeof (chrome) !== "undefined") {
 		// Chrome detected
 		browser = "Chrome";
-		main();	
+		main();
 	} else {
 		browser = "FireFox";
 		main();
@@ -6132,9 +6137,9 @@ var mainCode = function(){
 }
 
 
-	window.addEventListener("message", function(e){	
+	window.addEventListener("message", function(e){
 		if(e.data && e.data.indexOf("GCC_Storage_") === 0){
-			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));		
+			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
 			GM_setValue(Object.keys(data)[0], data[Object.keys(data)[0]]);
 		}
 	});
@@ -6146,31 +6151,31 @@ function updateCheck(){
 	//Update check
 	if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
 					|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
-					
+
 		function log(level, text) {
 			GM_log(level + ": " + text);
 		}
-		
+
 		var SETTINGS_LANGUAGE = "settings language";
 		var SETTINGS_LANGUAGE_EN = "English";
 		var SETTINGS_LANGUAGE_DE = "Deutsch";
-		var SETTINGS_LANGUAGE_AUTO = "Auto";	
-		
+		var SETTINGS_LANGUAGE_AUTO = "Auto";
+
 		var languages = [];
 		languages[SETTINGS_LANGUAGE_EN] = {
 			update_changes : 'Changes in version ',
 			update_clickToUpdate : "Click here to update!",
 			tmpl_update : "Hooray, a GCComment update is available. The new version is {{serverVersion}} while your installed version is {{version}}."
 		};
-		languages[SETTINGS_LANGUAGE_DE] = {	
+		languages[SETTINGS_LANGUAGE_DE] = {
 			update_changes : 'Änderungen in Version ',
-			update_clickToUpdate : "Hier klicken, um das Update einzuspielen!",		
+			update_clickToUpdate : "Hier klicken, um das Update einzuspielen!",
 			tmpl_update : "Hooray, eine Aktualisierung für GCComment ist verfügbar. Die neue Version ist {{serverVersion}}, während die installierte Version {{version}} ist."
 		};
-		
+
 		var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 		var lang = languages[SETTINGS_LANGUAGE_EN];
-		
+
 		if (langsetting === SETTINGS_LANGUAGE_AUTO) {
 			if ($('.selected-language > a:first')) {
 				var gslang = $('.selected-language > a:first').text();
@@ -6185,7 +6190,7 @@ function updateCheck(){
 		if (!lang) {
 			lang = languages[SETTINGS_LANGUAGE_EN];
 		}
-		
+
 		function updateAvailable(oChanges) {
 			log("info", "current version: " + version + " latest version: " + oChanges.latestVersion);
 			var updateInfo = document.createElement('div');
@@ -6220,7 +6225,7 @@ function updateCheck(){
 				updateInfo.appendChild(divv);
 			});
 		}
-		
+
 		function checkforupdates() {
 			var updateDateString = GM_getValue('updateDate');
 			var updateDate = null;
@@ -6260,8 +6265,8 @@ function updateCheck(){
 				});
 				GM_setValue('updateDate', "" + (currentDate - 0));
 			}
-		}	
-		
+		}
+
 		checkforupdates();
 	}
 }
