@@ -20,7 +20,9 @@
 // @grant				GM_listValues
 // @grant				GM_registerMenuCommand
 // @grant				GM_log
+// @grant				GM.log
 // @grant				GM_info
+// @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
 // @version			93
 // @author			Birnbaum2001, lukeIam, ramirez
@@ -6136,7 +6138,14 @@ var mainCode = function(){
 	}
 }
 
+isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
 
+if (isTampermonkey === false) {
+                console.log('No Tampermonkey');
+				alert('GCComment only 100% works with Tampermonkey. Please switch to tampermonkey.net');
+}
+else
+{
 	window.addEventListener("message", function(e){
 		if(e.data && e.data.indexOf("GCC_Storage_") === 0){
 			var data = JSON.parse(e.data.replace("GCC_Storage_", ""));
@@ -6145,7 +6154,7 @@ var mainCode = function(){
 	});
 	updateCheck();
 	mainCode();
-
+}
 
 function updateCheck(){
 	//Update check
