@@ -24,13 +24,13 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			93
+// @version			94
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
 // version information
-var version = "93";
+var version = "94";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 
@@ -43,10 +43,17 @@ if (typeof (chrome) !== "undefined") {
 }
 
 var mainCode = function(){
-	var $ = this.$||$||null;
-	var jQuery = this.jQuery||jQuery||null;
+//	var $ = this.$||$||null;
+//	var jQuery = this.jQuery||jQuery||null;
 
-	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
+    if (typeof $ === "undefined") {
+        $ = $ || unsafeWindow.$ || window.$ || null;
+    }
+    if (typeof jQuery === "undefined") {
+        jQuery = jQuery || unsafeWindow.jQuery || window.jQuery || null;
+    }
+	
+/*	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
 		$ = unsafeWindow.$;
 	}
 	else if(typeof($) === "undefined" && typeof(window.$) !== "undefined"){
@@ -58,7 +65,7 @@ var mainCode = function(){
 	}
 	else if(typeof(jQuery) === "undefined" && typeof(window.$) !== "undefined"){
 		jQuery = window.jQuery;
-	}
+	} */
 
 
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
@@ -651,10 +658,10 @@ var mainCode = function(){
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 				mysteryMoverOnMapPage();
-		} else if (document.URL.search("sendtogps\.aspx") >= 0) {
+		} else if (document.URL.search("\/sendtogps\.aspx") >= 0) {
 			log('debug', 'matched sendToGPS');
 			sendToGPS();
-		} else if (document.URL.search("\/account\/ManageLocations\.aspx") >= 0) {
+		} else if (document.URL.search("www.geocaching.com\/account\/settings\/homelocation") >= 0) {
 			log('debug', 'matched gccommentOnManageLocations');
 			gccommentOnManageLocations();
 		} else if (document.URL.search("\/seek\/log\.aspx") >= 0) {
@@ -664,6 +671,9 @@ var mainCode = function(){
 		else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
 			log('debug', 'matched gccommentOnSharingPage');
 			gccommentOnSharingPage();
+		}
+		else {
+			log('debug', 'nothing matched');
 		}
 	}
 
@@ -751,17 +761,19 @@ var mainCode = function(){
 
 	// GCComment auf der Profilseite
 	function gccommentOnProfilePage() {
-			appendScript('src', 'https://cdn.datatables.net/1.10.6/js/jquery.dataTables.js');
-			appendCSS('src', 'https://cdn.datatables.net/1.10.6/css/jquery.dataTables.css');
+		
+		
+		// Datatables CSS anhaengen
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">');
+//			appendScript('src', 'https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js');
+//			appendCSS('src', 'https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css');
 
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
 				+ '.haveFinalIcon{margin-left:3px;width:14px}');
 
 		// styling the table's content
-		appendCSS(
-				'text',
-				'.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
+		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
 
 		// load settings
 		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
@@ -1558,9 +1570,8 @@ var mainCode = function(){
     log("debug", "Dropbox Access Token suchen");
     var Db_Access_Token = utils.parseQueryString(window.location.hash).access_token;
     var AppId = utils.parseQueryString(window.location.search).AppId;
-	log("debug", Db_Access_Token);
-	log("debug", AppId);
-    if (AppId == 'GCComment') {
+
+    if (AppId && AppId == 'GCComment') {
 		if (Db_Access_Token) {
 			// zurück von DB mit Access Token, speichern und weiter
 			GM_setValue('Db_Access_Token', Db_Access_Token);
@@ -3259,7 +3270,7 @@ var mainCode = function(){
 		commentTable = document.createElement('table');
 		commentTable.setAttribute('id', 'gccommentoverviewtable');
 		commentTable.setAttribute('style',
-				'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#EBECED');
+				'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#c8cbce');
 		// commentTable.setAttribute('class', 'Table');
 		var thead = document.createElement('thead');
 		commentTable.appendChild(thead);
@@ -5353,8 +5364,11 @@ var mainCode = function(){
 	var originalGPX = "";
 	// Original idea from Schatzjäger2
 	function sendToGPS() {
+		log('debug','Suche Datastring');
 		setTimeout(function() {
+			log('debug','Suche Datastring');
 			var gpxTextArea = document.getElementById('dataString');
+			log('debug',dataString);
 			// gpxTextArea.parentNode.setAttribute('style', "");
 			var gpx = gpxTextArea.value;
 			originalGPX = gpx;
@@ -6141,8 +6155,10 @@ var mainCode = function(){
 isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
 
 if (isTampermonkey === false) {
-                console.log('No Tampermonkey');
-				alert('GCComment only 100% works with Tampermonkey. Please switch to tampermonkey.net');
+	console.log('No Tampermonkey');
+	alert('GCComment only 100% works with Tampermonkey. Please switch to tampermonkey.net');
+	updateCheck();
+	mainCode();
 }
 else
 {
