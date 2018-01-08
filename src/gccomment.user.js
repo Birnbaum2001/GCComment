@@ -3271,7 +3271,7 @@ var mainCode = function(){
 		commentTable.setAttribute('id', 'gccommentoverviewtable');
 		commentTable.setAttribute('style',
 				'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#c8cbce');
-		// commentTable.setAttribute('class', 'Table');
+		commentTable.setAttribute('class', 'display');
 		var thead = document.createElement('thead');
 		commentTable.appendChild(thead);
 
@@ -3519,7 +3519,7 @@ var mainCode = function(){
 	var oDataTableSettings = {
 			"bAutoWidth" : false,
 			"bStateSave" : true,
-			"bJQueryUI" : true,
+			"bJQueryUI" : false,
 			"aoColumns" : [ {
 				"sWidth" : "200px"
 			}, {
