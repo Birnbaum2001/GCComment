@@ -761,7 +761,7 @@ var mainCode = function(){
 
 	// GCComment auf der Profilseite
 	function gccommentOnProfilePage() {
-		
+
 
 		// Datatables CSS anhaengen
 		$('head').append('<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
