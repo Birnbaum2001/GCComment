@@ -52,7 +52,7 @@ var mainCode = function(){
     if (typeof jQuery === "undefined") {
         jQuery = jQuery || unsafeWindow.jQuery || window.jQuery || null;
     }
-	
+
 /*	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
 		$ = unsafeWindow.$;
 	}
@@ -762,9 +762,9 @@ var mainCode = function(){
 	// GCComment auf der Profilseite
 	function gccommentOnProfilePage() {
 		
-		
+
 		// Datatables CSS anhaengen
-		$('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">');
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
 //			appendScript('src', 'https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js');
 //			appendCSS('src', 'https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css');
 
