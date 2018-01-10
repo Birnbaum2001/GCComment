@@ -655,6 +655,10 @@ var mainCode = function(){
 				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
 			log('debug', 'matched gccommentOnProfilePage');
 			gccommentOnProfilePage();
+		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
+				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
+			log('debug', 'matched gccommentOnNewProfilePage');
+			gccommentOnNewProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 				mysteryMoverOnMapPage();
@@ -762,11 +766,8 @@ var mainCode = function(){
 	// GCComment auf der Profilseite
 	function gccommentOnProfilePage() {
 
-
-		// Datatables CSS anhaengen
+   	// Datatables CSS anhaengen
 		$('head').append('<link rel="stylesheet" type="text/css" href="https://rawgit.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
-//			appendScript('src', 'https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js');
-//			appendCSS('src', 'https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css');
 
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
@@ -1107,7 +1108,785 @@ var mainCode = function(){
 			paypallink.setAttribute('style',
 					'position:absolute;left:650px;top:10px;text-align:center;text-decoration:none;');
 			paypallink.setAttribute('href',
-					'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3RG7N2ELTYRX4');
+					'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FK6XVH5SULGL');
+			paypallink.setAttribute('target', 'blank');
+			paypallink.appendChild(document.createTextNode(lang.settings_feelfree));
+			paypallink.appendChild(document.createElement('br'));
+			var paypalImg = document.createElement('img');
+			paypalImg.setAttribute('src', 'https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif');
+			paypallink.appendChild(paypalImg);
+			paypallink.appendChild(document.createElement('br'));
+			paypallink.appendChild(document.createTextNode(lang.thank_you));
+			configDiv.appendChild(paypallink);
+
+			appendCheckBox(configDiv, ENABLE_EXPORT, lang.settings_allowExport);
+
+			appendCheckBox(configDiv, LAZY_TABLE_REFRESH, lang.settings_lazyTable);
+
+			appendCheckBox(configDiv, AUTO_UPDATE_GS_FINAL, lang.settings_syncWithGS);
+
+			appendCheckBox(configDiv, AUTO_UPLOAD_CACHE_NOTES, lang.settings_saveCacheNotes);
+
+			var IdResoverContent = "";
+			function updateIdResoverContent(){
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
+				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
+
+				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
+					IdResoverContent = IdResoverContentActive;
+				}
+				else{
+					IdResoverContent = IdResoverContentInactive;
+				}
+			}
+			updateIdResoverContent();
+			$(configDiv).append("<br>").append(IdResoverContent).append("<br>");
+
+			configDiv.appendChild(document.createTextNode(lang.settings_language + ":"));
+			var languageSelector = document.createElement('select');
+			languageSelector.setAttribute("name", "languageSelector");
+			languageSelector.setAttribute("id", "languageSelector");
+			languageSelector.setAttribute('size', 1);
+			languageSelector.setAttribute('style', "margin-left:5px;");
+			languageSelector.addEventListener('change', function() {
+				GM_setValue(SETTINGS_LANGUAGE, $('#languageSelector option:selected').text());
+				// showSuccessIcon(languageSelector);
+			});
+			var option0 = document.createElement('option');
+			option0.appendChild(document.createTextNode(SETTINGS_LANGUAGE_AUTO));
+			var option1 = document.createElement('option');
+			option1.appendChild(document.createTextNode(SETTINGS_LANGUAGE_EN));
+			var option2 = document.createElement('option');
+			option2.appendChild(document.createTextNode(SETTINGS_LANGUAGE_DE));
+			languageSelector.appendChild(option0);
+			languageSelector.appendChild(option1);
+			languageSelector.appendChild(option2);
+			var langsetting = GM_getValue(SETTINGS_LANGUAGE);
+			if (langsetting === SETTINGS_LANGUAGE_EN)
+				option1.setAttribute('selected', 'true');
+			else if (langsetting === SETTINGS_LANGUAGE_DE)
+				option2.setAttribute('selected', 'true');
+			else
+				option0.setAttribute('selected', 'true');
+			configDiv.appendChild(languageSelector);
+
+			gccRoot.appendChild(configDiv);
+
+			setTimeout(function(){
+				$('#shareLinkPermQR').qrcode({
+					width: $('#shareLinkPermQR').width(),
+					height: $('#shareLinkPermQR').height(),
+					text: "http://gccs.lukeIam.de#"+GM_getValue("idResolverId", "")
+				}).parent().nyroModal();
+				$('#shareLinkPermQRBig').qrcode({
+					width: $('#shareLinkPermQRBig').width(),
+					height: $('#shareLinkPermQRBig').height(),
+					text: "http://gccs.lukeIam.de#"+GM_getValue("idResolverId", "")
+				});
+			},1000);
+
+			function divIdResoverSettingsSetupClickHandler(){
+				$('#divIdResoverSettingsRemove').unbind("click").click(function(){
+					GM_setValue("idResolverId", "");
+					GM_setValue("idResolverSecret", "");
+					updateIdResoverContent();
+					$('#divIdResoverSettings').replaceWith(IdResoverContent);
+					divIdResoverSettingsSetupClickHandler();
+				});
+
+				$('#divIdResoverSettingsLogin').unbind("click").click(function(){
+					GM_xmlhttpRequest({
+						url: "https://idresolver.azurewebsites.net/check",
+						onload: function(e){
+							GM_setValue("idResolverId", document.getElementById("divIdResoverSettingsId").value.trim());
+							GM_setValue("idResolverSecret", document.getElementById("divIdResoverSettingsSecret").value.trim());
+							updateIdResoverContent();
+							$('#divIdResoverSettings').replaceWith(IdResoverContent);
+							divIdResoverSettingsSetupClickHandler();
+
+							$('#shareLinkPermQR').qrcode({
+								width: $('#shareLinkPermQR').width(),
+								height: $('#shareLinkPermQR').height(),
+								text: "http://gccs.lukeIam.de#"+document.getElementById("divIdResoverSettingsId").value.trim()
+							}).parent().nyroModal();
+							$('#shareLinkPermQRBig').qrcode({
+								width: $('#shareLinkPermQRBig').width(),
+								height: $('#shareLinkPermQRBig').height(),
+								text: "http://gccs.lukeIam.de#"+document.getElementById("divIdResoverSettingsId").value.trim()
+							});
+						},
+
+						onerror: function(e){
+							document.getElementById("divIdResoverSettingsId").value = "";
+							document.getElementById("divIdResoverSettingsSecret").value = "";
+							alert("Failed");
+							console.log(e.statusText);
+						},
+						headers:{
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify( {
+							Id: document.getElementById("divIdResoverSettingsId").value.trim(),
+							SecretToken: document.getElementById("divIdResoverSettingsSecret").value.trim(),
+							TargetId: ""
+						}),
+						method: "POST"
+					});
+				});
+
+				$('#divIdResoverSettingsCreate').unbind("click").click(function(){
+					GM_xmlhttpRequest({
+						url: "https://idresolver.azurewebsites.net/register",
+						onload: function(e){
+							var data = JSON.parse(e.responseText);
+							GM_setValue("idResolverId", data.Id);
+							GM_setValue("idResolverSecret", data.SecretToken);
+							updateIdResoverContent();
+							$('#divIdResoverSettings').replaceWith(IdResoverContent);
+							divIdResoverSettingsSetupClickHandler();
+						},
+						onerror: function(e){
+							alert("Failed");
+							console.log(e.statusText);
+						},
+						method: "GET"
+					});
+				});
+			}
+			divIdResoverSettingsSetupClickHandler();
+
+			//
+			// gccommenttablediv
+			//
+			var tableDiv = document.createElement('div');
+			tableDiv.setAttribute('id', 'gccommenttablediv');
+			tableDiv
+					.setAttribute(
+							'style',
+							'margin: 5px; padding: 4px; outline: 1px solid rgb(215, 215, 215); position: relative; background-color: rgb(235, 236, 237);display:none');
+			gccRoot.appendChild(tableDiv);
+
+			//
+			// EXPORT DIV
+			//
+			exportDiv = document.createElement('div');
+			exportDiv.setAttribute('id', 'exportDiv');
+			exportDiv.setAttribute('style',
+					'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+			exportDiv.style.display = 'none';
+
+			exportDiv.appendChild(document.createTextNode(lang.export_step1));
+			var exportFilterDiv = document.createElement('div');
+			appendCheckBox(exportFilterDiv, EXPORT_FILTER_ALL, lang.all, toggleExportFilterOptions);
+			appendCheckBox(exportFilterDiv, EXPORT_FILTER_UNTYPED, lang.type_untyped);
+			appendCheckBox(exportFilterDiv, EXPORT_FILTER_UNSOLVED, lang.type_unsolved);
+			appendCheckBox(exportFilterDiv, EXPORT_FILTER_SOLVED, lang.type_solved);
+			appendCheckBox(exportFilterDiv, EXPORT_FILTER_FOUND, lang.type_found);
+
+			exportFilterDiv.appendChild(document.createElement('br'));
+			exportFilterDiv.appendChild(document.createTextNode(lang.export_step2));
+			exportFilterDiv.appendChild(document.createElement('br'));
+			appendRadioGroup(exportFilterDiv, EXPORT_FILTER_ARCHIVE, [ {
+				label : lang.both,
+				attr : EXPORT_FILTER_ARCHIVE_BOTH
+			}, {
+				label : lang.not_archived,
+				attr : EXPORT_FILTER_ARCHIVE_NOT_ARCHIVED
+			}, {
+				label : lang.archived,
+				attr : EXPORT_FILTER_ARCHIVE_ARCHIVED
+			} ], GM_getValue(EXPORT_FILTER_ARCHIVE, EXPORT_FILTER_ARCHIVE_BOTH));
+
+			exportDiv.appendChild(exportFilterDiv);
+
+			exportFilterDiv.appendChild(document.createElement('br'));
+			var exportTypeDiv = document.createElement('div');
+			exportTypeDiv.appendChild(document.createTextNode(lang.export_step3));
+			var exportTypeSelector = document.createElement('select');
+			exportTypeSelector.setAttribute("name", "exportTypeSelector");
+			exportTypeSelector.setAttribute("id", "exportTypeSelector");
+			exportTypeSelector.setAttribute('size', 1);
+			var option0 = document.createElement('option');
+			option0.appendChild(document.createTextNode("GCC"));
+			var option1 = document.createElement('option');
+			option1.appendChild(document.createTextNode("GPX"));
+			var option2 = document.createElement('option');
+			option2.appendChild(document.createTextNode("CSV"));
+			var option3 = document.createElement('option');
+			option3.appendChild(document.createTextNode("HTML"));
+			var option4 = document.createElement('option');
+			option4.appendChild(document.createTextNode("KML"));
+			var option5 = document.createElement('option');
+			option5.appendChild(document.createTextNode("JSON"));
+			exportTypeSelector.appendChild(option0);
+			exportTypeSelector.appendChild(option1);
+			exportTypeSelector.appendChild(option2);
+			exportTypeSelector.appendChild(option3);
+			exportTypeSelector.appendChild(option4);
+			exportTypeSelector.appendChild(option5);
+			exportTypeDiv.appendChild(exportTypeSelector);
+			exportDiv.appendChild(exportTypeDiv);
+
+			var explainP = document.createElement('p');
+			explainP.setAttribute('style', 'margin-top:1.5em');
+			explainP.appendChild(document.createTextNode(lang.export_explain));
+			exportDiv.appendChild(explainP);
+
+			var exportButton = document.createElement('input');
+			exportButton.setAttribute('type', 'button');
+			exportButton.setAttribute('value', lang.export_perform);
+			exportButton.addEventListener('click', performFilteredExport, false);
+			exportButton.setAttribute('style', 'margin:5px');
+			exportDiv.appendChild(exportButton);
+
+			exportDropboxButton = document.createElement('input');
+			exportDropboxButton.setAttribute('type', 'button');
+			exportDropboxButton.setAttribute('value', lang.export_toDropboxPerformFilteredExport);
+			exportDropboxButton.addEventListener('click', performFilteredDropboxExport, false);
+			exportDropboxButton.setAttribute('style', 'margin:5px');
+			exportDiv.appendChild(exportDropboxButton);
+
+			exportGistButton = document.createElement('input');
+			exportGistButton.setAttribute('type', 'button');
+			exportGistButton.setAttribute('value', lang.export_toGistPerformFilteredExport);
+			exportGistButton.addEventListener('click', performFilteredGistExport, false);
+			exportGistButton.setAttribute('style', 'margin:5px');
+			exportDiv.appendChild(exportGistButton);
+
+
+			dropboxExportLink = document.createElement('input');
+			dropboxExportLink.setAttribute('type', 'button');
+			dropboxExportLink.setAttribute('style', 'margin:5px');
+			dropboxExportLink.setAttribute('value', lang.export_toDropbox);
+			dropboxExportLink.addEventListener('mouseup', storeToDropbox, false);
+			exportDiv.appendChild(dropboxExportLink);
+
+			// Dropbox Auth Link
+		    var dropboxAuthLinkExport = document.createElement('a');
+			dropboxAuthLinkExport.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLinkExport.setAttribute('style','display: none');
+		    dropboxAuthLinkExport.setAttribute('id','dropboxAuthLinkExport');
+			dropboxAuthLinkExport.appendChild(document.createTextNode('Auth with DropBox'));
+			exportDiv.appendChild(dropboxAuthLinkExport);
+
+
+			gccRoot.appendChild(exportDiv);
+
+			//
+			// IMPORT DIV
+			//
+			importDiv = document.createElement('div');
+			importDiv.setAttribute('id', 'importDiv');
+			importDiv.setAttribute('style',
+					'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+			importDiv.style.display = 'none';
+			gccRoot.appendChild(importDiv);
+			var importDivExplanation = document.createElement('p');
+			importDivExplanation.appendChild(document.createTextNode(lang.import_explain));
+			importDiv.appendChild(importDivExplanation);
+
+			if (unsafeWindow.File && unsafeWindow.FileReader && unsafeWindow.FileList && unsafeWindow.Blob) {
+				var input = document.createElement('input');
+				input.setAttribute('id', 'fileinput');
+				input.setAttribute('name', 'files[]');
+				input.setAttribute('type', 'file');
+				importDiv.appendChild(document.createTextNode(lang.import_choose));
+				importDiv.appendChild(input);
+				document.getElementById('fileinput').addEventListener('change', function(evt) {
+					var files = evt.target.files;
+					var file = files[0];
+					var reader = new FileReader();
+					reader.onload = (function(theFile) {
+						return function(e) {
+							importText.value = e.target.result;
+						};
+					})(file);
+					if (file.name.indexOf('.gcc') > 0)
+						reader.readAsText(file);
+				}, false);
+			}
+
+			importDiv.appendChild(document.createElement('br'));
+
+			dropboxCheck = document.createElement('input');
+			dropboxCheck.setAttribute('id', 'dropboxCheck');
+			dropboxCheck.setAttribute('type', 'button');
+			dropboxCheck.setAttribute('value', lang.import_fromDropboxCheckForFiles);
+			dropboxCheck.addEventListener('mouseup', checkDropbox, false);
+			importDiv.appendChild(dropboxCheck);
+
+			dropboxSelect = document.createElement('select');
+			dropboxSelect.setAttribute('id', 'dropboxSelect');
+			importDiv.appendChild(dropboxSelect);
+
+			dropboxImportLink = document.createElement('input');
+			dropboxImportLink.setAttribute('id', 'dropboxImportLink');
+			dropboxImportLink.setAttribute('disabled', 'disabled');
+			dropboxImportLink.setAttribute('type', 'button');
+			dropboxImportLink.setAttribute('value', lang.import_fromDropbox);
+			dropboxImportLink.addEventListener('mouseup', loadFromDropbox, false);
+			importDiv.appendChild(dropboxImportLink);
+
+			// Dropbox Auth Link
+			var dropboxAuthLink = document.createElement('a');
+			dropboxAuthLink.setAttribute('href','https://www.dropbox.com/');
+		    dropboxAuthLink.setAttribute('style','display: none');
+		    dropboxAuthLink.setAttribute('id','dropboxAuthLinkImport');
+			dropboxAuthLink.appendChild(document.createTextNode('Auth with DropBox'));
+			importDiv.appendChild(dropboxAuthLink);
+
+			importDiv.appendChild(document.createElement('br'));
+
+			gistImportLink = document.createElement('input');
+			gistImportLink.setAttribute('id', 'gistImportLink');
+			gistImportLink.setAttribute('type', '');
+			if(GM_getValue("idResolverId", "") !== ""){
+				gistImportLink.setAttribute('value', "http://gccs.lukeIam.de#" + GM_getValue("idResolverId", "").trim());
+			}
+			else{
+				gistImportLink.setAttribute('value', "http://gcc.lukeIam.de#gccc");
+			}
+			gistImportLink.setAttribute('style', "margin-right: 0.5em; width: 25em; color: darkgray;");
+			importDiv.appendChild(gistImportLink);
+			$('#gistImportLink').before('<img  style="height: 18px; width: 18px; vertical-align: middle; margin-right: 0.5em; margin-bottom: 0.2em;" src="'+linkIconSmall+'"></img>');
+
+			gistImportLinkButton = document.createElement('input');
+			gistImportLinkButton.setAttribute('id', 'gistImportLinkButton');
+			gistImportLinkButton.setAttribute('type', 'button');
+			gistImportLinkButton.setAttribute('value', lang.import_fromGist);
+			gistImportLinkButton.addEventListener('mouseup', loadFromGist, false);
+			importDiv.appendChild(gistImportLinkButton);
+
+			importDiv.appendChild(document.createElement('br'));
+
+			importText = document.createElement('textarea');
+			importText.setAttribute('id', 'gccommentimporttextarea');
+			importText.setAttribute('style', 'margin-top: 0.5em;');
+			importText.cols = 100;
+			importText.rows = 10;
+			importDiv.appendChild(importText);
+
+			var submitImport = document.createElement('input');
+			submitImport.setAttribute('type', 'button');
+			submitImport.setAttribute('value', lang.import_perform);
+			submitImport.setAttribute('style', 'margin:5px');
+			submitImport.addEventListener('mouseup', performImport, false);
+			importDiv.appendChild(document.createElement('br'));
+			importDiv.appendChild(submitImport);
+
+			var cancelImport = document.createElement('input');
+			cancelImport.setAttribute('type', 'button');
+			cancelImport.setAttribute('value', lang.import_close);
+			cancelImport.addEventListener('mouseup', function() {
+				importresult.innerHTML = "";
+				toggleTabOnProfile('importDiv');
+			}, false);
+			cancelImport.setAttribute('style', 'margin:5px');
+			importDiv.appendChild(document.createTextNode('\t'));
+			importDiv.appendChild(cancelImport);
+
+			importresult = document.createElement('p');
+			submitImport.parentNode.appendChild(importresult);
+
+			//
+			// DELETE DIV
+			//
+			deleteAllDiv = document.createElement('div');
+			deleteAllDiv.setAttribute('id', 'deleteAllDiv');
+			deleteAllDiv.setAttribute('style',
+					'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+			deleteAllDiv.style.display = 'none';
+			deleteAllDiv.appendChild(document.createTextNode(lang.delete_select));
+			deleteAllDiv.appendChild(document.createElement('br'));
+
+			appendCheckBox(deleteAllDiv, DELETEALL_FILTER_ALL, lang.all, toggleDeleteAllFilterOptions);
+			appendCheckBox(deleteAllDiv, DELETEALL_FILTER_UNTYPED, lang.type_untyped);
+			appendCheckBox(deleteAllDiv, DELETEALL_FILTER_UNSOLVED, lang.type_unsolved);
+			appendCheckBox(deleteAllDiv, DELETEALL_FILTER_SOLVED, lang.type_solved);
+			appendCheckBox(deleteAllDiv, DELETEALL_FILTER_FOUND, lang.type_found);
+			// appendCheckBox(deleteAllDiv, DELETEALL_FILTER_ARCHIVED,
+			// lang.type_archived);
+			appendRadioGroup(deleteAllDiv, DELETEALL_FILTER_ARCHIVED, [ {
+				label : lang.both,
+				attr : DELETEALL_FILTER_ARCHIVED_BOTH
+			}, {
+				label : lang.not_archived,
+				attr : DELETEALL_FILTER_ARCHIVED_NOT_ARCHIVED
+			}, {
+				label : lang.archived,
+				attr : DELETEALL_FILTER_ARCHIVED_ARCHIVED
+			} ], GM_getValue(DELETEALL_FILTER_ARCHIVED, DELETEALL_FILTER_ARCHIVED_BOTH));
+
+			var deleteAllButton = document.createElement('input');
+			deleteAllButton.setAttribute('type', 'button');
+			deleteAllButton.setAttribute('value', lang.delete_perform);
+			deleteAllButton.addEventListener('click', performFilteredDeleteAll, false);
+			deleteAllDiv.appendChild(deleteAllButton);
+
+			deleteAllResult = document.createElement('div');
+			deleteAllDiv.appendChild(deleteAllResult);
+
+			gccRoot.appendChild(deleteAllDiv);
+
+			waitingTag = document.createElement('img');
+			waitingTag.setAttribute('src', waitingGif);
+			waitingTag.setAttribute('id', 'waiting');
+			waitingTag.setAttribute('style', 'padding-right:5px');
+
+			if (GM_getValue(EXPORT_FILTER_ALL))
+				toggleExportFilterOptions();
+			if (GM_getValue(DELETEALL_FILTER_ALL))
+				toggleDeleteAllFilterOptions();
+		}
+	}
+
+	function gccommentOnNewProfilePage() {
+
+   	// Datatables CSS anhaengen
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://rawgit.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
+
+		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
+				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
+				+ '.haveFinalIcon{margin-left:3px;width:14px}');
+
+		// styling the table's content
+		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
+
+		// load settings
+		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
+		if (!archivedFilter) {
+			archivedFilter = ARCHIVE_FILTER_NO_ARCHIVED;
+			GM_setValue(SETTING_ARCHIVE_FILTER, ARCHIVE_FILTER_NO_ARCHIVED);
+		}
+
+		// add links to each entry on that page
+		addCommentBubblesToPage();
+
+		// add overview of all comments on top of page
+		var layouttag = document.getElementsByClassName('layout-main');
+		var h2list = document.getElementsByTagName('h2');
+		log('debug',layouttag[0]);
+		if (layouttag) {
+			var root = layouttag[0];
+
+			gccRoot = document.createElement('div');
+			gccRoot.id = "gccRoot";
+			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
+			root.parentNode.insertBefore(gccRoot, root.nextSibling);
+
+			var gcclink = document.createElement('a');
+			gcclink.setAttribute('style', 'cursor:pointer;padding-left:5px;padding-right:5px;margin-left:5px');
+			gcclink.setAttribute('id', 'configDivButton');
+			gcclink.setAttribute('title', lang.menu_options);
+			var icon = document.createElement('img');
+			icon.setAttribute('src', gccIcon);
+			icon.setAttribute('style', 'vertical-align:middle;');
+			gcclink.appendChild(icon);
+			gccRoot.appendChild(gcclink);
+
+			gcclink.addEventListener('mouseover', function(evt) {
+				var stats = "<u><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
+						+ getNumberOfComments() + " (" + GM_getValue('countWhite') + " " + lang.type_untyped + ", "
+						+ GM_getValue('countRed') + " " + lang.type_unsolved + ", " + GM_getValue('countGreen') + " "
+						+ lang.type_solved + ", " + lang.and + " " + GM_getValue('countGray') + " " + lang.type_found
+						+ ")<br/><b>" + lang.ov_amountarchive + "</b> " + GM_getValue('countArchive');
+				stats = stats + "<br/><b>" + lang.ov_lastim + ": </b>";
+				var lastim = GM_getValue(LAST_IMPORT);
+				if (lastim)
+					stats = stats + createTimeString(lastim);
+				else
+					stats = stats + " " + lang.never;
+				stats = stats + "<br/><b>" + lang.ov_lastex + ": </b>";
+				var lastex = GM_getValue(LAST_EXPORT);
+				if (lastex)
+					stats = stats + createTimeString(lastex);
+				else
+					stats = stats + " " + lang.never;
+
+				stats = stats + "<br/><b>" + lang.ov_lastup + ": </b>";
+				stats = stats + createTimeString(parseInt(GM_getValue('updateDate')));
+				unsafeWindow.tooltip.show(stats, 500);
+			}, false);
+			gcclink.addEventListener('mouseup', function(evt) {
+				toggleTabOnProfile('configDiv');
+			}, false);
+			gcclink.setAttribute('onmouseout', 'tooltip.hide();');
+
+			$('#configDivButton').click(function(e) {
+				if (e.shiftKey) {
+					var gistIdLog = JSON.parse(GM_getValue("GistIdLog", "[]")).reverse();
+					var message = "";
+					for(i=0;i < gistIdLog.length;i++){
+						message += (i+1)+": http://gcc.lukeIam.de#gcc"+gistIdLog[i]+"\n";
+					}
+					console.log(message);
+					alert(message);
+				}
+			});
+
+			gccRoot.appendChild(document.createTextNode(' | '));
+
+			var showCommentsLink = document.createElement('a');
+			showCommentsLink.setAttribute('id', 'gccommenttabledivButton');
+			showCommentsLink.appendChild(document.createTextNode(lang.menu_showmycomments));
+			showCommentsLink.addEventListener('mouseup', function() {
+				toggleTabOnProfile('gccommenttablediv');
+			}, false);
+			showCommentsLink.setAttribute('style',
+					'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+			gccRoot.appendChild(showCommentsLink);
+
+			// -----
+			displayFilters = document.createElement("div");
+			displayFilters.style.display = "none";
+			displayFilters.setAttribute('id', 'displayFilters');
+
+			var filterclear = document.createElement('img');
+			filterclear.setAttribute('src', state_clear);
+			filterclear.setAttribute('style', 'cursor:pointer;vertical-align:bottom');
+			filterclear.setAttribute('title', lang.table_filter_all);
+			filterclear.addEventListener('mouseup', function() {
+				$('#displayFilters > img').css('opacity', '0.3');
+				$(filterclear).css('opacity', '1');
+				filter = null;
+				refreshTable(true);
+			}, false);
+			displayFilters.appendChild(document.createTextNode(' '));
+			displayFilters.appendChild(filterclear);
+
+			var filterall = document.createElement('img');
+			filterall.setAttribute('src', state_default);
+			filterall.setAttribute('style', 'cursor:pointer;vertical-align:bottom');
+			filterall.setAttribute('title', lang.table_filter_untyped);
+			filterall.addEventListener('mouseup', function() {
+				$('#displayFilters > img').css('opacity', '0.3');
+				$(filterall).css('opacity', '1');
+				filter = stateOptions[0];
+				refreshTable(true);
+			}, false);
+			displayFilters.appendChild(document.createTextNode(' '));
+			displayFilters.appendChild(filterall);
+
+			var filterunsolved = document.createElement('img');
+			filterunsolved.setAttribute('src', state_unsolved);
+			filterunsolved.setAttribute('style', 'cursor:pointer;vertical-align:bottom');
+			filterunsolved.setAttribute('title', lang.table_filter_unsolved);
+			filterunsolved.addEventListener('mouseup', function() {
+				$('#displayFilters > img').css('opacity', '0.3');
+				$(filterunsolved).css('opacity', '1');
+				filter = stateOptions[1];
+				refreshTable(true);
+			}, false);
+			displayFilters.appendChild(document.createTextNode(' '));
+			displayFilters.appendChild(filterunsolved);
+
+			var filtersolved = document.createElement('img');
+			filtersolved.setAttribute('src', state_solved);
+			filtersolved.setAttribute('style', 'cursor:pointer;vertical-align:bottom');
+			filtersolved.setAttribute('title', lang.table_filter_solved);
+			filtersolved.addEventListener('mouseup', function() {
+				$('#displayFilters > img').css('opacity', '0.3');
+				$(filtersolved).css('opacity', '1');
+				filter = stateOptions[2];
+				refreshTable(true);
+			}, false);
+			displayFilters.appendChild(document.createTextNode(' '));
+			displayFilters.appendChild(filtersolved);
+
+			var filterFound = document.createElement('img');
+			filterFound.setAttribute('src', state_found);
+			filterFound.setAttribute('style', 'cursor:pointer;vertical-align:bottom');
+			filterFound.setAttribute('title', lang.table_filter_found);
+			filterFound.addEventListener('mouseup', function() {
+				$('#displayFilters > img').css('opacity', '0.3');
+				$(filterFound).css('opacity', '1');
+				filter = stateOptions[3];
+				refreshTable(true);
+			}, false);
+			displayFilters.appendChild(document.createTextNode(' '));
+			displayFilters.appendChild(filterFound);
+
+			var archivedSelector = document.createElement("select");
+			archivedSelector.setAttribute("id", "archivedSelector");
+			archivedSelector.setAttribute("style", "margin-left:5px");
+			archivedSelector.addEventListener('change', function() {
+				var indexSelected = $('#archivedSelector option:selected').index();
+				if (indexSelected === 0) {
+					archivedFilter = ARCHIVE_FILTER_NO_ARCHIVED;
+				} else if (indexSelected === 1) {
+					archivedFilter = ARCHIVE_FILTER_INCLUDE_ARCHIVED;
+				} else if (indexSelected === 2) {
+					archivedFilter = ARCHIVE_FILTER_ONLY_ARCHIVED;
+				} else {
+					log("error", "unknown archive filter selector: " + indexSelected);
+				}
+				GM_setValue(SETTING_ARCHIVE_FILTER, archivedFilter);
+				refreshTable(true);
+			});
+			displayFilters.appendChild(archivedSelector);
+
+			var optionNoArchived = document.createElement("option");
+			optionNoArchived.appendChild(document.createTextNode(lang.archived_filter_no_archived));
+			archivedSelector.appendChild(optionNoArchived);
+
+			var optionIncludeArchived = document.createElement("option");
+			optionIncludeArchived.appendChild(document.createTextNode(lang.archived_filter_include_archived));
+			archivedSelector.appendChild(optionIncludeArchived);
+
+			var optionOnlyArchived = document.createElement("option");
+			optionOnlyArchived.appendChild(document.createTextNode(lang.archived_filter_only_archived));
+			archivedSelector.appendChild(optionOnlyArchived);
+
+			// pre-set from settings
+			if (archivedFilter === ARCHIVE_FILTER_INCLUDE_ARCHIVED) {
+				optionIncludeArchived.setAttribute("selected", "true");
+			} else if (archivedFilter === ARCHIVE_FILTER_ONLY_ARCHIVED) {
+				optionOnlyArchived.setAttribute("selected", "true");
+			}
+
+			gccRoot.appendChild(displayFilters);
+
+			$('#displayFilters > img').css('opacity', '0.3');
+			$(filterclear).css('opacity', '1');
+			// ------
+
+			gccRoot.appendChild(document.createTextNode(' | '));
+
+			var exportToggleButton = document.createElement('a');
+			exportToggleButton.setAttribute('id', 'exportDivButton');
+			exportToggleButton.appendChild(document.createTextNode(lang.menu_export));
+			exportToggleButton.setAttribute('style',
+					'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+			exportToggleButton.addEventListener('mouseup', function() {
+				toggleTabOnProfile('exportDiv');
+			}, false);
+
+			gccRoot.appendChild(exportToggleButton);
+			gccRoot.appendChild(document.createTextNode(' '));
+
+			gccRoot.appendChild(document.createTextNode(' | '));
+
+			var importLink = document.createElement('a');
+			importLink.setAttribute('id', 'importDivButton');
+			importLink.appendChild(document.createTextNode(lang.menu_import));
+			importLink.addEventListener('mouseup', function() {
+				toggleTabOnProfile('importDiv');
+			}, false);
+			importLink
+					.setAttribute('style', 'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+			gccRoot.appendChild(importLink);
+
+			gccRoot.appendChild(document.createTextNode(' | '));
+
+			var deleteAllLink = document.createElement('a');
+			deleteAllLink.setAttribute('id', 'deleteAllDivButton');
+			deleteAllLink.appendChild(document.createTextNode(lang.menu_delete));
+			deleteAllLink.addEventListener('mouseup', function() {
+				toggleTabOnProfile('deleteAllDiv');
+			}, false);
+			deleteAllLink.setAttribute('style',
+					'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+			gccRoot.appendChild(deleteAllLink);
+
+			//
+			// PATCH DIV
+			//
+			if (unsafeWindow.File && unsafeWindow.FileReader && unsafeWindow.FileList && unsafeWindow.Blob) {
+				gccRoot.appendChild(document.createTextNode(' | '));
+				var patchGPXLink = document.createElement('a');
+				patchGPXLink.setAttribute('id', 'patchDivButton');
+				patchGPXLink.appendChild(document.createTextNode(lang.menu_patchgpx));
+				patchGPXLink.addEventListener('mouseup', function() {
+					toggleTabOnProfile('patchDiv');
+				}, false);
+				patchGPXLink.setAttribute('style',
+						'cursor:pointer;text-decoration:none;padding-left:5px;padding-right:5px');
+				gccRoot.appendChild(patchGPXLink);
+
+				patchDiv = document.createElement('div');
+				patchDiv.setAttribute('id', 'patchDiv');
+				patchDiv.setAttribute('style',
+						'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+				patchDiv.style.display = 'none';
+				gccRoot.appendChild(patchDiv);
+
+				var patchDivExplanation = document.createElement('p');
+				patchDivExplanation.appendChild(document.createTextNode(lang.patchgpx_explain));
+				patchDiv.appendChild(patchDivExplanation);
+
+				var removeUnusedDiv = document.createElement('div');
+				removeUnusedDiv.setAttribute('id', 'removeUnusedDiv');
+				removeUnusedDiv.setAttribute('style', 'margin-left:20px');
+				appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_OTHERS, lang.patchgpx_filter_nogcc);
+				appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_DEFAULTTYPE, lang.patchgpx_filter_markeddefaulttype);
+				appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_UNSOLVED, lang.patchgpx_filter_markednotsolved);
+				appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_SOLVED, lang.patchgpx_filter_markedsolved);
+				appendCheckBox(removeUnusedDiv, PATCHGPX_REMOVE_FOUND, lang.patchgpx_filter_markfound);
+
+				var removeUnused = document.createElement('p');
+				removeUnused.appendChild(document.createTextNode(lang.patchgpx_remove));
+				removeUnused.appendChild(removeUnusedDiv);
+				patchDiv.appendChild(removeUnused);
+
+				appendCheckBox(removeUnused, PATCHGPX_CHANGEORIGINAL, lang.patchgpx_changeorig);
+
+				appendCheckBox(removeUnused, PATCHGPX_ADDFINALWPT, lang.patchgpx_addwptforfinal);
+
+				appendCheckBox(removeUnused, PATCHGPX_STRIP_EMOJIS, lang.patchgpx_stripemojis);
+
+				// appendCheckBox(removeUnused, PATCHGPX_STRIP_HTML_TAGS,
+				// lang.patchgpx_striphtmltags);
+
+				var input = document.createElement('input');
+				input.setAttribute('id', 'patchgpxinput');
+				input.setAttribute('name', 'files[]');
+				input.setAttribute('type', 'file');
+				input.setAttribute('style', 'margin:3px');
+				input.addEventListener('change', function(evt) {
+					var files = evt.target.files;
+					var file = files[0];
+					var reader = new FileReader();
+					reader.onload = (function(theFile) {
+						return function(e) {
+							handleGPXFileSelected(file.name, e.target.result);
+						};
+					})(file);
+					if (file.name.indexOf('.gpx') > 0) {
+						reader.readAsText(file);
+					}
+				}, false);
+				patchDiv.appendChild(input);
+				download = document.createElement('input');
+				download.setAttribute('type', 'button');
+				download.setAttribute('id', 'patchndownload');
+				download.setAttribute('style', 'margin:3px');
+				download.setAttribute('value', lang.patchgpx_perform);
+				download.setAttribute('disabled', '');
+				patchDiv.appendChild(download);
+				var patchResultDiv = document.createElement('div');
+				patchResultDiv.setAttribute('id', 'patchResultDiv');
+				patchDiv.appendChild(patchResultDiv);
+			}
+
+			//
+			// CONFIG DIV
+			//
+			configDiv = document.createElement('div');
+			configDiv.setAttribute('id', 'configDiv');
+			configDiv.setAttribute('style',
+					'margin:5px;padding:10px;outline:1px solid #D7D7D7;position:relative;background-color:#EBECED');
+			configDiv.style.display = 'none';
+
+			var gccintro = document.createElement('p');
+			gccintro.setAttribute('style', 'width:600px');
+			gccintro.innerHTML = lang.settings_intro;
+			configDiv.appendChild(gccintro);
+
+			var paypallink = document.createElement('a');
+			paypallink.setAttribute('style',
+					'position:absolute;left:650px;top:10px;text-align:center;text-decoration:none;');
+			paypallink.setAttribute('href',
+					'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FK6XVH5SULGL');
 			paypallink.setAttribute('target', 'blank');
 			paypallink.appendChild(document.createTextNode(lang.settings_feelfree));
 			paypallink.appendChild(document.createElement('br'));
@@ -1751,17 +2530,16 @@ var mainCode = function(){
 			loadCommentFunction(possibleId);
 		}
 }
-
 	function DropboxShowAuthLink() {
-        var APP_Key = 'w23bgpsespnddow';
-        dropbox_auth_link = new Dropbox({clientId: APP_Key});
-        Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
-        Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
-        Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+		var APP_Key = 'w23bgpsespnddow';
+    dropbox_auth_link = new Dropbox({clientId: APP_Key});
+    Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+    Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+    Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
         Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
 
 		// Import Seite
-        $(Db_AuthLinkImport).show();
+    $(Db_AuthLinkImport).show();
 		dropboxImportLink.setAttribute('disabled', 'disabled');
  		dropboxCheck.setAttribute('disabled', 'disabled');
  		dropboxSelect.setAttribute('disabled', 'disabled');
