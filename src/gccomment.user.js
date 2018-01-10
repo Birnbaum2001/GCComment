@@ -764,7 +764,7 @@ var mainCode = function(){
 
 
 		// Datatables CSS anhaengen
-		$('head').append('<link rel="stylesheet" type="text/css" href="https://raw.githubusercontent.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://rawgit.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
 //			appendScript('src', 'https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js');
 //			appendCSS('src', 'https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css');
 
