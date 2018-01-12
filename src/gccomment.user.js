@@ -43,8 +43,6 @@ if (typeof (chrome) !== "undefined") {
 }
 
 var mainCode = function(){
-//	var $ = this.$||$||null;
-//	var jQuery = this.jQuery||jQuery||null;
 
     if (typeof $ === "undefined") {
         $ = $ || unsafeWindow.$ || window.$ || null;
@@ -52,21 +50,6 @@ var mainCode = function(){
     if (typeof jQuery === "undefined") {
         jQuery = jQuery || unsafeWindow.jQuery || window.jQuery || null;
     }
-
-/*	if(typeof($) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.$) !== "undefined"){
-		$ = unsafeWindow.$;
-	}
-	else if(typeof($) === "undefined" && typeof(window.$) !== "undefined"){
-		$ = window.$;
-	}
-
-	if(typeof(jQuery) === "undefined" && typeof(unsafeWindow) !== "undefined" && typeof(unsafeWindow.jQuery) !== "undefined"){
-		jQuery = unsafeWindow.jQuery;
-	}
-	else if(typeof(jQuery) === "undefined" && typeof(window.$) !== "undefined"){
-		jQuery = window.jQuery;
-	} */
-
 
 	if(typeof(GM_log) === "undefined" && typeof(console) !== "undefined" && typeof(console.log) !== "undefined"){
 		GM_log = function(message){
@@ -658,7 +641,7 @@ var mainCode = function(){
 		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
 				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
 			log('debug', 'matched gccommentOnNewProfilePage');
-			gccommentOnNewProfilePage();
+			// gccommentOnNewProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 				mysteryMoverOnMapPage();
@@ -1563,8 +1546,8 @@ var mainCode = function(){
 		addCommentBubblesToPage();
 
 		// add overview of all comments on top of page
-		var layouttag = document.getElementsByClassName('layout-main');
-		var h2list = document.getElementsByTagName('h2');
+		var layouttag = document.getElementsByClassName('alert');
+
 		log('debug',layouttag[0]);
 		if (layouttag) {
 			var root = layouttag[0];
@@ -6929,8 +6912,11 @@ var mainCode = function(){
 		main();
 	}
 }
-
-isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
+if (typeof (chrome) !== "undefined") {
+    isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
+} else {
+    isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
+}
 
 if (isTampermonkey === false) {
 	console.log('No Tampermonkey');
