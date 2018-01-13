@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>93</gccommentlatestversion>
+	<gccommentlatestversion>95</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>95</version>
+			<date>2018-01-03</date>
+			<content>GCComment on new Dashbord</content></change><change>
+		</change>
+		<change>
+			<version>94</version>
+			<date>2018-01-12</date>
+			<content>Fix: QRcode works again, Some Fixes</content></change><change>
+		</change>
 		<change>
 			<version>93</version>
 			<date>2018-01-03</date>

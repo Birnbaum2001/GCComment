@@ -1,6 +1,16 @@
 {
-	"latestVersion":93,
+	"latestVersion":95,
 	"changes":[
+	{
+		"version": 95,
+		"date": "2018-01-03",
+		"change": "<ul><li>GCComment on new Dashboard</li></ul>"
+	},
+	{
+		"version": 94,
+		"date": "2018-01-12",
+		"change": "<ul><li>Fix: QRcode works again</li><li>Some Fixes</li></ul>"
+	},
 	{
 		"version": 93,
 		"date": "2018-01-03",
