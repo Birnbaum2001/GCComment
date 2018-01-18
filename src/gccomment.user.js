@@ -5148,6 +5148,7 @@ var mainCode = function(){
 	}
 
 	function drawMarker(lat, lng, type, state, gccode) {
+    $ = this.$;
 		var iconSize = new unsafeWindow.L.Point(22, 22);
 		var iconAnchor = new unsafeWindow.L.Point(11, 11);
 		var url = null;

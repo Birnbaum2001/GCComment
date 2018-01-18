@@ -3,8 +3,8 @@
 	"changes":[
 	{
 		"version": 95,
-		"date": "2018-01-03",
-		"change": "<ul><li>GCComment on new Dashboard</li></ul>"
+		"date": "2018-01-18",
+		"change": "<ul><li>GCComment on new Dashboard</li><li>quick fix for Map</li></ul>"
 	},
 	{
 		"version": 94,
