@@ -24,13 +24,13 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			94
+// @version			95
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
 // version information
-var version = "94";
+var version = "95";
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 
@@ -641,7 +641,7 @@ var mainCode = function(){
 		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
 				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
 			log('debug', 'matched gccommentOnNewProfilePage');
-			// gccommentOnNewProfilePage();
+			 gccommentOnNewProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 				mysteryMoverOnMapPage();
@@ -654,12 +654,10 @@ var mainCode = function(){
 		} else if (document.URL.search("\/seek\/log\.aspx") >= 0) {
 			log('debug', 'matched gccommentOnLogPage');
 			gccommentOnLogPage();
-		}
-		else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
+		} else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
 			log('debug', 'matched gccommentOnSharingPage');
 			gccommentOnSharingPage();
-		}
-		else {
+		} else {
 			log('debug', 'nothing matched');
 		}
 	}
@@ -1534,7 +1532,7 @@ var mainCode = function(){
 
 		// styling the table's content
 		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
-
+		appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
 		// load settings
 		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
 		if (!archivedFilter) {
@@ -1554,7 +1552,8 @@ var mainCode = function(){
 
 			gccRoot = document.createElement('div');
 			gccRoot.id = "gccRoot";
-			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
+			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
 
 			var gcclink = document.createElement('a');
@@ -1890,7 +1889,7 @@ var mainCode = function(){
 
 			var IdResoverContent = "";
 			function updateIdResoverContent(){
-				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: small; margin-left: 0.5em; width: 26em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
 				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
 
 				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
@@ -5149,6 +5148,7 @@ var mainCode = function(){
 	}
 
 	function drawMarker(lat, lng, type, state, gccode) {
+    $ = this.$;
 		var iconSize = new unsafeWindow.L.Point(22, 22);
 		var iconAnchor = new unsafeWindow.L.Point(11, 11);
 		var url = null;
