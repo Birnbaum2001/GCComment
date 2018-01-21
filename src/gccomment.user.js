@@ -364,6 +364,7 @@ var mainCode = function(){
 		detail_finaldeleteconfirmation : "Do you really want to delete the final coordinates?",
 		detail_deleteconfirmation : 'Do you really want to delete this comment?',
 		detail_inclfinal : "incl. final",
+		detail_jumptocomment : "Jump to Comment",
 		map_enablemm : "Enable mystery mover and show ...",
 		map_area : "161m area",
 		map_home : "link to original",
@@ -516,6 +517,7 @@ var mainCode = function(){
 		detail_finaldeleteconfirmation : "Möchtest du wirklich die Finalkoordinate löschen?",
 		detail_deleteconfirmation : 'Möchtest du wirklich diesen Kommentar löschen?',
 		detail_inclfinal : "inkl. Finale",
+		detail_jumptocomment : "springe zum Kommentar",
 		map_enablemm : "Aktiviere den Mystery-Verschieber und zeige ...",
 		map_area : "161m-Radius",
 		map_home : "Verbindung zum Original",
@@ -1567,7 +1569,7 @@ var mainCode = function(){
 			gccRoot.appendChild(gcclink);
 
 			gcclink.addEventListener('mouseover', function(evt) {
-				var stats = "<u><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
+				var stats = "<u><font size=\"2\"><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
 						+ getNumberOfComments() + " (" + GM_getValue('countWhite') + " " + lang.type_untyped + ", "
 						+ GM_getValue('countRed') + " " + lang.type_unsolved + ", " + GM_getValue('countGreen') + " "
 						+ lang.type_solved + ", " + lang.and + " " + GM_getValue('countGray') + " " + lang.type_found
@@ -1582,11 +1584,12 @@ var mainCode = function(){
 				var lastex = GM_getValue(LAST_EXPORT);
 				if (lastex)
 					stats = stats + createTimeString(lastex);
+				
 				else
 					stats = stats + " " + lang.never;
-
 				stats = stats + "<br/><b>" + lang.ov_lastup + ": </b>";
 				stats = stats + createTimeString(parseInt(GM_getValue('updateDate')));
+				stats = stats + "</font>";
 				unsafeWindow.tooltip.show(stats, 500);
 			}, false);
 			gcclink.addEventListener('mouseup', function(evt) {
@@ -3040,7 +3043,7 @@ var mainCode = function(){
 
 			SaveFinalCoords = document.createElement("a");
 			SaveFinalCoords.setAttribute('style', 'margin-left:3px;margin-right:3px');
-		imgSave = document.createElement('img');
+			imgSave = document.createElement('img');
 			imgSave.src = commentIconSave;
 			imgSave.title = lang.detail_finalsave;
 			imgSave.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
@@ -3085,6 +3088,17 @@ var mainCode = function(){
 				}
 			}, false);
 
+			JumpToComment = document.createElement("a");
+			JumpToComment.setAttribute('style', 'margin-left:16px;margin-right:3px');
+			JumpToComment.setAttribute('href','#gccommentarea');
+			imgJumpToComment = document.createElement('img');
+			imgJumpToComment.src = commentIcon;
+			imgJumpToComment.title = lang.detail_jumptocomment;
+			imgJumpToComment.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
+			JumpToComment.appendChild(imgJumpToComment);
+
+			
+			
 			ArchiveComment = document.createElement('a');
 			imgArchive = document.createElement('img');
 			imgArchive.src = archiveAdd;
@@ -3482,6 +3496,7 @@ var mainCode = function(){
 			mysteryData.appendChild(detailFinalCacheState);
 			mysteryData.appendChild(SaveFinalCoords);
 			mysteryData.appendChild(DeleteFinalCoords);
+			mysteryData.appendChild(JumpToComment);
 		}
 
 		// check for waypoints header and add if not present
@@ -5148,7 +5163,7 @@ var mainCode = function(){
 	}
 
 	function drawMarker(lat, lng, type, state, gccode) {
-    $ = this.$;
+		$ = this.$;
 		var iconSize = new unsafeWindow.L.Point(22, 22);
 		var iconAnchor = new unsafeWindow.L.Point(11, 11);
 		var url = null;
