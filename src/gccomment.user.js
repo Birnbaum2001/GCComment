@@ -282,7 +282,7 @@ var mainCode = function(){
 		ov_lastex : "Last export",
 		ov_lastim : "Last import",
 		ov_lastup : "Last check for updates",
-		settings_intro : "Thanks for using GCComment. Visit <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact me at <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
+		settings_intro : "Thanks for using GCComment. Visit <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact us at <a href='mailto:ramirez_@online.de'>ramirez_@online.de</a> or <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
 		settings_feelfree : "Feel free to show your appreciation :)",
 		settings_enterUUID : "UUID for server synchronisation",
 		settings_enterServer : "Server for server synchronisation",
@@ -347,7 +347,7 @@ var mainCode = function(){
 		patchgpx_filter_markfound : "you marked as found",
 		patchgpx_changeorig : "Change the original waypoint's coordinates to your final coordinates",
 		patchgpx_addwptforfinal : "Add additional waypoints for final coordinates",
-		patchgpx_stripemojis : "Remove emojis if present (warning: beta state. if your emoji was not removed, please send the GPX to birnbaum2001@gmx.de)",
+		patchgpx_stripemojis : "Remove emojis if present (warning: beta state. if your emoji was not removed, please send the GPX to ramirez_@online.de)",
 		patchgpx_striphtmltags : "Remove HTML tags from descriptions",
 		patchgpx_perform : "Patch and download",
 		detail_final : "Final coordinate",
@@ -435,7 +435,7 @@ var mainCode = function(){
 		ov_lastex : "Letzter Export",
 		ov_lastim : "Letzter Import",
 		ov_lastup : "Letzte Prüfung auf Aktualisierung",
-		settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du mich über <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
+		settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du uns über <a href='mailto:ramirez_@online.de'>ramirez_@online.de</a> oder <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
 		settings_feelfree : "Zögere nicht, deiner Wertschätzung Ausdruck zu verleihen :)",
 		settings_enterUUID : "UUID zur Serversynchronisierung",
 		settings_enterServer : "Server zur Serversynchronisierung",
@@ -6453,7 +6453,10 @@ var mainCode = function(){
 	}
 
 	function log(level, text) {
-		GM_log(level + ": " + text);
+		switch (level) {
+          case 'info': console.log(level + ": " + text); break
+          case 'debug': console.log(level + ": " + text); break
+		}		
 	}
 
 	function getGUIDFromGCCode(gcCode) {
