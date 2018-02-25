@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>95</gccommentlatestversion>
+	<gccommentlatestversion>96</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>96</version>
+			<date>2018-02-25</date>
+			<content>New Button on Dateil Page - Jump to Comments, Some small Changes</content></change><change>
+		</change>
 		<change>
 			<version>95</version>
 			<date>2018-01-18</date>

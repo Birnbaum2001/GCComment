@@ -1,6 +1,11 @@
 {
-	"latestVersion":95,
+	"latestVersion":96,
 	"changes":[
+	{
+		"version": 96,
+		"date": "2018-02-25",
+		"change": "<ul><li>New Button on Dateil Page. Jump to Comments</li><li>Some small Changes</li></ul>"
+	},
 	{
 		"version": 95,
 		"date": "2018-01-18",
