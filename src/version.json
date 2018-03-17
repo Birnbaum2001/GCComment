@@ -3,7 +3,7 @@
 	"changes":[
 	{
 		"version": 97,
-		"date": "2018-xx-xx",
+		"date": "2018-03-17",
 		"change": "<ul><li>GCC on new Logpage</li><li>Fix small Map on Cache Detailpage</li><li>Some small Changes</li></ul>"
 	},
 	{
