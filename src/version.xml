@@ -3,19 +3,24 @@
 	<gccommentlatestversion>96</gccommentlatestversion>
 	<changelist>
 		<change>
+			<version>97</version>
+			<date>2018-03-17</date>
+			<content>GCC on new Logpage, Fix small Map on Cache Detailpage, Some small Changes</content>
+		</change>
+		<change>
 			<version>96</version>
 			<date>2018-02-25</date>
-			<content>New Button on Dateil Page - Jump to Comments, Some small Changes</content></change><change>
+			<content>New Button on Dateil Page - Jump to Comments, Some small Changes</content>
 		</change>
 		<change>
 			<version>95</version>
 			<date>2018-01-18</date>
-			<content>GCComment on new Dashbord, quick fix for Map</content></change><change>
+			<content>GCComment on new Dashbord, quick fix for Map</content>
 		</change>
 		<change>
 			<version>94</version>
 			<date>2018-01-12</date>
-			<content>Fix: QRcode works again, Some Fixes</content></change><change>
+			<content>Fix: QRcode works again, Some Fixes</content>
 		</change>
 		<change>
 			<version>93</version>
