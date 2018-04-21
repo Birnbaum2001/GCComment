@@ -24,13 +24,13 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			97
+// @version			98
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
 // version information
-var version = "97";
+var version = GM_info.script.version;
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 
@@ -5529,7 +5529,7 @@ var mainCode = function(){
 				result = result + "<waypoint>";
 				result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
 				result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
-				result = result + "<name>" + comment.waypoints[j].name + "</name>";
+				result = result + "<name>" + escapeXML(comment.waypoints[j].name) + "</name>";
 				result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
 				result = result + "</waypoint>";
 			}
@@ -5587,7 +5587,7 @@ var mainCode = function(){
 			result = result + "<waypoint>";
 			result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
 			result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
-			result = result + "<name>" + comment.waypoints[j].name + "</name>";
+			result = result + "<name>" + escapeXML(comment.waypoints[j].name) + "</name>";
 			result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
 			result = result + "</waypoint>";
 		}
@@ -6087,7 +6087,7 @@ var mainCode = function(){
 						prefix : Xwpt.childNodes[0].childNodes[0].nodeValue,
 						lookup : Xwpt.childNodes[1].childNodes[0].nodeValue,
 						name : Xwpt.childNodes[2].childNodes[0].nodeValue,
-						coordinate : Xwpt.childNodes[3].childNodes[0].nodeValue
+						coordinate : unescapeXML(unescape(Xwpt.childNodes[3].childNodes[0].nodeValue))
 					});
 				}
 			}

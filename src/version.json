@@ -1,6 +1,11 @@
 {
-	"latestVersion":97,
+	"latestVersion":98,
 	"changes":[
+	{
+		"version": 98,
+		"date": "2018-04-21",
+		"change": "<ul><li>Fix Import & Export - issue #33</li></ul>"
+	}
 	{
 		"version": 97,
 		"date": "2018-03-17",
