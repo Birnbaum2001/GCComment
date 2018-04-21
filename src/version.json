@@ -1,9 +1,14 @@
 {
-	"latestVersion":96,
+	"latestVersion":98,
 	"changes":[
 	{
+		"version": 98,
+		"date": "2018-04-21",
+		"change": "<ul><li>Fix Import & Export - issue #33</li></ul>"
+	}
+	{
 		"version": 97,
-		"date": "2018-xx-xx",
+		"date": "2018-03-17",
 		"change": "<ul><li>GCC on new Logpage</li><li>Fix small Map on Cache Detailpage</li><li>Some small Changes</li></ul>"
 	},
 	{
