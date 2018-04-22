@@ -6981,11 +6981,9 @@ var mainCode = function(){
 		main();
 	}
 }
-if (typeof (chrome) !== "undefined") {
-    isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
-} else {
-    isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
-}
+
+isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
+
 
 if (isTampermonkey === false) {
 	console.log('No Tampermonkey');
@@ -7054,12 +7052,9 @@ function updateCheck(){
 			var updateInfo = document.createElement('div');
 			updateInfo.setAttribute('id', 'gccupdateinfo');
 			var updatelnk = document.createElement('a');
-			if(browser === "Chrome"){
-				tmpl_update = tmpl_update + ' Achtung. Für Chrome wird es in Zukunft nur noch eine Version geben die über Tampermonkey läuft.;'
-			}
-			else{
-				updatelnk.setAttribute('href', updateurl);
-			}
+
+			updatelnk.setAttribute('href', updateurl);
+
 			updatelnk.innerHTML = lang.update_clickToUpdate;
 			updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
 					oChanges.latestVersion).replace("{{version}}", version)
