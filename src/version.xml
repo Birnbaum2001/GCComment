@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>98</gccommentlatestversion>
+	<gccommentlatestversion>99</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>99</version>
+			<date>2018-07-28</date>
+			<content>Small Style changes on old Profil Page</content>
+		</change>
 		<change>
 			<version>98</version>
 			<date>2018-04-21</date>

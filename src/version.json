@@ -1,6 +1,11 @@
 {
-	"latestVersion":98,
+	"latestVersion":99,
 	"changes":[
+	{
+		"version": 99,
+		"date": "2018-07-28",
+		"change": "<ul><li>Small Style changes on old Profil Page</li></ul>"
+	}
 	{
 		"version": 98,
 		"date": "2018-04-21",

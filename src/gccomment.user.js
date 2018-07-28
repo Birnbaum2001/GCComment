@@ -24,7 +24,7 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			98
+// @version			99
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -761,6 +761,8 @@ var mainCode = function(){
 
 		// styling the table's content
 		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
+		appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
+
 
 		// load settings
 		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
@@ -780,7 +782,11 @@ var mainCode = function(){
 			gccRoot = document.createElement('div');
 			gccRoot.id = "gccRoot";
 			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
+			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
+			
+//			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+
 
 			var gcclink = document.createElement('a');
 			gcclink.setAttribute('style', 'cursor:pointer;padding-left:5px;padding-right:5px;margin-left:5px');
@@ -6981,11 +6987,9 @@ var mainCode = function(){
 		main();
 	}
 }
-if (typeof (chrome) !== "undefined") {
-    isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
-} else {
-    isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
-}
+
+isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
+
 
 if (isTampermonkey === false) {
 	console.log('No Tampermonkey');
@@ -7054,12 +7058,9 @@ function updateCheck(){
 			var updateInfo = document.createElement('div');
 			updateInfo.setAttribute('id', 'gccupdateinfo');
 			var updatelnk = document.createElement('a');
-			if(browser === "Chrome"){
-				tmpl_update = tmpl_update + ' Achtung. Für Chrome wird es in Zukunft nur noch eine Version geben die über Tampermonkey läuft.;'
-			}
-			else{
-				updatelnk.setAttribute('href', updateurl);
-			}
+
+			updatelnk.setAttribute('href', updateurl);
+
 			updatelnk.innerHTML = lang.update_clickToUpdate;
 			updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
 					oChanges.latestVersion).replace("{{version}}", version)
