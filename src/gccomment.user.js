@@ -24,7 +24,7 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			99
+// @version			100
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -2526,11 +2526,23 @@ var mainCode = function(){
 }
 	function DropboxShowAuthLink() {
 		var APP_Key = 'w23bgpsespnddow';
-    dropbox_auth_link = new Dropbox({clientId: APP_Key});
-    Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
-    Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
-    Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
-        Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+		dropbox_auth_link = new Dropbox({clientId: APP_Key});
+		
+		if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
+				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
+			log('debug', 'matched gccommentOnProfilePage');
+            Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+            Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+            Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+            Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
+				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
+			log('debug', 'matched gccommentOnNewProfilePage');
+			Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+            Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/account/dashboard?AppId=GCComment');
+            Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+            Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/account/dashboard?AppId=GCComment');
+		}
 
 		// Import Seite
     $(Db_AuthLinkImport).show();
@@ -7098,7 +7110,7 @@ function updateCheck(){
 			var currentDate = new Date();
 
 			// in ms. equals 1 day
-			if (currentDate - updateDate > 86400000) {
+			if (currentDate - updateDate > 14400000) {
 
 				GM_xmlhttpRequest({
 					method : 'GET',
