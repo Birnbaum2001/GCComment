@@ -1,6 +1,11 @@
 {
-	"latestVersion":99,
+	"latestVersion":100,
 	"changes":[
+	{
+		"version": 100,
+		"date": "2018-08-01",
+		"change": "<ul><li>Fix Dropbox auth on new Profil Page - issue #36</li></ul>"
+	}
 	{
 		"version": 99,
 		"date": "2018-07-28",

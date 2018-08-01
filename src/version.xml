@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>99</gccommentlatestversion>
+	<gccommentlatestversion>100</gccommentlatestversion>
 	<changelist>
 		<change>
+			<version>100</version>
+			<date>2018-08-01</date>
+			<content>Fix Dropbox auth on new Profil Page - issue #36</content>
+		</change>
+	    <change>
 			<version>99</version>
 			<date>2018-07-28</date>
 			<content>Small Style changes on old Profil Page</content>
