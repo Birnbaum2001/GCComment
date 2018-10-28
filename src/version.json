@@ -1,6 +1,11 @@
 {
-	"latestVersion":100,
+	"latestVersion":101,
 	"changes":[
+	{
+		"version": 101,
+		"date": "2018-10-28",
+		"change": "<ul><li>Fix: Save GCC to Cache Note</li></ul>"
+	}
 	{
 		"version": 100,
 		"date": "2018-08-01",

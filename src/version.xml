@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>100</gccommentlatestversion>
+	<gccommentlatestversion>101</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>101</version>
+			<date>2018-10-28</date>
+			<content>Fix: Save GCC to Cache Note</content>
+		</change>
 		<change>
 			<version>100</version>
 			<date>2018-08-01</date>

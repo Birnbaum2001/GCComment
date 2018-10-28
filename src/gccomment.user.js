@@ -24,7 +24,7 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			100
+// @version			101
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -3743,10 +3743,10 @@ var mainCode = function(){
 		}
 
 		if(currentComment){ //TODO: Setting
-			if($("#cache_note").children().length !== 0){
+			if($("#viewCacheNote").children().length !== 0){
 				log("info", "saveToCacheNote failed: cache note is in edit mode");
 			}
-			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
+			else if($("#viewCacheNote").text()!== "" && $("#viewCacheNote").text()!== "Click to enter a note" && $("#viewCacheNote").text().indexOf("GCCNote:") === -1){
 				log("info", "saveToCacheNote failed: cache note contains other text");
 			}
 			else{
@@ -3755,7 +3755,7 @@ var mainCode = function(){
 						text = text.substr(0, 500);
 				}
 
-				if($("#cache_note").text().trim() === text){
+				if($("#viewCacheNote").text().trim() === text){
 					log("debug", "saveToCacheNote: cache note identical - nothing to do");
 					return;
 				}
@@ -3767,7 +3767,7 @@ var mainCode = function(){
 							return;
 						}
 
-						$("#cache_note").text(text);
+						$("#viewCacheNote").text(text);
 					});
 				};
 
