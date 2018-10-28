@@ -1,7 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>93</gccommentlatestversion>
+	<gccommentlatestversion>101</gccommentlatestversion>
 	<changelist>
+		<change>
+			<version>101</version>
+			<date>2018-10-28</date>
+			<content>Fix: Save GCC to Cache Note</content>
+		</change>
+		<change>
+			<version>100</version>
+			<date>2018-08-01</date>
+			<content>Fix Dropbox auth on new Profil Page - issue #36</content>
+		</change>
+	    <change>
+			<version>99</version>
+			<date>2018-07-28</date>
+			<content>Small Style changes on old Profil Page</content>
+		</change>
+		<change>
+			<version>98</version>
+			<date>2018-04-21</date>
+			<content>Fix Import and Export - issue #33</content>
+		</change>
+		<change>
+			<version>97</version>
+			<date>2018-03-17</date>
+			<content>GCC on new Logpage, Fix small Map on Cache Detailpage, Some small Changes</content>
+		</change>
+		<change>
+			<version>96</version>
+			<date>2018-02-25</date>
+			<content>New Button on Dateil Page - Jump to Comments, Some small Changes</content>
+		</change>
+		<change>
+			<version>95</version>
+			<date>2018-01-18</date>
+			<content>GCComment on new Dashbord, quick fix for Map</content>
+		</change>
+		<change>
+			<version>94</version>
+			<date>2018-01-12</date>
+			<content>Fix: QRcode works again, Some Fixes</content>
+		</change>
 		<change>
 			<version>93</version>
 			<date>2018-01-03</date>

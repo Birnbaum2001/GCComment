@@ -24,13 +24,13 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			94
+// @version			101
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
 // version information
-var version = "94";
+var version = GM_info.script.version;
 var updatechangesurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/version.json';
 var updateurl = 'https://raw.githubusercontent.com/Birnbaum2001/GCComment/master/src/gccomment.user.js';
 
@@ -282,7 +282,7 @@ var mainCode = function(){
 		ov_lastex : "Last export",
 		ov_lastim : "Last import",
 		ov_lastup : "Last check for updates",
-		settings_intro : "Thanks for using GCComment. Visit <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact me at <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
+		settings_intro : "Thanks for using GCComment. Visit <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> for general information and documentation or <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> for discussions & feedback. If you have direct feedback or questions, contact us at <a href='mailto:ramirez_@online.de'>ramirez_@online.de</a> or <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a>.",
 		settings_feelfree : "Feel free to show your appreciation :)",
 		settings_enterUUID : "UUID for server synchronisation",
 		settings_enterServer : "Server for server synchronisation",
@@ -347,7 +347,7 @@ var mainCode = function(){
 		patchgpx_filter_markfound : "you marked as found",
 		patchgpx_changeorig : "Change the original waypoint's coordinates to your final coordinates",
 		patchgpx_addwptforfinal : "Add additional waypoints for final coordinates",
-		patchgpx_stripemojis : "Remove emojis if present (warning: beta state. if your emoji was not removed, please send the GPX to birnbaum2001@gmx.de)",
+		patchgpx_stripemojis : "Remove emojis if present (warning: beta state. if your emoji was not removed, please send the GPX to ramirez_@online.de)",
 		patchgpx_striphtmltags : "Remove HTML tags from descriptions",
 		patchgpx_perform : "Patch and download",
 		detail_final : "Final coordinate",
@@ -364,6 +364,7 @@ var mainCode = function(){
 		detail_finaldeleteconfirmation : "Do you really want to delete the final coordinates?",
 		detail_deleteconfirmation : 'Do you really want to delete this comment?',
 		detail_inclfinal : "incl. final",
+		detail_jumptocomment : "Jump to Comment",
 		map_enablemm : "Enable mystery mover and show ...",
 		map_area : "161m area",
 		map_home : "link to original",
@@ -434,7 +435,7 @@ var mainCode = function(){
 		ov_lastex : "Letzter Export",
 		ov_lastim : "Letzter Import",
 		ov_lastup : "Letzte Prüfung auf Aktualisierung",
-		settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du mich über <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
+		settings_intro : "Vielen Dank für die Verwendung von GCComment. Besuche <a href='https://github.com/Birnbaum2001/GCComment' target='blank'>github.com</a> für allgemeine Informationen und Dokumentation oder <a href='http://www.geoclub.de/viewtopic.php?f=117&t=44631' target='blank'>geoclub.de</a> für Diskussionen und Rückmeldungen. Wenn du direkte Rückmeldungen oder Fragen hast, dann kannst du uns über <a href='mailto:ramirez_@online.de'>ramirez_@online.de</a> oder <a href='mailto:birnbaum2001@gmx.de'>birnbaum2001@gmx.de</a> kontaktieren.",
 		settings_feelfree : "Zögere nicht, deiner Wertschätzung Ausdruck zu verleihen :)",
 		settings_enterUUID : "UUID zur Serversynchronisierung",
 		settings_enterServer : "Server zur Serversynchronisierung",
@@ -516,6 +517,7 @@ var mainCode = function(){
 		detail_finaldeleteconfirmation : "Möchtest du wirklich die Finalkoordinate löschen?",
 		detail_deleteconfirmation : 'Möchtest du wirklich diesen Kommentar löschen?',
 		detail_inclfinal : "inkl. Finale",
+		detail_jumptocomment : "springe zum Kommentar",
 		map_enablemm : "Aktiviere den Mystery-Verschieber und zeige ...",
 		map_area : "161m-Radius",
 		map_home : "Verbindung zum Original",
@@ -641,7 +643,7 @@ var mainCode = function(){
 		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
 				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
 			log('debug', 'matched gccommentOnNewProfilePage');
-			// gccommentOnNewProfilePage();
+			 gccommentOnNewProfilePage();
 		} else if (document.URL.search("www.geocaching.com\/map") >= 0) {
 			log('debug', 'matched mysteryMoverOnMapPage');
 				mysteryMoverOnMapPage();
@@ -654,12 +656,13 @@ var mainCode = function(){
 		} else if (document.URL.search("\/seek\/log\.aspx") >= 0) {
 			log('debug', 'matched gccommentOnLogPage');
 			gccommentOnLogPage();
-		}
-		else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
+		} else if (document.URL.search("\/play\/geocache\/") >= 0) {
+			log('debug', 'matched gccommentOnNewLogPage');
+			gccommentOnNewLogPage();
+		} else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
 			log('debug', 'matched gccommentOnSharingPage');
 			gccommentOnSharingPage();
-		}
-		else {
+		} else {
 			log('debug', 'nothing matched');
 		}
 	}
@@ -758,6 +761,8 @@ var mainCode = function(){
 
 		// styling the table's content
 		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
+		appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
+
 
 		// load settings
 		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
@@ -777,7 +782,11 @@ var mainCode = function(){
 			gccRoot = document.createElement('div');
 			gccRoot.id = "gccRoot";
 			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
+			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
+			
+//			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+
 
 			var gcclink = document.createElement('a');
 			gcclink.setAttribute('style', 'cursor:pointer;padding-left:5px;padding-right:5px;margin-left:5px');
@@ -1534,7 +1543,7 @@ var mainCode = function(){
 
 		// styling the table's content
 		appendCSS('text','.tableFinal, .tableComment, .tableWaypoints{margin: 0px;} .tableComment{font-family:monospace;font-size:small} .tableWaypoints{width: 100%}');
-
+		appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
 		// load settings
 		archivedFilter = GM_getValue(SETTING_ARCHIVE_FILTER);
 		if (!archivedFilter) {
@@ -1554,7 +1563,8 @@ var mainCode = function(){
 
 			gccRoot = document.createElement('div');
 			gccRoot.id = "gccRoot";
-			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
+			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
 
 			var gcclink = document.createElement('a');
@@ -1568,7 +1578,7 @@ var mainCode = function(){
 			gccRoot.appendChild(gcclink);
 
 			gcclink.addEventListener('mouseover', function(evt) {
-				var stats = "<u><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
+				var stats = "<u><font size=\"2\"><b>GCComment v" + version + "</b></u><br><b>" + lang.ov_totalamount + " </b>"
 						+ getNumberOfComments() + " (" + GM_getValue('countWhite') + " " + lang.type_untyped + ", "
 						+ GM_getValue('countRed') + " " + lang.type_unsolved + ", " + GM_getValue('countGreen') + " "
 						+ lang.type_solved + ", " + lang.and + " " + GM_getValue('countGray') + " " + lang.type_found
@@ -1583,11 +1593,12 @@ var mainCode = function(){
 				var lastex = GM_getValue(LAST_EXPORT);
 				if (lastex)
 					stats = stats + createTimeString(lastex);
+				
 				else
 					stats = stats + " " + lang.never;
-
 				stats = stats + "<br/><b>" + lang.ov_lastup + ": </b>";
 				stats = stats + createTimeString(parseInt(GM_getValue('updateDate')));
+				stats = stats + "</font>";
 				unsafeWindow.tooltip.show(stats, 500);
 			}, false);
 			gcclink.addEventListener('mouseup', function(evt) {
@@ -1890,7 +1901,7 @@ var mainCode = function(){
 
 			var IdResoverContent = "";
 			function updateIdResoverContent(){
-				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: 1.5em; margin-left: 0.5em; width: 30em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
+				var IdResoverContentActive = IdResoverContent ='<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>You are using the IDReclover autoupload with</span><br><span style="font-weight: bold;">static-ID: '+ GM_getValue("idResolverId", "") +'</span><br><span style="font-weight: bold;">secret: '+ GM_getValue("idResolverSecret", "") +'</span><br><span style="font-weight: bold;">Permanet link: </span><img  style="height: 2em; width: 2em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em;" src="'+linkIcon+'"></img><input style="font-size: small; margin-left: 0.5em; width: 26em; color: darkgray;" id="shareLinkPerm" readonly="readonly" value="http://gccs.lukeIam.de#'+ GM_getValue("idResolverId", "").trim() +'"></input><a href="#shareLinkPermQRBig"><div id="shareLinkPermQR" style="height: 2.5em; width: 2.5em; vertical-align: middle; margin-bottom: 0.5em; margin-left: 0.5em; display: inline-block; cursor:pointer;"></div></a><div style="display:none;"><div style="padding:0px;margin:0px;height:600px;width:600px;" id="shareLinkPermQRBig"></div></div><br><a id="divIdResoverSettingsRemove" style="cursor:pointer;"><span style="font-weight: bold;">Remove</span></a> </div>';
 				var IdResoverContentInactive = '<div id="divIdResoverSettings"> <span>Use a static ID for exports (uploads the the IDs to IDResolver).</span> <br> <span>To activate enter your id and secret or create a new id:</span> <br> <label for="divIdResoverSettingsId" style="font-weight: bold;">ID:</label><input type="" size="36" id="divIdResoverSettingsId" style="margin:3px"> <label for="divIdResoverSettingsSecret" style="font-weight: bold;">Secret:</label><input type="" size="20" id="divIdResoverSettingsSecret" style="margin:3px"><a id="divIdResoverSettingsLogin" style="cursor:pointer;"><span style="font-weight: bold;">Ok</span></a> <span> | </span> <a id="divIdResoverSettingsCreate" style="cursor:pointer;"><span style="font-weight: bold;">Create</span></a> </div>';
 
 				if(GM_getValue("idResolverId", "") !== "" && GM_getValue("idResolverSecret", "") !== ""){
@@ -2515,11 +2526,23 @@ var mainCode = function(){
 }
 	function DropboxShowAuthLink() {
 		var APP_Key = 'w23bgpsespnddow';
-    dropbox_auth_link = new Dropbox({clientId: APP_Key});
-    Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
-    Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
-    Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
-        Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+		dropbox_auth_link = new Dropbox({clientId: APP_Key});
+		
+		if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
+				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
+			log('debug', 'matched gccommentOnProfilePage');
+            Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+            Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+            Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+            Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/my/default.aspx?AppId=GCComment');
+		} else if ((document.URL.search("\/account\/dashboard") >= 0) || (document.URL.search("\/dashboard\/$") >= 0)
+				|| (document.URL.search("\/dashboard\/\#") >= 0) || (document.URL.search("\/dashboard\/\\?.*=.*") >= 0)) {
+			log('debug', 'matched gccommentOnNewProfilePage');
+			Db_AuthLinkImport = document.getElementById('dropboxAuthLinkImport');
+            Db_AuthLinkImport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/account/dashboard?AppId=GCComment');
+            Db_AuthLinkExport = document.getElementById('dropboxAuthLinkExport');
+            Db_AuthLinkExport.href = dropbox_auth_link.getAuthenticationUrl('https://www.geocaching.com/account/dashboard?AppId=GCComment');
+		}
 
 		// Import Seite
     $(Db_AuthLinkImport).show();
@@ -2880,7 +2903,48 @@ var mainCode = function(){
 			}
 		}
 	}
+//	TODO: New Log Page - Logtype Auswahl berücksichtigen, 
+	function gccommentOnNewLogPage() {
+		if (("" + window.location).indexOf('LUID=') >= 0) {
+			// do something if we watch the user log.
+		} else {
+			var urlGCCode = /geocache\/(\w*)/;
+			if (urlGCCode.exec(location.href)) {
+				var gccode = RegExp.$1.toUpperCase();
+			}
+			if (gccode) {
+				var comment = doLoadCommentFromGCCode(gccode);
+				if (comment) {
+					log('debug','im Comment');
+					appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
+					var gccBox = $('#logAttachments'); 
+					var gccActionDiv = document.createElement('div');
+					gccActionDiv.setAttribute('class', 'tableGCComment');
+					var markfound = appendCheckBox(gccActionDiv, AUTOMARKFOUND, lang.log_markfound);
+				    var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE, lang.log_movearchive);
+					gccBox.after(gccActionDiv);
+					var actionDiv = $(gccActionDiv).css('padding', '5px').css('border', 'solid 1px lightgray').css('margin-top', '10px');
+					var buttonSubmit = $('.btn-submit')[0];
+					buttonSubmit.parentNode.addEventListener(
+							"click",
+							function(event) {
+								var input = document.getElementsByClassName('log-types');
+								var c = doLoadCommentFromGCCode(gccode);
+								var markFoundState = /* (input.value == 2) */ GM_getValue(AUTOMARKFOUND) ? stateOptions[3]
+										: c.state;
+								var markArchiveState = GM_getValue(AUTOMARKARCHIVE) ? ARCHIVED : c.archived;
 
+								c.state = markFoundState;
+								c.archived = markArchiveState;
+
+								doSaveCommentToGUID(c);
+							}, false);
+					
+				}
+			}
+		}
+	}
+	
 	function gccommentOnSharingPage(){
 		$('#btnAddToGcc').removeClass("forceHide");
 		window.addEventListener("message", function(e){
@@ -3041,7 +3105,7 @@ var mainCode = function(){
 
 			SaveFinalCoords = document.createElement("a");
 			SaveFinalCoords.setAttribute('style', 'margin-left:3px;margin-right:3px');
-		imgSave = document.createElement('img');
+			imgSave = document.createElement('img');
 			imgSave.src = commentIconSave;
 			imgSave.title = lang.detail_finalsave;
 			imgSave.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
@@ -3086,6 +3150,17 @@ var mainCode = function(){
 				}
 			}, false);
 
+			JumpToComment = document.createElement("a");
+			JumpToComment.setAttribute('style', 'margin-left:16px;margin-right:3px');
+			JumpToComment.setAttribute('href','#gccommentarea');
+			imgJumpToComment = document.createElement('img');
+			imgJumpToComment.src = commentIcon;
+			imgJumpToComment.title = lang.detail_jumptocomment;
+			imgJumpToComment.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
+			JumpToComment.appendChild(imgJumpToComment);
+
+			
+			
 			ArchiveComment = document.createElement('a');
 			imgArchive = document.createElement('img');
 			imgArchive.src = archiveAdd;
@@ -3094,7 +3169,7 @@ var mainCode = function(){
 			ArchiveComment.appendChild(imgArchive);
 
 			DeleteComment = document.createElement('a');
-		imgDelete = document.createElement('img');
+			imgDelete = document.createElement('img');
 			imgDelete.src = commentIconDelete;
 			imgDelete.title = lang.detail_delete;
 			imgDelete.setAttribute('style', 'cursor:pointer');
@@ -3439,13 +3514,13 @@ var mainCode = function(){
 					return map;
 				};
 
-					if(browser === "Chrome"){
+//					if(browser === "Chrome"){
 						$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
 						setStaticMap();
-					}
+//					}
 				};
 
-				if(browser === "FireFox"){
+/*				if(browser === "FireFox"){
 					var code = document.createElement('script');
 					code.setAttribute('type', 'text/javascript');
 					code.textContent = "var browser=\""+browser+"\";var unsafeWindow = unsafeWindow||window; var currentComment = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify(currentComment)) + "\"));";
@@ -3459,8 +3534,9 @@ var mainCode = function(){
 
 				}
 				else{
+*/
 					modifyCachePageMap();
-				}
+//				}
 			} else {
 				detailFinalInputLatLng.value = DEFAULTCOORDS;
 				detailFinalInputLatLng.setAttribute('style', 'color:grey');
@@ -3483,6 +3559,7 @@ var mainCode = function(){
 			mysteryData.appendChild(detailFinalCacheState);
 			mysteryData.appendChild(SaveFinalCoords);
 			mysteryData.appendChild(DeleteFinalCoords);
+			mysteryData.appendChild(JumpToComment);
 		}
 
 		// check for waypoints header and add if not present
@@ -3585,9 +3662,8 @@ var mainCode = function(){
 					enableSort : false
 				});
 				wpttable.getElementsByTagName('tbody')[0].appendChild(waypoint);
-				// add second row to show proper alternating colors. Could be used for
-				// notes
-				// wpttable.getElementsByTagName('tbody')[0].appendChild(document.createElement('tr'));
+				// add second row to show proper alternating colors. Could be used for notes
+				wpttable.getElementsByTagName('tbody')[0].appendChild(document.createElement('tr'));
 			}
 
 			// add the final waypoint, if available
@@ -3606,8 +3682,9 @@ var mainCode = function(){
 			}
 		}
 
+// ToDo: URLs anpassen, die richtigen Orig Koords verwenden 
 		// check for "links to maps" table and augment the links
-		var mapLinks = document.getElementById('ctl00_ContentBody_MapLinks_MapLinks');
+/*		var mapLinks = document.getElementById('ctl00_ContentBody_MapLinks_MapLinks');
 		if (mapLinks && currentComment && (currentComment.lat && currentComment.lng)) {
 			var items = mapLinks.getElementsByTagName('li');
 			var newlink = "";
@@ -3627,6 +3704,7 @@ var mainCode = function(){
 							maplng = chunk.split('=')[1];
 						}
 					}
+					
 					newlink = "http://www.mapquest.com/?saddr=" + maplat + "," + maplng + "&daddr=" + currentComment.lat
 							+ "," + currentComment.lng + "&zoom=10";
 				} else
@@ -3642,7 +3720,7 @@ var mainCode = function(){
 				}
 			}
 		}
-
+*/
 		//saveToCacheNote(currentComment);
 	}
 
@@ -3665,10 +3743,10 @@ var mainCode = function(){
 		}
 
 		if(currentComment){ //TODO: Setting
-			if($("#cache_note").children().length !== 0){
+			if($("#viewCacheNote").children().length !== 0){
 				log("info", "saveToCacheNote failed: cache note is in edit mode");
 			}
-			else if($("#cache_note").text()!== "" && $("#cache_note").text()!== "Click to enter a note" && $("#cache_note").text().indexOf("GCCNote:") === -1){
+			else if($("#viewCacheNote").text()!== "" && $("#viewCacheNote").text()!== "Click to enter a note" && $("#viewCacheNote").text().indexOf("GCCNote:") === -1){
 				log("info", "saveToCacheNote failed: cache note contains other text");
 			}
 			else{
@@ -3677,7 +3755,7 @@ var mainCode = function(){
 						text = text.substr(0, 500);
 				}
 
-				if($("#cache_note").text().trim() === text){
+				if($("#viewCacheNote").text().trim() === text){
 					log("debug", "saveToCacheNote: cache note identical - nothing to do");
 					return;
 				}
@@ -3689,7 +3767,7 @@ var mainCode = function(){
 							return;
 						}
 
-						$("#cache_note").text(text);
+						$("#viewCacheNote").text(text);
 					});
 				};
 
@@ -4013,12 +4091,12 @@ var mainCode = function(){
 
 	function gccommentOnManageLocations() {
 		setTimeout(function() {
-			var span = document.getElementById('LatLng');
-			var coords = parseCoordinates(span.innerHTML);
-			log('debug', coords.length);
-			if (coords.length == 2) {
-				GM_setValue('HOMELAT', "" + coords[0]);
-				GM_setValue('HOMELNG', "" + coords[1]);
+			var homeCoordinates;
+			homeCoordinates = parseCoordinates(unsafeWindow.mapOptions.homeLocation);
+			log('debug', homeCoordinates.length);
+			if (homeCoordinates.length == 2) {
+				GM_setValue('HOMELAT', "" + homeCoordinates[0]);
+				GM_setValue('HOMELNG', "" + homeCoordinates[1]);
 				log('info', 'stored new Home : ' + GM_getValue('HOMELAT') + " " + GM_getValue('HOMELNG'));
 			}
 		}, 2000);
@@ -4431,6 +4509,9 @@ var mainCode = function(){
 		// schema for
 		// http://www.geocaching.com/geocache/GC1P7MN_eine-dunkle-seite-der-stadt
 		var regGCCode = /geocache\/(\w*)_/;
+		// schema for
+		// https://coord.info/XYZ123
+		var regCoordInfo = /coord\.info\/(\w*)/;
 		var previousAnchor = null;
 
 		for (var i = 0; i < anchors.length; i++) { // check all links
@@ -4441,6 +4522,8 @@ var mainCode = function(){
 				comment = doLoadCommentFromGCCode(RegExp.$1);
 			} else if (regGUID.exec(a.href)) { // anchor is a GUID link to a cache
 				comment = doLoadCommentFromGUID(RegExp.$1);
+			} else if (regCoordInfo.exec(a.href)) { // anchor is a CoordInfo link to a cache
+				comment = doLoadCommentFromGCCode(RegExp.$1);
 			}
 			if (a.href == previousAnchor) {
 				continue;
@@ -5149,6 +5232,7 @@ var mainCode = function(){
 	}
 
 	function drawMarker(lat, lng, type, state, gccode) {
+		$ = this.$;
 		var iconSize = new unsafeWindow.L.Point(22, 22);
 		var iconAnchor = new unsafeWindow.L.Point(11, 11);
 		var url = null;
@@ -5463,7 +5547,7 @@ var mainCode = function(){
 				result = result + "<waypoint>";
 				result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
 				result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
-				result = result + "<name>" + comment.waypoints[j].name + "</name>";
+				result = result + "<name>" + escapeXML(comment.waypoints[j].name) + "</name>";
 				result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
 				result = result + "</waypoint>";
 			}
@@ -5521,7 +5605,7 @@ var mainCode = function(){
 			result = result + "<waypoint>";
 			result = result + "<prefix>" + comment.waypoints[j].prefix + "</prefix>";
 			result = result + "<lookup>" + comment.waypoints[j].lookup + "</lookup>";
-			result = result + "<name>" + comment.waypoints[j].name + "</name>";
+			result = result + "<name>" + escapeXML(comment.waypoints[j].name) + "</name>";
 			result = result + "<coordinate>" + comment.waypoints[j].coordinate + "</coordinate>";
 			result = result + "</waypoint>";
 		}
@@ -6021,7 +6105,7 @@ var mainCode = function(){
 						prefix : Xwpt.childNodes[0].childNodes[0].nodeValue,
 						lookup : Xwpt.childNodes[1].childNodes[0].nodeValue,
 						name : Xwpt.childNodes[2].childNodes[0].nodeValue,
-						coordinate : Xwpt.childNodes[3].childNodes[0].nodeValue
+						coordinate : unescapeXML(unescape(Xwpt.childNodes[3].childNodes[0].nodeValue))
 					});
 				}
 			}
@@ -6438,7 +6522,10 @@ var mainCode = function(){
 	}
 
 	function log(level, text) {
-		GM_log(level + ": " + text);
+		switch (level) {
+          case 'info': console.log(level + ": " + text); break
+          case 'debug': console.log(level + ": " + text); break
+		}		
 	}
 
 	function getGUIDFromGCCode(gcCode) {
@@ -6912,11 +6999,9 @@ var mainCode = function(){
 		main();
 	}
 }
-if (typeof (chrome) !== "undefined") {
-    isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
-} else {
-    isTampermonkey = (typeof GM.info != "undefined" && typeof GM.info.scriptHandler != "undefined" && GM.info.scriptHandler == "Tampermonkey") ? true : false;
-}
+
+isTampermonkey = (typeof GM_info != "undefined" && typeof GM_info.scriptHandler != "undefined" && GM_info.scriptHandler == "Tampermonkey") ? true : false;
+
 
 if (isTampermonkey === false) {
 	console.log('No Tampermonkey');
@@ -6985,12 +7070,9 @@ function updateCheck(){
 			var updateInfo = document.createElement('div');
 			updateInfo.setAttribute('id', 'gccupdateinfo');
 			var updatelnk = document.createElement('a');
-			if(browser === "Chrome"){
-				tmpl_update = tmpl_update + ' Achtung. Für Chrome wird es in Zukunft nur noch eine Version geben die über Tampermonkey läuft.;'
-			}
-			else{
-				updatelnk.setAttribute('href', updateurl);
-			}
+
+			updatelnk.setAttribute('href', updateurl);
+
 			updatelnk.innerHTML = lang.update_clickToUpdate;
 			updateInfo.appendChild(document.createTextNode(lang.tmpl_update.replace("{{serverVersion}}",
 					oChanges.latestVersion).replace("{{version}}", version)
@@ -7028,7 +7110,7 @@ function updateCheck(){
 			var currentDate = new Date();
 
 			// in ms. equals 1 day
-			if (currentDate - updateDate > 86400000) {
+			if (currentDate - updateDate > 14400000) {
 
 				GM_xmlhttpRequest({
 					method : 'GET',

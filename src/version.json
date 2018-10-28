@@ -1,6 +1,46 @@
 {
-	"latestVersion":93,
+	"latestVersion":101,
 	"changes":[
+	{
+		"version": 101,
+		"date": "2018-10-28",
+		"change": "<ul><li>Fix: Save GCC to Cache Note</li></ul>"
+	}
+	{
+		"version": 100,
+		"date": "2018-08-01",
+		"change": "<ul><li>Fix Dropbox auth on new Profil Page - issue #36</li></ul>"
+	}
+	{
+		"version": 99,
+		"date": "2018-07-28",
+		"change": "<ul><li>Small Style changes on old Profil Page</li></ul>"
+	}
+	{
+		"version": 98,
+		"date": "2018-04-21",
+		"change": "<ul><li>Fix Import & Export - issue #33</li></ul>"
+	}
+	{
+		"version": 97,
+		"date": "2018-03-17",
+		"change": "<ul><li>GCC on new Logpage</li><li>Fix small Map on Cache Detailpage</li><li>Some small Changes</li></ul>"
+	},
+	{
+		"version": 96,
+		"date": "2018-02-25",
+		"change": "<ul><li>New Button on Dateil Page. Jump to Comments</li><li>Some small Changes</li></ul>"
+	},
+	{
+		"version": 95,
+		"date": "2018-01-18",
+		"change": "<ul><li>GCComment on new Dashboard</li><li>quick fix for Map</li></ul>"
+	},
+	{
+		"version": 94,
+		"date": "2018-01-12",
+		"change": "<ul><li>Fix: QRcode works again</li><li>Some Fixes</li></ul>"
+	},
 	{
 		"version": 93,
 		"date": "2018-01-03",
