@@ -24,7 +24,7 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			101
+// @version			102
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -3443,7 +3443,7 @@ var mainCode = function(){
 			if (currentComment && currentComment.lat && currentComment.lng) {
 				detailFinalInputLatLng.value = convertDec2DMS(currentComment.lat, currentComment.lng);
 			}
-
+/* ToDo - Minimap doesn't work
 			if (currentComment
 					&& ((currentComment.lat && currentComment.lng) || (currentComment.waypoints && (currentComment.waypoints.length > 0)))
 					&& typeof(unsafeWindow.L)!=="undefined") {
@@ -3520,7 +3520,7 @@ var mainCode = function(){
 //					}
 				};
 
-/*				if(browser === "FireFox"){
+				if(browser === "FireFox"){
 					var code = document.createElement('script');
 					code.setAttribute('type', 'text/javascript');
 					code.textContent = "var browser=\""+browser+"\";var unsafeWindow = unsafeWindow||window; var currentComment = JSON.parse(decodeURIComponent(\"" + encodeURIComponent(JSON.stringify(currentComment)) + "\"));";
@@ -3534,13 +3534,14 @@ var mainCode = function(){
 
 				}
 				else{
-*/
+
 					modifyCachePageMap();
 //				}
 			} else {
 				detailFinalInputLatLng.value = DEFAULTCOORDS;
 				detailFinalInputLatLng.setAttribute('style', 'color:grey');
 			}
+*/
 			detailFinalInputLatLng.addEventListener('click', function() {
 				if (detailFinalInputLatLng.value == DEFAULTCOORDS) {
 					detailFinalInputLatLng.value = "";

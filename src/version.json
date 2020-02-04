@@ -1,6 +1,11 @@
 {
-	"latestVersion":101,
+	"latestVersion":102,
 	"changes":[
+	{
+		"version": 102,
+		"date": "2020-02-04",
+		"change": "<ul><li>Fix: Coordsfield shows wrong. Quick fix only.</li></ul>"
+	}
 	{
 		"version": 101,
 		"date": "2018-10-28",
