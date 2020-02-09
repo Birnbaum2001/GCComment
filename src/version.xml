@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gccomment>
-	<gccommentlatestversion>102</gccommentlatestversion>
+	<gccommentlatestversion>101</gccommentlatestversion>
 	<changelist>
-		<change>
-			<version>102</version>
-			<date>2020-02.04</date>
-			<content>Fix: Coordsfield shows wrong. Quick fix only.</content>
-		</change>
 		<change>
 			<version>101</version>
 			<date>2018-10-28</date>
