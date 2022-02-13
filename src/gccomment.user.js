@@ -24,7 +24,7 @@
 // @grant				GM_info
 // @grant				GM.info
 // @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			101
+// @version			102
 // @author			Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -784,7 +784,7 @@ var mainCode = function(){
 			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:10px;padding:3px;');
 			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
-			
+
 //			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
 
 
@@ -1593,7 +1593,7 @@ var mainCode = function(){
 				var lastex = GM_getValue(LAST_EXPORT);
 				if (lastex)
 					stats = stats + createTimeString(lastex);
-				
+
 				else
 					stats = stats + " " + lang.never;
 				stats = stats + "<br/><b>" + lang.ov_lastup + ": </b>";
@@ -2527,7 +2527,7 @@ var mainCode = function(){
 	function DropboxShowAuthLink() {
 		var APP_Key = 'w23bgpsespnddow';
 		dropbox_auth_link = new Dropbox({clientId: APP_Key});
-		
+
 		if ((document.URL.search("\/my\/default\.aspx") >= 0) || (document.URL.search("\/my\/$") >= 0)
 				|| (document.URL.search("\/my\/\#") >= 0) || (document.URL.search("\/my\/\\?.*=.*") >= 0)) {
 			log('debug', 'matched gccommentOnProfilePage');
@@ -2903,7 +2903,7 @@ var mainCode = function(){
 			}
 		}
 	}
-//	TODO: New Log Page - Logtype Auswahl berücksichtigen, 
+//	TODO: New Log Page - Logtype Auswahl berücksichtigen,
 	function gccommentOnNewLogPage() {
 		if (("" + window.location).indexOf('LUID=') >= 0) {
 			// do something if we watch the user log.
@@ -2917,7 +2917,7 @@ var mainCode = function(){
 				if (comment) {
 					log('debug','im Comment');
 					appendCSS('text','.tableGCComment {text-transform:none; font-size:small;} label{font-size: small; font-weight:400;text-transform:none;display:initial;margin-bottom:4px;max-width:100%} select{display:initial;font-size: small; background: none; width:auto;padding:initial;-moz-appearance:listbox;-webkit-appearance:listbox;}');
-					var gccBox = $('#logAttachments'); 
+					var gccBox = $('#logAttachments');
 					var gccActionDiv = document.createElement('div');
 					gccActionDiv.setAttribute('class', 'tableGCComment');
 					var markfound = appendCheckBox(gccActionDiv, AUTOMARKFOUND, lang.log_markfound);
@@ -2939,12 +2939,12 @@ var mainCode = function(){
 
 								doSaveCommentToGUID(c);
 							}, false);
-					
+
 				}
 			}
 		}
 	}
-	
+
 	function gccommentOnSharingPage(){
 		$('#btnAddToGcc').removeClass("forceHide");
 		window.addEventListener("message", function(e){
@@ -3026,6 +3026,16 @@ var mainCode = function(){
 	// wir sind auf der Detailbeschreibungsseite eines Caches
 	function gccommentOnDetailpage() {
 		appendCSS('text', '#gccommenttextarea{font-family:monospace;font-size:medium}');
+
+// ToDo: Check CookieBot
+//		var checkL = setInterval(function(){
+//			if (typeof(unsafeWindow.L)!=="undefined"){
+//				clear checkL;
+//			}
+//		},100)
+
+
+
 		var findtag = document.getElementById('ctl00_ContentBody_uxFindLinksHeader');
 		if (findtag) {
 			AddComment = document.createElement('a');
@@ -3159,8 +3169,8 @@ var mainCode = function(){
 			imgJumpToComment.setAttribute('style', 'cursor:pointer;vertical-align:middle;');
 			JumpToComment.appendChild(imgJumpToComment);
 
-			
-			
+
+
 			ArchiveComment = document.createElement('a');
 			imgArchive = document.createElement('img');
 			imgArchive.src = archiveAdd;
@@ -3266,7 +3276,7 @@ var mainCode = function(){
 
 			detailCommentCacheState = document.createElement('select');
 			detailCommentCacheState.setAttribute("name", "detailCommentCacheState");
-			detailCommentCacheState.setAttribute("style", "margin-right:10px;");
+			detailCommentCacheState.setAttribute("style", "margin-right:10px;display: initial;width: auto;border-radius: 0px;padding: initial;");
 			detailCommentCacheState.setAttribute('size', 1);
 			detailCommentCacheState.setAttribute('disabled', '');
 			var option0 = document.createElement('option');
@@ -3409,10 +3419,10 @@ var mainCode = function(){
 
 			detailFinalInputLatLng = document.createElement('input');
 			detailFinalInputLatLng.setAttribute('style', 'margin-left:5px;margin-right:5px');
-			detailFinalInputLatLng.setAttribute('size', '30');
+			detailFinalInputLatLng.setAttribute('size', '25');
 
 			detailFinalCacheState = document.createElement('select');
-			detailFinalCacheState.setAttribute("style", "margin:0 5px 0 5px;");
+			detailFinalCacheState.setAttribute("style", "margin:0 5px 0 5px;display: initial;width: auto;border-radius: 0px;padding: initial;");
 			detailFinalCacheState.setAttribute("name", "detailFinalCacheState");
 			detailFinalCacheState.setAttribute('size', 1);
 			var option0 = document.createElement('option');
@@ -3682,7 +3692,7 @@ var mainCode = function(){
 			}
 		}
 
-// ToDo: URLs anpassen, die richtigen Orig Koords verwenden 
+// ToDo: URLs anpassen, die richtigen Orig Koords verwenden
 		// check for "links to maps" table and augment the links
 /*		var mapLinks = document.getElementById('ctl00_ContentBody_MapLinks_MapLinks');
 		if (mapLinks && currentComment && (currentComment.lat && currentComment.lng)) {
@@ -3704,7 +3714,7 @@ var mainCode = function(){
 							maplng = chunk.split('=')[1];
 						}
 					}
-					
+
 					newlink = "http://www.mapquest.com/?saddr=" + maplat + "," + maplng + "&daddr=" + currentComment.lat
 							+ "," + currentComment.lng + "&zoom=10";
 				} else
@@ -6525,7 +6535,7 @@ var mainCode = function(){
 		switch (level) {
           case 'info': console.log(level + ": " + text); break
           case 'debug': console.log(level + ": " + text); break
-		}		
+		}
 	}
 
 	function getGUIDFromGCCode(gcCode) {
