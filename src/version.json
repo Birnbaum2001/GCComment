@@ -1,6 +1,11 @@
 {
-	"latestVersion":102,
+	"latestVersion":103,
 	"changes":[
+	{
+		"version": 103,
+		"date": "2026-09-10",
+		"change": "<ul><li>Some fixes. Updates on the Way</li></ul>"
+	}
 	{
 		"version": 101,
 		"date": "2018-10-28",

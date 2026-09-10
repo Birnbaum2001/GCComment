@@ -1,31 +1,31 @@
 // ==UserScript==
-// @name				GCComment
-// @namespace		https://geoclub.de/forum/viewtopic.php?f=117&t=44631
-// @description	Add comments to your geocaches on geocaching.com.
-// @include			/^https?://.*geocaching\.com/.*$/
-// @include			/^https?://lukeiam.github.io/gcc/.*$/
-// @include			/^https://api.dropbox.com/.*$/
-// @include			/^https://gist.github.com/.*$/
-// @include			/^https://api.github.com/.*$/
-// @require			https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/2.5.13/Dropbox-sdk.min.js
-// @require			https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js
-// @require			https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js
-// @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.qrcode.min.js
-// @require			https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/jquery.nyroModal.custom.min.js
-// @resource     	nyroModalCss https://raw.githubusercontent.com/lukeIam/GCComment/GistImportExport/src/nyroModal.css
-// @grant				GM_getValue
-// @grant				GM_setValue
-// @grant				GM_deleteValue
-// @grant				GM_xmlhttpRequest
-// @grant				GM_listValues
-// @grant				GM_registerMenuCommand
-// @grant				GM_log
-// @grant				GM.log
-// @grant				GM_info
-// @grant				GM.info
-// @icon         	https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
-// @version			102
-// @author			Birnbaum2001, lukeIam, ramirez
+// @name            GCComment
+// @namespace       https://geoclub.de/forum/viewtopic.php?f=117&t=44631
+// @description     Add comments to your geocaches on geocaching.com.
+// @include         /^https?://.*geocaching\.com/.*$/
+// @include         /^https?://lukeiam.github.io/gcc/.*$/
+// @include         /^https://api.dropbox.com/.*$/
+// @include         /^https://gist.github.com/.*$/
+// @include         /^https://api.github.com/.*$/
+// @require         https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/2.5.13/Dropbox-sdk.min.js
+// @require         https://code.jquery.com/jquery-3.7.1.min.js
+// @require         https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js
+// @require         https://cdn.jsdelivr.net/gh/lukeIam/GCComment@GistImportExport/src/jquery.qrcode.min.js
+// @require         https://cdn.jsdelivr.net/gh/lukeIam/GCComment@GistImportExport/src/jquery.nyroModal.custom.min.js
+// @resource        nyroModalCss https://cdn.jsdelivr.net/gh/lukeIam/GCComment@GistImportExport/src/nyroModal.css
+// @grant           GM_getValue
+// @grant           GM_setValue
+// @grant           GM_deleteValue
+// @grant           GM_xmlhttpRequest
+// @grant           GM_listValues
+// @grant           GM_registerMenuCommand
+// @grant           GM_log
+// @grant           GM.log
+// @grant           GM_info
+// @grant           GM.info
+// @icon            https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
+// @version         103
+// @author          Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
 
@@ -160,9 +160,6 @@ var mainCode = function(){
 	var AUTOMOVEMYSTERIESBETAAREA = "autoMoveMysteriesbetaarea";
 	var AUTOMOVEMYSTERIESBETAUNSOLVED = "autoMoveMysteriesbetaunsolved";
 	var AUTOMOVEMYSTERIESBETAINCLUDEWPT = "autoMoveMysteriesbetaIncludeWaypoints";
-	var ADDCOMMENTSETTING = "addCommentSetting";
-	var CHANGEORIGINALSETTING = "changeOriginalSetting";
-	var ADDWAYPOINTSETTING = "addWaypointSetting";
 	var PATCHGPX_CHANGEORIGINAL = "patchGPXChangeOriginal";
 	var PATCHGPX_ADDFINALWPT = "patchGPXAddFinalWpt";
 	var ENABLE_EXPORT = "enableExport";
@@ -379,10 +376,6 @@ var mainCode = function(){
 		gpxexportwpttitle : 'GCComment Final and Comment',
 		kmlexporttitle : "Waypoint listing with final coordinates of geocaches",
 		actionfailed : "Action failed",
-		savegpx_explain : 'Use GCComment information to configure your GPX ',
-		savegpx_addgcc : 'Add your GCComment',
-		savegpx_changeorig : 'Change the original coordinates to your final coordinates',
-		savegpx_addfinal : 'Add final coordinates as separate waypoint',
 		update_changes : 'Changes in version ',
 		update_clickToUpdate : "Click here to update!",
 		tmpl_commentremoved : "Removed <a target='blank' href='data:text/html;base64,{{1}}' class='gcccomment' data-gcccom='{{2}}'>comment.</a>",
@@ -532,10 +525,6 @@ var mainCode = function(){
 		gpxexportwpttitle : 'GCComment Finale und Kommentar',
 		kmlexporttitle : "Wegpunkte mit Finalkoordinaten von Geocaches",
 		actionfailed : "Aktion fehlgeschlagen",
-		savegpx_explain : 'Benutze GCComment-Information, um das GPX zu konfigurieren ',
-		savegpx_addgcc : 'Füge deinen Kommentar hinzu',
-		savegpx_changeorig : 'Ändere die Originalkoordinate auf deine Finalkoordinate',
-		savegpx_addfinal : 'Füge die Finalkoordinate als zusätzlichen Wegpunkt hinzu',
 		update_changes : 'Änderungen in Version ',
 		update_clickToUpdate : "Hier klicken, um das Update einzuspielen!",
 		tmpl_commentremoved : "<a target='blank' href='data:text/html;base64,{{1}}' class='gcccomment' data-gcccom='{{2}}'>Kommentar</a> gelöscht.",
@@ -559,6 +548,35 @@ var mainCode = function(){
 	};
 	var langsetting = GM_getValue(SETTINGS_LANGUAGE);
 	var lang = languages[SETTINGS_LANGUAGE_EN];
+
+    const waitForElement = (selector, timeout = 10000) => {
+        return new Promise((resolve, reject) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                return resolve(element);
+            }
+
+            const observer = new MutationObserver(() => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    observer.disconnect();
+                    resolve(el);
+                }
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+            if (timeout) {
+                setTimeout(() => {
+                    observer.disconnect();
+                    reject(new Error(`Timeout: Element ${selector} nicht gefunden`));
+                }, timeout);
+            }
+        });
+    };
 
 	function main() {
 		if (!$) {
@@ -623,10 +641,7 @@ var mainCode = function(){
 
 		// starting the GCC
 		log('debug', 'found URL: ' + document.URL);
-		if ((document.URL.search("cache_details\.aspx") >= 0) || (document.URL.search("\/geocache\/GC") >= 0)) {
-			log('debug', 'matched gccommentOnDetailpage');
-			gccommentOnDetailpage();
-		} else if ((document.URL.search("\/my\/logs\.aspx") >= 0)
+        if ((document.URL.search("\/my\/logs\.aspx") >= 0)
 				|| (document.URL.search("\/seek\/nearest\.aspx") >= 0)
 				|| (document.URL.search("\/watchlist\.aspx") >= 0)
 				|| (document.URL.search("\/my\/recentlyviewedcaches\.aspx") >= 0)
@@ -659,7 +674,13 @@ var mainCode = function(){
 		} else if (document.URL.search("\/play\/geocache\/") >= 0) {
 			log('debug', 'matched gccommentOnNewLogPage');
 			gccommentOnNewLogPage();
-		} else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
+        } else if (document.URL.search(/\/live\/geocache\/.*\/log/) >= 0) {
+            log('debug', 'matched gccommentOnLiveLogPage');
+            gccommentOnLiveLogPage();
+        } else if ((document.URL.search("cache_details\.aspx") >= 0) || (document.URL.search("\/geocache\/GC") >= 0)) {
+			log('debug', 'matched gccommentOnDetailpage');
+			gccommentOnDetailpage();
+        } else if (document.URL.search("lukeiam\.github\.io\/gcc") >= 0) {
 			log('debug', 'matched gccommentOnSharingPage');
 			gccommentOnSharingPage();
 		} else {
@@ -753,7 +774,7 @@ var mainCode = function(){
 	function gccommentOnProfilePage() {
 
    	// Datatables CSS anhaengen
-		$('head').append('<link rel="stylesheet" type="text/css" href="https://rawgit.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">');
 
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
@@ -1095,21 +1116,6 @@ var mainCode = function(){
 			gccintro.setAttribute('style', 'width:600px');
 			gccintro.innerHTML = lang.settings_intro;
 			configDiv.appendChild(gccintro);
-
-			var paypallink = document.createElement('a');
-			paypallink.setAttribute('style',
-					'position:absolute;left:650px;top:10px;text-align:center;text-decoration:none;');
-			paypallink.setAttribute('href',
-					'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FK6XVH5SULGL');
-			paypallink.setAttribute('target', 'blank');
-			paypallink.appendChild(document.createTextNode(lang.settings_feelfree));
-			paypallink.appendChild(document.createElement('br'));
-			var paypalImg = document.createElement('img');
-			paypalImg.setAttribute('src', 'https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif');
-			paypallink.appendChild(paypalImg);
-			paypallink.appendChild(document.createElement('br'));
-			paypallink.appendChild(document.createTextNode(lang.thank_you));
-			configDiv.appendChild(paypallink);
 
 			appendCheckBox(configDiv, ENABLE_EXPORT, lang.settings_allowExport);
 
@@ -1535,7 +1541,7 @@ var mainCode = function(){
 	function gccommentOnNewProfilePage() {
 
    	// Datatables CSS anhaengen
-		$('head').append('<link rel="stylesheet" type="text/css" href="https://rawgit.com/ramirezhr/GCComment/dev/resources/jquery.dataTables.css">');
+		$('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">');
 
 		appendCSS('text', '.odd{background-color:#ffffff} .even{background-color:#E8E8E8}'
 				+ '.ui-icon{display:inline-block;}' + ' .tableStateIcon{width: 11px;margin-right:3px}'
@@ -1552,18 +1558,32 @@ var mainCode = function(){
 		}
 
 		// add links to each entry on that page
+		// Initiale Prüfung
 		addCommentBubblesToPage();
 
-		// add overview of all comments on top of page
-		var layouttag = document.getElementsByClassName('alert');
+		// Observer für das moderne React-Dashboard
+		let debounceTimer;
+		const observer = new MutationObserver(() => {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => {
+				addCommentBubblesToPage();
+			}, 250);
+		});
 
-		log('debug',layouttag[0]);
-		if (layouttag) {
-			var root = layouttag[0];
+		// Klemme den Observer an die Hauptstruktur des Dashboards
+		const dashboardRoot = document.getElementById('header-root') ? document.getElementById('header-root').parentNode : document.body;
+		observer.observe(dashboardRoot, { childList: true, subtree: true });
+
+		// add overview of all comments on top of page
+        var root = document.getElementById('header-root');
+
+		log('debug', root);
+		if (root) {
 
 			gccRoot = document.createElement('div');
 			gccRoot.id = "gccRoot";
-			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+//			gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7;margin-bottom:-10px;padding:2px;min-width:1000px;max-width:1300px;margin:auto;');
+            gccRoot.setAttribute('style', 'outline:1px solid #D7D7D7; margin-bottom: 20px; padding: 5px; width: 100%; box-sizing: border-box; border-radius: 8px;');
 			gccRoot.setAttribute('class', 'tableGCComment');
 			root.parentNode.insertBefore(gccRoot, root.nextSibling);
 
@@ -1599,13 +1619,14 @@ var mainCode = function(){
 				stats = stats + "<br/><b>" + lang.ov_lastup + ": </b>";
 				stats = stats + createTimeString(parseInt(GM_getValue('updateDate')));
 				stats = stats + "</font>";
-				unsafeWindow.tooltip.show(stats, 500);
+				gccTooltip.show(stats);
 			}, false);
 			gcclink.addEventListener('mouseup', function(evt) {
 				toggleTabOnProfile('configDiv');
 			}, false);
-			gcclink.setAttribute('onmouseout', 'tooltip.hide();');
-
+			gcclink.addEventListener('mouseout', function() {
+				gccTooltip.hide();
+			});
 			$('#configDivButton').click(function(e) {
 				if (e.shiftKey) {
 					var gistIdLog = JSON.parse(GM_getValue("GistIdLog", "[]")).reverse();
@@ -1876,20 +1897,7 @@ var mainCode = function(){
 			gccintro.innerHTML = lang.settings_intro;
 			configDiv.appendChild(gccintro);
 
-			var paypallink = document.createElement('a');
-			paypallink.setAttribute('style',
-					'position:absolute;left:650px;top:10px;text-align:center;text-decoration:none;');
-			paypallink.setAttribute('href',
-					'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8FK6XVH5SULGL');
-			paypallink.setAttribute('target', 'blank');
-			paypallink.appendChild(document.createTextNode(lang.settings_feelfree));
-			paypallink.appendChild(document.createElement('br'));
-			var paypalImg = document.createElement('img');
-			paypalImg.setAttribute('src', 'https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif');
-			paypallink.appendChild(paypalImg);
-			paypallink.appendChild(document.createElement('br'));
-			paypallink.appendChild(document.createTextNode(lang.thank_you));
-			configDiv.appendChild(paypallink);
+
 
 			appendCheckBox(configDiv, ENABLE_EXPORT, lang.settings_allowExport);
 
@@ -2944,7 +2952,75 @@ var mainCode = function(){
 			}
 		}
 	}
+    function gccommentOnLiveLogPage() {
+		var urlGCCode = /\/live\/geocache\/(GC[a-zA-Z0-9]+)\/log/;
+		if (urlGCCode.exec(location.href)) {
+			var gccode = RegExp.$1.toUpperCase();
+		}
 
+		if (gccode) {
+			var comment = doLoadCommentFromGCCode(gccode);
+			if (comment) {
+				log('debug', 'GCComment found for live log page: ' + gccode);
+
+				appendCSS('text', '.gccLiveLogBox { padding: 8px 12px; border: solid 1px #d7d7d7; background: #f8f9fa; border-radius: 6px; font-size: 13px; z-index: 999; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }');
+
+				// Funktion zum Einbetten, falls React neu gerendert hat
+                var ensureCheckboxes = function() {
+					var postContainer = document.querySelector('.post-button-container');
+					if (postContainer && !document.getElementById('gccLiveLogBoxContainer')) {
+						var gccActionDiv = document.createElement('div');
+						gccActionDiv.setAttribute('id', 'gccLiveLogBoxContainer');
+						gccActionDiv.setAttribute('class', 'gccLiveLogBox');
+
+						var markfound = appendCheckBox(gccActionDiv, AUTOMARKFOUND, lang.log_markfound);
+						var markarchive = appendCheckBox(gccActionDiv, AUTOMARKARCHIVE, lang.log_movearchive);
+
+						// Den Post-Container selbst zum Flex-Column machen
+						postContainer.style.display = 'flex';
+						postContainer.style.flexDirection = 'column';
+						postContainer.style.alignItems = 'flex-end';
+						postContainer.style.gap = '8px';
+
+						// Box als erstes Kind direkt in den Post-Container vor den Button setzen
+						postContainer.insertBefore(gccActionDiv, postContainer.firstChild);
+						log('debug', 'GCComment checkboxes injected nicely into post container');
+					}
+				};
+
+				// Einmal initial versuchen
+				ensureCheckboxes();
+
+				// Beobachter, falls React die Elemente neu aufbaut
+				var observer = new MutationObserver(function(mutations) {
+					ensureCheckboxes();
+				});
+
+				observer.observe(document.body, {
+					childList: true,
+					subtree: true
+				});
+
+				// Event-Listener für den Absende-Klick
+				document.addEventListener('click', function(event) {
+					var target = event.target;
+					if (target && (target.classList.contains('submit-button') || target.getAttribute('data-event-label') === 'Cache Log - post')) {
+						var c = doLoadCommentFromGCCode(gccode);
+						if (c) {
+							var markFoundState = GM_getValue(AUTOMARKFOUND) ? stateOptions[3] : c.state;
+							var markArchiveState = GM_getValue(AUTOMARKARCHIVE) ? ARCHIVED : c.archived;
+
+							c.state = markFoundState;
+							c.archived = markArchiveState;
+
+							doSaveCommentToGUID(c);
+							log('info', 'GCComment updated on live log submit');
+						}
+					}
+				}, true);
+			}
+		}
+	}
 	function gccommentOnSharingPage(){
 		$('#btnAddToGcc').removeClass("forceHide");
 		window.addEventListener("message", function(e){
@@ -3037,6 +3113,7 @@ var mainCode = function(){
 
 
 		var findtag = document.getElementById('ctl00_ContentBody_uxFindLinksHeader');
+
 		if (findtag) {
 			AddComment = document.createElement('a');
 			var imgAdd = document.createElement('img');
@@ -3526,7 +3603,7 @@ var mainCode = function(){
 
 //					if(browser === "Chrome"){
 						$('#map_canvas').replaceWith('<div style="width: 325px; height: 325px;" id="map_canvas"></div>');
-						setStaticMap();
+						// setStaticMap();
 //					}
 				};
 
@@ -3929,35 +4006,33 @@ var mainCode = function(){
 		}
 	}
 
-	function gccommentOnPrintPage() {
+	async function gccommentOnPrintPage() {
 		log('debug', 'determining print page');
-		setTimeout(function() {
-			var hook = document.getElementById('Content');
-			// log("debug", "print page: " + hook);
-			if (hook == null) {
-				log("debug", "gctour print page found");
-				// setTimeout(function() {
-				var overLay = document.getElementsByClassName('dark_msg_overlay')[0];
 
-				if (overLay == null) { // kein overlay vorhanden? dann sofort
-					gcTourPrintPage();
-				} else { // overlay, erst warten, bis es weg ist und dann
-					// rein
-					overLay.addEventListener('DOMNodeRemoved', function(evt) {
-						// log("info", "removed: " + evt);
+		try {
+			// Wir warten bis zu 10 Sekunden, ob entweder das GCTour-Overlay oder der normale Print-Hook auftaucht
+			const hook = await waitForElement('#Content, .dark_msg_overlay', 10000);
+
+			if (hook.classList.contains('dark_msg_overlay')) {
+				log("debug", "gctour print page overlay found. Waiting for it to disappear...");
+				// Bei GCTour warten wir per Observer, bis das Overlay verschwindet
+				const observer = new MutationObserver((mutations, obs) => {
+					if (!document.querySelector('.dark_msg_overlay')) {
+						obs.disconnect();
 						gcTourPrintPage();
-					}, false);
-				}
-				// }, 100);
+					}
+				});
+				observer.observe(document.body, { childList: true, subtree: true });
 			} else {
 				log("debug", "regular print page found");
-				var actionString = document.getElementById('Form1').getAttribute('action');
+				const actionString = document.getElementById('Form1').getAttribute('action');
 				currentCacheGUID = actionString.split('&')[0].split('=')[1];
-				var comment = doLoadCommentFromGUID(currentCacheGUID);
+				const comment = doLoadCommentFromGUID(currentCacheGUID);
+
 				if (comment != null) {
 					// add marker to map
 					if (comment.lat && comment.lng) {
-						var mapImg = document.getElementById('map');
+						const mapImg = document.getElementById('map');
 						if (mapImg) {
 							mapImg.setAttribute('src', addToGoogleMapsStatic({
 								href : mapImg.getAttribute('src'),
@@ -3966,9 +4041,9 @@ var mainCode = function(){
 								icon : finalIconLink,
 								label : "F"
 							}));
-							for (var k = 0; comment.waypoints && (k < comment.waypoints.length); k++) {
-								var wpt = comment.waypoints[k];
-								var coords = parseCoordinates(wpt.coordinate);
+							for (let k = 0; comment.waypoints && (k < comment.waypoints.length); k++) {
+								const wpt = comment.waypoints[k];
+								const coords = parseCoordinates(wpt.coordinate);
 								if (coords.length == 2) {
 									mapImg.setAttribute('src', addToGoogleMapsStatic({
 										href : mapImg.getAttribute('src'),
@@ -3983,18 +4058,16 @@ var mainCode = function(){
 						unsafeWindow.__imageResize = unsafeWindow.imageResize;
 						unsafeWindow.imageResize = function(width, height) {
 							unsafeWindow.__imageResize(width, height);
-							var addToGoogleMapsStatic = function(data) {
-								var href = data.href;
-								var finlat = data.lat;
-								var finlng = data.lng;
-								var icon = data.icon;
-								var label = data.label;
+							const addToGoogleMapsStaticInner = function(data) {
+								const href = data.href;
+								const finlat = data.lat;
+								const finlng = data.lng;
+								const icon = data.icon;
+								const label = data.label;
 
-								// log('debug', href);
-								var GMstaticDelim = '&sensor';
-								var hrefParts = href.split(GMstaticDelim);
-								// log('debug', hrefParts);
-								var result = hrefParts[0] + "&markers=color:green|";
+								const GMstaticDelim = '&sensor';
+								const hrefParts = href.split(GMstaticDelim);
+								let result = hrefParts[0] + "&markers=color:green|";
 								if (label) {
 									result += "label:" + label + "|";
 								} else {
@@ -4005,12 +4078,12 @@ var mainCode = function(){
 								result = result + finlat + "," + finlng + '&sensor' + hrefParts[1];
 								return result.replace(/zoom=\d*&/, "");
 							};
-							http: // maps.google.com/maps/api/staticmap?zoom=14&size=320x240&maptype=roadmap&markers=icon:http%3A//www.geocaching.com/images/WptTypes/pins/3.png|51.050667,13.690133&markers=icon:http%3A//www.geocaching.com/images/WptTypes/pins/218.png|51.05067,13.69013&&markers=color:green|label:2|51.05126666666666,13.6913&&markers=color:green|label:3|51.0532,13.693183333333334&&markers=color:green|label:4|51.05518333333333,13.695216666666667&&markers=color:green|label:5|51.05721666666667,13.70855&&markers=color:green|label:6|51.061366666666665,13.7136&&markers=color:green|label:F|icon:http://gccomment.svn.sourceforge.net/svnroot/gccomment/trunk/gccomment/res/finalcoord.png|51.06775,13.7106&sensor=false
-							for (var k = 0; comment.waypoints && (k < comment.waypoints.length); k++) {
-								var wpt = comment.waypoints[k];
-								var coords = parseCoordinates(wpt.coordinate);
+
+							for (let k = 0; comment.waypoints && (k < comment.waypoints.length); k++) {
+								const wpt = comment.waypoints[k];
+								const coords = parseCoordinates(wpt.coordinate);
 								if (coords.length == 2) {
-									mapImg.setAttribute('src', addToGoogleMapsStatic({
+									mapImg.setAttribute('src', addToGoogleMapsStaticInner({
 										href : mapImg.getAttribute('src'),
 										lat : coords[0],
 										lng : coords[1],
@@ -4018,7 +4091,7 @@ var mainCode = function(){
 									}));
 								}
 							}
-							mapImg.setAttribute('src', addToGoogleMapsStatic({
+							mapImg.setAttribute('src', addToGoogleMapsStaticInner({
 								href : mapImg.getAttribute('src'),
 								lat : comment.lat,
 								lng : comment.lng,
@@ -4028,26 +4101,25 @@ var mainCode = function(){
 					}
 
 					// add comment sortable
-					var contentGroup = hook.lastChild;
+					let contentGroup = hook.lastChild;
 					while ((contentGroup.nodeName.toLowerCase() != "div") && (contentGroup != null)) {
 						contentGroup = contentGroup.previousSibling;
 					}
 
-					var commentDiv = document.createElement('div');
+					const commentDiv = document.createElement('div');
 					commentDiv.setAttribute('class', 'item ui-widget ui-widget-content ui-helper-clearfix');
 
-					var headerDiv = document.createElement('div');
+					const headerDiv = document.createElement('div');
 					headerDiv.setAttribute('class', 'item-header');
-					var headText = "<span id='gccommentwidget' class='ui-icon ui-icon-minusthick'></span><h2>"
-							+ lang.mycomment;
+					let headText = `<span id='gccommentwidget' class='ui-icon ui-icon-minusthick'></span><h2>${lang.mycomment}`;
 
-					if (comment.lat && comment.lng)
-						headText = headText + " (final at " + convertDec2DMS(comment.lat, comment.lng) + ")";
-
-					headText = headText + "</h2>";
+					if (comment.lat && comment.lng) {
+						headText += ` (final at ${convertDec2DMS(comment.lat, comment.lng)})`;
+					}
+					headText += "</h2>";
 					headerDiv.innerHTML = headText;
 
-					var contentDiv = document.createElement('div');
+					const contentDiv = document.createElement('div');
 					contentDiv.setAttribute('class', 'item-content');
 					contentDiv.innerHTML = comment.commentValue.replace(/\n/g, '<br/>');
 
@@ -4056,16 +4128,15 @@ var mainCode = function(){
 
 					contentGroup.insertBefore(commentDiv, contentGroup.firstChild);
 					$("#gccommentwidget").click(function() {
-					$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
-					$(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
+					    $(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+					    $(this).parents(".item:first").toggleClass("no-print").find(".item-content").toggle();
 					});
 
 					if (comment.waypoints && (comment.waypoints.length > 0)) {
-						// we have some waypoints to display
-						var table = document.getElementById('Waypoints');
+						const table = document.getElementById('Waypoints');
 						if (table) {
-							for (var j = 0; comment.waypoints && (j < comment.waypoints.length); j++) {
-								var waypoint = createAdditionalWaypointsRow({
+							for (let j = 0; comment.waypoints && (j < comment.waypoints.length); j++) {
+								const waypoint = createAdditionalWaypointsRow({
 									imageAlt : "",
 									imageSrc : waypointIcon,
 									prefix : comment.waypoints[j].prefix,
@@ -4078,9 +4149,8 @@ var mainCode = function(){
 								table.getElementsByTagName('tbody')[0].appendChild(waypoint);
 							}
 
-							// add the final waypoint, if available
 							if (comment.lat && comment.lng) {
-								var finalRow = createAdditionalWaypointsRow({
+								const finalRow = createAdditionalWaypointsRow({
 									imageAlt : lang.final_location,
 									imageSrc : finalIcon,
 									prefix : "FL",
@@ -4096,7 +4166,9 @@ var mainCode = function(){
 					}
 				}
 			}
-		}, 1000);
+		} catch (error) {
+			log("error", "Print page initialization failed: " + error);
+		}
 	}
 
 	function gccommentOnManageLocations() {
@@ -4119,7 +4191,7 @@ var mainCode = function(){
 		commentTable = document.createElement('table');
 		commentTable.setAttribute('id', 'gccommentoverviewtable');
 		commentTable.setAttribute('style',
-				'width:auto; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#c8cbce');
+				'width:100%; outline: 1px solid rgb(215, 215, 215); position: relative;background-color:#c8cbce');
 		commentTable.setAttribute('class', 'display');
 		var thead = document.createElement('thead');
 		commentTable.appendChild(thead);
@@ -4168,6 +4240,11 @@ var mainCode = function(){
 
 			tr = document.createElement('tr');
 			var comment = doLoadCommentFromGUID(commentKey.substr(COMPREFIX.length));
+
+            // NEU: Überspringe kaputte oder leere Einträge
+			if (!comment) {
+				continue;
+			}
 
 			if (!comment.state || (comment.state == "undefined") || (comment.state == undefined))
 				comment.state = stateOptions[0];
@@ -4475,137 +4552,114 @@ var mainCode = function(){
 
 	// es wird eine Tabelle angezeigt (suchergebnis, profilseite, etc.).
 	// Tooltips werden hier eingewebt.
-	function addCommentBubblesToPage() {
-		log("info", "weaving comments into table...");
-		appendScript('text', "var tooltip = function(){	" + "var id = 'tt';	" + "var top = 3;	" + "var left = 3;	"
-				+ "var maxw = 500;	" + "var speed = 10;	" + "var timer = 20;	" + "var endalpha = 95;	"
-				+ "var alpha = 0;	" + "var tt,t,c,b,h;	" + "var ie = document.all ? true : false;	" + "return {		"
-				+ "show:function(v,w) {			" + "if(tt == null) {				" + "tt = document.createElement('div');				"
-				+ "tt.setAttribute('id',id);				" + "t = document.createElement('div');				"
-				+ "t.setAttribute('id',id + 'top');				" + "c = document.createElement('div');				"
-				+ "c.setAttribute('id',id + 'cont');				" + "b = document.createElement('div');				"
-				+ "b.setAttribute('id',id + 'bot');				" + "tt.appendChild(t);				" + "tt.appendChild(c);				"
-				+ "tt.appendChild(b);				" + "document.body.appendChild(tt);				" + "tt.style.opacity = 0;				"
-				+ "tt.style.filter = 'alpha(opacity=0)';				" + "document.onmousemove = this.pos;			" + "}			"
-				+ "tt.style.display = 'block';			" + "c.innerHTML = v;			"
-				+ "tt.style.width = w ? w + 'px' : 'auto';			" + "if(!w && ie){				" + "t.style.display = 'none';				"
-				+ "b.style.display = 'none';				" + "tt.style.width = tt.offsetWidth;				"
-				+ "t.style.display = 'block';				" + "b.style.display = 'block';			" + "}			"
-				+ "if(tt.offsetWidth > maxw){" + "tt.style.width = maxw + 'px'" + "}			"
-				+ "h = parseInt(tt.offsetHeight) + top;			" + "clearInterval(tt.timer);			"
-				+ "tt.timer = setInterval(function(){tooltip.fade(1)},timer);" + "},		" + "pos:function(e){			"
-				+ "var u = ie ? event.clientY + document.documentElement.scrollTop : e.pageY;			"
-				+ "var l = ie ? event.clientX + document.documentElement.scrollLeft : e.pageX;			"
-				+ "tt.style.top = (u - h) + 'px';			" + "tt.style.left = (l + left) + 'px';		" + "},		"
-				+ "fade:function(d){			" + "var a = alpha;			"
-				+ "if((a != endalpha && d == 1) || (a != 0 && d == -1)){				" + "var i = speed;				"
-				+ "if(endalpha - a < speed && d == 1){					" + "i = endalpha - a;				"
-				+ "}else if(alpha < speed && d == -1){					" + "i = a;				" + "}				" + "alpha = a + (i * d);				"
-				+ "tt.style.opacity = alpha * .01;				" + "tt.style.filter = 'alpha(opacity=' + alpha + ')';			"
-				+ "}else{				" + "clearInterval(tt.timer);				" + "if(d == -1){tt.style.display = 'none'}			" + "}		"
-				+ "},		" + "hide:function(){			" + "clearInterval(tt.timer);			"
-				+ "tt.timer = setInterval(function(){tooltip.fade(-1)},timer);		" + "}	};}();", null);
+// Isolierter, moderner Tooltip (sicher vor CSP)
+	const gccTooltip = {
+		tt: null, c: null, h: 0,
+		init: function() {
+			if (this.tt) return;
+			this.tt = document.createElement('div');
+			this.tt.id = 'gcc-tt';
+			this.tt.style.position = 'absolute';
+			this.tt.style.display = 'none';
+			this.tt.style.zIndex = '99999';
+			this.tt.style.pointerEvents = 'none'; // Verhindert Flackern unter der Maus
 
-		var style = document.createElement('style');
-		style.type = 'text/css';
-		style.media = 'screen';
-		style.innerHTML = '* {margin:0; padding:0}#text {margin:50px auto; width:500px}.hotspot {color:#900; padding-bottom:1px; border-bottom:1px dotted #900; cursor:pointer}#tt {position:absolute; display:block}#tttop {display:block; height:5px; margin-left:5px; overflow:hidden}#ttcont {display:block; padding:2px 12px 3px 7px; margin-left:5px; background:#666; color:#FFF}#ttbot {display:block; height:5px; margin-left:5px; overflow:hidden}';
-		document.getElementsByTagName('head')[0].appendChild(style);
+			this.c = document.createElement('div');
+			this.c.id = 'gcc-ttcont';
+			this.c.style.background = '#333';
+			this.c.style.color = '#FFF';
+			this.c.style.padding = '8px 12px';
+			this.c.style.borderRadius = '6px';
+			this.c.style.fontSize = '13px';
+			this.c.style.lineHeight = '1.4';
+			this.c.style.boxShadow = '0 4px 6px rgba(0,0,0,0.3)';
 
-		var anchors = document.getElementsByTagName('a');
-		// old regex
-		var regGUID = /cache_details\.aspx\?guid=([^&]*)/;
-
-		// schema for
-		// http://www.geocaching.com/geocache/GC1P7MN_eine-dunkle-seite-der-stadt
-		var regGCCode = /geocache\/(\w*)_/;
-		// schema for
-		// https://coord.info/XYZ123
-		var regCoordInfo = /coord\.info\/(\w*)/;
-		var previousAnchor = null;
-
-		for (var i = 0; i < anchors.length; i++) { // check all links
-			var comment = null;
-			var a = anchors[i];
-
-			if (regGCCode.exec(a.href)) { // anchor is a GCCode link to a cache
-				comment = doLoadCommentFromGCCode(RegExp.$1);
-			} else if (regGUID.exec(a.href)) { // anchor is a GUID link to a cache
-				comment = doLoadCommentFromGUID(RegExp.$1);
-			} else if (regCoordInfo.exec(a.href)) { // anchor is a CoordInfo link to a cache
-				comment = doLoadCommentFromGCCode(RegExp.$1);
+			this.tt.appendChild(this.c);
+			document.body.appendChild(this.tt);
+			document.addEventListener('mousemove', (e) => this.pos(e));
+		},
+		show: function(html) {
+			this.init();
+			this.c.innerHTML = html;
+			this.tt.style.display = 'block';
+			this.h = this.tt.offsetHeight + 10;
+		},
+		hide: function() {
+			if (this.tt) this.tt.style.display = 'none';
+		},
+		pos: function(e) {
+			if (this.tt && this.tt.style.display === 'block') {
+				this.tt.style.top = (e.pageY - this.h) + 'px';
+				this.tt.style.left = (e.pageX + 15) + 'px';
 			}
-			if (a.href == previousAnchor) {
+		}
+	};
+
+	// Die neue, schlaue Scan-Funktion (ehemals addCommentBubblesToPage)
+    function addCommentBubblesToPage() {
+		const anchors = document.querySelectorAll('a[href*="coord.info/GC"], a[href*="cache_details.aspx?guid="], a[href*="geocache/GC"]');
+
+		for (let i = 0; i < anchors.length; i++) {
+			const a = anchors[i];
+
+			if (a.hasAttribute('data-gcc-processed')) continue;
+
+			// NEU: Wenn der NÄCHSTE Link das exakt selbe Ziel hat, überspringen wir den aktuellen.
+			// So landet die Bubble immer hinter dem letzten Link einer Gruppe (also hinter dem Text).
+			if (i < anchors.length - 1 && anchors[i + 1].href === a.href) {
+				a.setAttribute('data-gcc-processed', 'true');
 				continue;
 			}
-			previousAnchor = a.href;
 
-			if (!comment)
-				continue;
+			let gccode = null;
+			let guid = null;
 
-			var target = document.createElement('img');
+			const matchCode = a.href.match(/(?:coord\.info|geocache)\/(GC[A-Z0-9]+)/i);
+			const matchGuid = a.href.match(/cache_details\.aspx\?guid=([a-z0-9\-]+)/i);
 
-			if (!comment.state)
-				target.src = state_default;
-			else {
-				if (comment.state == stateOptions[1])
-					target.src = state_unsolved;
-				else if (comment.state == stateOptions[2])
-					target.src = state_solved;
-				else if (comment.state == stateOptions[3])
-					target.src = state_found;
-				else
-					target.src = state_default;
-			}
+			if (matchCode) gccode = matchCode[1].toUpperCase();
+			else if (matchGuid) guid = matchGuid[1];
+			else continue;
 
-			target.width = '16';
-			target.height = '16';
-			target.alt = 'Comment available';
-			target.setAttribute("guid", comment.guid);
+			let comment = null;
+			if (gccode) comment = doLoadCommentFromGCCode(gccode);
+			else if (guid) comment = doLoadCommentFromGUID(guid);
 
-			target.addEventListener('mouseover', function(evt) {
-				var targetNode = evt.relatedTarget;
-				if (!targetNode)
-					return;
+			if (!comment) continue;
 
-				var cacheLink, commValue;
+			// Link als bearbeitet markieren
+			a.setAttribute('data-gcc-processed', 'true');
 
-				while (targetNode.nodeName.toLowerCase() != "td") {
-					targetNode = targetNode.parentNode;
-					if (!targetNode)
-						break;
+			const target = document.createElement('img');
+			target.src = state_default;
+			if (comment.state === stateOptions[1]) target.src = state_unsolved;
+			else if (comment.state === stateOptions[2]) target.src = state_solved;
+			else if (comment.state === stateOptions[3]) target.src = state_found;
+
+			target.style.width = '16px';
+			target.style.height = '16px';
+			target.style.marginLeft = '6px';
+			target.style.flexShrink = '0';
+			target.style.cursor = 'help';
+			target.style.verticalAlign = 'middle';
+
+			target.addEventListener('mouseenter', () => {
+				let text = "";
+				if (comment.lat && comment.lng) {
+					text += "<strong>" + lang.myfinalcoords + "</strong><br/>" + convertDec2DMS(comment.lat, comment.lng);
 				}
-				if (!targetNode || (targetNode.nodeName.toLowerCase() != "td"))
-					return;
-
-				var gccimg = $(targetNode).find("img[guid]");
-				var guid = gccimg.attr("guid");
-				commValue = doLoadCommentFromGUID(guid);
-
-				if (commValue == null) {
-					log('debug', 'could not load comment for guid ' + guid);
-					return;
+				if (comment.commentValue) {
+					if(text !== "") text += "<br/><br/>";
+					text += "<strong>" + lang.mycomment + "</strong><br/>" + comment.commentValue.replace(/\n/g, '<br/>');
 				}
+				if (text !== "") gccTooltip.show(text);
+			});
 
-				var commentTooltip = "";
-				if ((commValue.lat != null) && (commValue.lng != null)) {
-					commentTooltip = commentTooltip + "<strong>" + lang.myfinalcoords + "</strong><br/>"
-							+ convertDec2DMS(commValue.lat, commValue.lng);
-				}
-				if (commValue.commentValue) {
-					commentTooltip = commentTooltip + "<br/><br/><strong>" + lang.mycomment + "</strong><br/>"
-							+ commValue.commentValue.replace(/\n/g, '<br/>');
-				}
-				unsafeWindow.tooltip.show(commentTooltip, 400);
-			}, false);
-			target.setAttribute('onmouseout', 'tooltip.hide();');
-			// if (a.parentNode.getElementsByTagName('br').length = 2)
-			// a.parentNode.removeChild(a.parentNode
-			// .getElementsByTagName('br')[1]);
-			a.parentNode.appendChild(document.createTextNode(' '));
-			a.parentNode.appendChild(target);
-			// a.parentNode.insertBefore(target, a.nextSibling);
-			target.style.display = 'inline';
+			target.addEventListener('mouseleave', () => {
+				gccTooltip.hide();
+			});
+
+			a.parentNode.insertBefore(target, a.nextSibling);
 		}
 	}
 
@@ -5426,6 +5480,12 @@ var mainCode = function(){
 			if (key.indexOf(COMPREFIX) > -1) {
 				var guid = key.substring(COMPREFIX.length, key.length);
 				var comment = doLoadCommentFromGUID(guid);
+
+                // NEU: Überspringe kaputte oder leere Einträge
+				if (!comment) {
+					continue;
+				}
+
 				if (((comment.state == stSolved) || (comment.state == stFound) || (comment.state == stUnsolved))
 						&& (comment.archived != ARCHIVED)) {
 					// log('debug', "doMoveBeta(" + comment.lat + ", " + comment.lng + ",
@@ -5634,6 +5694,11 @@ var mainCode = function(){
 				var guid = commentKeys[i].substr(COMPREFIX.length);
 				// log('debug', 'guid: ' + guid);
 				var comment = doLoadCommentFromGUID(guid);
+
+                // NEU: Überspringe leere/korrupte Einträge
+				if (!comment) {
+					continue;
+				}
 
 				if (filtered) {
 					var isArchived = (comment.archived === ARCHIVED);
@@ -6216,187 +6281,6 @@ var mainCode = function(){
 		return username;
 	}
 
-	var originalGPX = "";
-	// Original idea from Schatzjäger2
-	function sendToGPS() {
-		log('debug','Suche Datastring');
-		setTimeout(function() {
-			log('debug','Suche Datastring');
-			var gpxTextArea = document.getElementById('dataString');
-			log('debug',dataString);
-			// gpxTextArea.parentNode.setAttribute('style', "");
-			var gpx = gpxTextArea.value;
-			originalGPX = gpx;
-			var anfang = gpx.indexOf('guid=');
-			var laenge = 'a5493497-70a7-4e07-946c-6d79c7a59994'.length + 5;
-			var currentCacheGUID = gpx.substring(anfang + 5, anfang + laenge);
-			currentComment = doLoadCommentFromGUID(currentCacheGUID);
-			if (currentComment && (currentComment.commentValue || (currentComment.lat && currentComment.lng))) {
-				// build special config
-				var writebox = document.getElementById('writeBox');
-				var configdiv = document.createElement('div');
-				configdiv.setAttribute('style', 'outline:1px solid grey;margin-bottom:5px');
-				var configlabel = document.createElement('p');
-				configlabel.appendChild(document.createTextNode(lang.savegpx_explain));
-				configdiv.appendChild(configlabel);
-
-				// add your comment
-				var addComment = document.createElement('input');
-				addComment.setAttribute('id', 'addComment');
-				addComment.setAttribute('type', 'checkbox');
-				addComment.setAttribute('class', 'Checkbox');
-				addComment.addEventListener('click', function() {
-					var state = addComment.getAttribute('checked');
-					if (state)
-						addComment.removeAttribute('checked');
-					else
-						addComment.setAttribute('checked', 'checked');
-					GM_setValue(ADDCOMMENTSETTING, state ? 0 : 1);
-					patchGarminGPX();
-				}, false);
-				configdiv.appendChild(addComment);
-
-				var addCommentSetting = GM_getValue(ADDCOMMENTSETTING);
-				if (addCommentSetting == 1)
-					addComment.setAttribute('checked', 'checked');
-
-				var addCommentLabel = document.createElement('label');
-				addCommentLabel.setAttribute('for', 'addComment');
-				addCommentLabel.appendChild(document.createTextNode(lang.savegpx_addgcc));
-				configdiv.appendChild(addCommentLabel);
-
-				var addCommentSetting = GM_getValue(ADDCOMMENTSETTING);
-				if (addCommentSetting == 1)
-					addComment.setAttribute('checked', 'checked');
-				configdiv.appendChild(document.createElement('br'));
-
-				// change Original
-				var changeOriginal = document.createElement('input');
-				changeOriginal.setAttribute('id', 'changeOriginal');
-				changeOriginal.setAttribute('type', 'checkbox');
-				changeOriginal.setAttribute('class', 'Checkbox');
-				changeOriginal.addEventListener('click', function() {
-					var state = changeOriginal.getAttribute('checked');
-					if (state)
-						changeOriginal.removeAttribute('checked');
-					else
-						changeOriginal.setAttribute('checked', 'checked');
-					GM_setValue(CHANGEORIGINALSETTING, state ? 0 : 1);
-					patchGarminGPX();
-				}, false);
-				configdiv.appendChild(changeOriginal);
-
-				var changeOrigSetting = GM_getValue(CHANGEORIGINALSETTING);
-				if (changeOrigSetting == 1)
-					changeOriginal.setAttribute('checked', 'checked');
-
-				var changeOriginalLabel = document.createElement('label');
-				changeOriginalLabel.setAttribute('for', 'changeOriginal');
-				changeOriginalLabel.appendChild(document.createTextNode(lang.savegpx_changeorig));
-				configdiv.appendChild(changeOriginalLabel);
-
-				var changeOrigSetting = GM_getValue(CHANGEORIGINALSETTING);
-				if (changeOrigSetting == 1)
-					changeOriginal.setAttribute('checked', 'checked');
-				configdiv.appendChild(document.createElement('br'));
-
-				if (!currentComment.lat && !currentComment.lng) {
-					changeOriginal.setAttribute('disabled', '');
-				}
-
-				// add waypoint
-				var addWaypoint = document.createElement('input');
-				addWaypoint.setAttribute('id', 'addWaypoint');
-				addWaypoint.setAttribute('type', 'checkbox');
-				addWaypoint.setAttribute('class', 'Checkbox');
-				addWaypoint.addEventListener('click', function() {
-					var state = addWaypoint.getAttribute('checked');
-					if (state)
-						addWaypoint.removeAttribute('checked');
-					else
-						addWaypoint.setAttribute('checked', 'checked');
-					GM_setValue(ADDWAYPOINTSETTING, state ? 0 : 1);
-					patchGarminGPX();
-				}, false);
-				configdiv.appendChild(addWaypoint);
-
-				var addWaypointLabel = document.createElement('label');
-				addWaypointLabel.setAttribute('for', 'addWaypoint');
-				addWaypointLabel.appendChild(document.createTextNode(lang.savegpx_addfinal));
-				configdiv.appendChild(addWaypointLabel);
-
-				var addWaypointSetting = GM_getValue(ADDWAYPOINTSETTING);
-				if (addWaypointSetting == 1)
-					addWaypoint.setAttribute('checked', 'checked');
-				configdiv.appendChild(document.createElement('br'));
-
-				if (!currentComment.lat && !currentComment.lng) {
-					addWaypoint.setAttribute('disabled', '');
-				}
-
-				writebox.parentNode.insertBefore(configdiv, writebox);
-				patchGarminGPX();
-				window.resizeTo(450, 550);
-			}
-		}, 500);
-	}
-
-	function buildGPXWPT(commentObject) {
-		var newwpt = "<wpt lat='" + commentObject.lat + "' lon='" + commentObject.lng + "'>" + "    <time>"
-				+ isoTime(commentObject.saveTime) + "</time>" + "    <name>" + commentObject.gccode + "</name>"
-				+ "    <cmt>GCComment: " + commentObject.commentValue + "</cmt>" + "    <desc>"
-				+ lang.gpxexportwpttitle + "</desc>"
-				+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + commentObject.guid + "</url>"
-				+ "    <urlname>GCComment Final</urlname>" + "    <sym>Final Location</sym>"
-				// alternativ
-				// <sym>Flag,
-				// Green</sym>
-				// gr�ne
-				// fahne
-				// oder
-				// <sym>Civil</sym>
-				// goldene
-				// fahne mit
-				// stern
-				+ "    <type>Waypoint|Final Location</type>" + "   </wpt>";
-		return newwpt;
-	}
-
-	function patchGarminGPX() {
-		var gpxTextArea = document.getElementById('dataString');
-		var newGPX = originalGPX;
-		var positioncomment = originalGPX.indexOf('</groundspeak:long_description>');
-		if (currentComment.commentValue && (GM_getValue(ADDCOMMENTSETTING) == 1)) {
-			newGPX = originalGPX.substring(0, positioncomment)
-					+ "\n&lt;br /&gt;\n&lt;br /&gt;\nGCComment:\n&lt;br /&gt;\n" + currentComment.commentValue
-					+ "&lt;br /&gt;\n" + originalGPX.substring(positioncomment, originalGPX.length);
-		}
-
-		if (currentComment.lat && currentComment.lng) {
-			if (GM_getValue(CHANGEORIGINALSETTING) == 1) {
-				var latstart = newGPX.indexOf('<wpt lat=\"') + 10;
-				var latstop = newGPX.indexOf('\"', latstart) + 1;
-				newGPX = newGPX.substring(0, latstart) + currentComment.lat
-						+ newGPX.substring(latstop - 1, newGPX.length);
-
-				var lngstart = newGPX.indexOf('\" lon=\"') + 7;
-				var lngstop = newGPX.indexOf('\"', lngstart) + 1;
-				newGPX = newGPX.substring(0, lngstart) + currentComment.lng
-						+ newGPX.substring(lngstop - 1, newGPX.length);
-			}
-
-			if (GM_getValue(ADDWAYPOINTSETTING) == 1) {
-				var newwpt = buildGPXWPT(currentComment);
-				var endindex = newGPX.indexOf('</gpx>');
-				newGPX = newGPX.substring(0, endindex) + newwpt + newGPX.substring(endindex, newGPX.length);
-			}
-		}
-		// set text area
-		gpxTextArea.value = newGPX;
-
-		// set text child of text area
-		gpxTextArea.replaceChild(document.createTextNode(newGPX), gpxTextArea.firstChild);
-	}
 
 	function isoTime(time) {
 		var saved = null;
@@ -6520,15 +6404,6 @@ var mainCode = function(){
 				counter++;
 		}
 		return counter;
-	}
-
-	function addEvent(obj, type, fn) {
-		if (obj.addEventListener)
-			obj.addEventListener(type, fn, false);
-		else if (obj.attachEvent)
-			obj.attachEvent('on' + type, function() {
-				return fn.apply(obj, new Array(window.event));
-			});
 	}
 
 	function log(level, text) {
