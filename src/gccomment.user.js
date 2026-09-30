@@ -23,7 +23,7 @@
 // @icon            https://raw.githubusercontent.com/ramirezhr/GCComment/master/resources/icon.png
 // @updateURL       https://raw.githubusercontent.com/ramirezhr/GCComment/master/src/gccomment.user.js
 // @downloadURL     https://raw.githubusercontent.com/ramirezhr/GCComment/master/src/gccomment.user.js
-// @version         104
+// @version         105
 // @author          Birnbaum2001, lukeIam, ramirez
 // ==/UserScript==
 
@@ -588,8 +588,13 @@ var mainCode = function(){
 		if (GM_getValue(ENABLE_EXPORT)) {
 			log('info', 'Enabling export to other scripts');
 
-			var getGCommentFunction = function(guid) {
-					return doLoadCommentFromGUID(guid);
+			// Nimmt seit 105 auch einen GC-Code entgegen; die GUID bleibt fuer
+			// bestehende Fremdskripte gueltig.
+			var getGCommentFunction = function(id) {
+					if (typeof id === "string" && /^GC[A-Z0-9]+$/i.test(id)) {
+						return doLoadCommentFromGCCode(id.toUpperCase());
+					}
+					return doLoadCommentFromGUID(id);
 			};
 
 			if (needsPageBridge && window.wrappedJSObject) {
@@ -654,88 +659,66 @@ var mainCode = function(){
 		}
 	}
 
-	function doMaintenance() {
-		var INDEXBUILT = "indexbuilt";
-		var INDEXREPAIRED = "indexRepaired";
-
-		// first check whether the index has been created at all. this was introduced
-		// in version 46.
-		// index means gccode - guid mapping.
-		// if the variable is not "done", this index is created.
-		if (GM_getValue(INDEXBUILT) != 'done') {
-			log('info',
-					'Building index for GCCode-GUID assignment. This is done only once after update on version 46');
-			var keys = GM_listValues();
-			for (var i = 0; i < keys.length; i++) {
-				if (keys[i].indexOf(COMPREFIX) >= 0) {
-					// we got a comment
-					var guid = keys[i].split(COMPREFIX)[1];
-					var comment = doLoadCommentFromGUID(guid);
-					if (!comment)
-						continue;
-					var indexKey = COMGCPREFIX + comment.gccode;
-					GM_setValue(indexKey, guid);
-					log("info", indexKey + "=" + guid);
-				}
-			}
-			log('info', 'Finished building index.');
-			GM_setValue(INDEXBUILT, 'done');
+	// Liest einen Datensatz im alten Schluesselformat (Schema 1). Wird nur noch
+	// von der Migration gebraucht: im Betrieb existieren diese Schluessel ab 105
+	// nicht mehr. Deckt beide Altformate ab - JSON und die mit DELIM getrennte
+	// Fassung, die bis Version 103 geschrieben wurde.
+	function readLegacyRecord(guid) {
+		var raw = GM_getValue(COMPREFIX + guid);
+		if (!raw) {
+			return null;
 		}
+
+		if (raw.charAt(0) === "{") {
+			try {
+				var parsed = JSON.parse(raw);
+				// Die GUID steht im Schluessel und ist damit auch dann bekannt,
+				// wenn sie im Datensatz selbst fehlt.
+				if (parsed && !parsed.guid) {
+					parsed.guid = guid;
+				}
+				return parsed;
+			} catch (e) {
+				log("error", "Legacy record " + guid + " is not readable: " + e);
+				return null;
+			}
+		}
+
+		var details = raw.split(DELIM);
+		var comment = {
+			guid : guid,
+			gccode : details[0],
+			name : details[1],
+			commentValue : details[2],
+			saveTime : details[3],
+			state : details[4]
+		};
+
+		var optional = [ 'lat', 'lng', 'origlat', 'origlng', 'archived' ];
+		for (var i = 0; i < optional.length; i++) {
+			var value = details[5 + i];
+			if (value !== undefined && value !== "" && value !== "undefined" && value !== "null") {
+				comment[optional[i]] = value;
+			}
+		}
+		return comment;
+	}
+
+	function doMaintenance() {
+		var INDEXREPAIRED = "indexRepaired";
 
 		var indexRepaired = parseInt(GM_getValue(INDEXREPAIRED), 10);
 		if (!indexRepaired) {
 			indexRepaired = 0;
 		}
 
-		// repair needed because until 76, only the guid (the actual comment) was
-		// deleted, but not the gccode-guid mapping
-		if (indexRepaired < 77) {
-			log('info',
-					'Performing maintenance of version 77. Removing dangling gccode-guid mappings from the GreaseMonkey storage');
-			var oComments = {};
-			var aGCCodes = [];
+		// Die Wartungsschritte 46 und 77 pflegten den gccode-guid-Index. Der ist
+		// mit 105 entfallen, beide Schritte sind damit gegenstandslos - auch fuer
+		// jemanden, der von einer sehr alten Version kommt: Schritt 104 liest die
+		// Altdatensaetze direkt und braucht den Index nicht.
 
-			var allkeys = GM_listValues();
-			for (var i = 0; i < allkeys.length; i++) {
-				if (allkeys[i].indexOf(COMPREFIX) >= 0) {
-					// we got a comment
-					var guid = allkeys[i].split(COMPREFIX)[1];
-					var comment = doLoadCommentFromGUID(guid);
-					if (comment) {
-						oComments[comment.gccode] = comment;
-					} else {
-						log('debug', 'tried to load from GUID ' + guid + ', but nothing was returned.');
-					}
-				} else if (allkeys[i].indexOf(COMGCPREFIX) >= 0) {
-					var gccode = allkeys[i].split(COMGCPREFIX)[1];
-					aGCCodes.push(gccode);
-				}
-			}
-
-			var removeCounter = 0;
-			for (i = 0; i < aGCCodes.length; i++) {
-				var gccode = aGCCodes[i];
-				var comment = oComments[gccode];
-				if (!comment) {
-					// GCCode without comment ==> delete it
-					GM_deleteValue(COMGCPREFIX + gccode);
-					log('info', 'Deleted GCCode ' + gccode + ' because it has no corresponding comment stored');
-					removeCounter++;
-				}
-			}
-
-			log('debug', 'Maintenance 77 complete. Dangling indexes removed: ' + removeCounter);
-			indexRepaired = 77;
-		}
-
-		if (indexRepaired < 77) {
-			indexRepaired = 77;
-		}
-
-		// Version 104: jeden Datensatz zusaetzlich unter dem GC-Code ablegen.
-		// Der GUID-Schluessel bleibt in dieser Version bestehen und wird weiter
-		// mitgeschrieben; entfernt wird er erst in 105. Der Durchlauf ist
-		// wiederholbar - bricht er ab, macht der naechste Seitenaufruf weiter.
+		// Version 104: jeden Datensatz unter seinem GC-Code ablegen. Wiederholbar -
+		// bricht der Lauf ab, macht der naechste Seitenaufruf weiter.
 		if (indexRepaired < 104) {
 			log('info', 'Performing maintenance of version 104. Storing comments under their GC code.');
 
@@ -749,23 +732,23 @@ var mainCode = function(){
 					continue;
 				}
 
-				var oldComment = doLoadCommentFromGUID(v104keys[k].substr(COMPREFIX.length));
+				var oldComment = readLegacyRecord(v104keys[k].substr(COMPREFIX.length));
 				if (!oldComment) {
 					continue;
 				}
 
 				if (!oldComment.gccode) {
 					// Ohne GC-Code gibt es keinen neuen Schluessel. Der Datensatz bleibt
-					// unangetastet unter der GUID liegen, damit nichts verloren geht.
+					// unangetastet liegen, damit nichts verloren geht.
 					log('debug', 'Maintenance 104: ' + v104keys[k] + ' has no GC code, left untouched');
 					withoutGCCode++;
 					continue;
 				}
 
-				var existing = doLoadCommentV2(oldComment.gccode);
+				var existing = doLoadCommentFromGCCode(oldComment.gccode);
 				if (existing) {
 					// Zwei GUIDs auf denselben GC-Code - der juengere Eintrag gewinnt,
-					// der andere bleibt unter seinem GUID-Schluessel erhalten.
+					// der andere bleibt vorerst unter seinem alten Schluessel erhalten.
 					var existingTime = parseInt(existing.saveTime, 10) || 0;
 					var candidateTime = parseInt(oldComment.saveTime, 10) || 0;
 					if (existingTime >= candidateTime) {
@@ -776,7 +759,7 @@ var mainCode = function(){
 					duplicates++;
 				}
 
-				doSaveCommentV2(oldComment);
+				doSaveCommentWithTime(oldComment);
 				migrated++;
 			}
 
@@ -785,9 +768,79 @@ var mainCode = function(){
 			indexRepaired = 104;
 		}
 
+		// Version 105: die alten Schluessel abraeumen. Geloescht wird ein
+		// Altdatensatz nur, wenn derselbe Stand nachweislich unter dem GC-Code
+		// liegt - was nicht uebernommen werden konnte, bleibt liegen und wird
+		// gemeldet. Lieber ein paar verwaiste Schluessel als ein verlorener
+		// Datensatz.
+		if (indexRepaired < 105) {
+			log('info', 'Performing maintenance of version 105. Removing the old GUID keys and the GC code index.');
+
+			var removedRecords = 0;
+			var removedIndex = 0;
+			var kept = 0;
+
+			var v105keys = GM_listValues();
+			for (var m = 0; m < v105keys.length; m++) {
+				var key = v105keys[m];
+
+				if (key.indexOf(COMGCPREFIX) === 0) {
+					// Der gccode-guid-Index wird nicht mehr gelesen.
+					GM_deleteValue(key);
+					removedIndex++;
+					continue;
+				}
+
+				if (key.indexOf(COMPREFIX) !== 0) {
+					continue;
+				}
+
+				var legacy = readLegacyRecord(key.substr(COMPREFIX.length));
+				if (!legacy || !legacy.gccode) {
+					log('debug', 'Maintenance 105: keeping ' + key + ', cannot be mapped to a GC code');
+					kept++;
+					continue;
+				}
+
+				var current = doLoadCommentFromGCCode(legacy.gccode);
+				if (!current) {
+					log('debug', 'Maintenance 105: keeping ' + key + ', no record under ' + legacy.gccode);
+					kept++;
+					continue;
+				}
+
+				if ((parseInt(current.saveTime, 10) || 0) < (parseInt(legacy.saveTime, 10) || 0)) {
+					log('debug', 'Maintenance 105: keeping ' + key + ', the old record is newer');
+					kept++;
+					continue;
+				}
+
+				if (current.guid && legacy.guid && current.guid !== legacy.guid) {
+					// Zwei GUIDs auf denselben GC-Code: unter dem Schluessel liegt der
+					// Gewinner aus Schritt 104, dieser Datensatz hier ist ein anderer
+					// Text. Er wird nicht mitgeloescht, sondern bleibt zum Nachsehen.
+					log('info', 'Maintenance 105: keeping ' + key + ', a different record holds '
+							+ legacy.gccode);
+					kept++;
+					continue;
+				}
+
+				GM_deleteValue(key);
+				removedRecords++;
+			}
+
+			// Der Index von Schritt 46 wird nicht mehr gebraucht.
+			GM_deleteValue("indexbuilt");
+
+			log('info', 'Maintenance 105 complete. Records removed: ' + removedRecords
+					+ ', index entries removed: ' + removedIndex + ', kept: ' + kept);
+			indexRepaired = 105;
+		}
+
 		log('debug', 'Setting indexRepaired to new value: ' + indexRepaired);
 		GM_setValue(INDEXREPAIRED, indexRepaired);
 	}
+
 
     // GCComment on the Profil Page
 	function gccommentOnProfilePage() {
@@ -1790,14 +1843,16 @@ var mainCode = function(){
 	function performFilteredDeleteAll() {
 		var check = confirm(lang.delete_confirmation);
 		if (check) {
-			var keys = GM_listValues();
-			// log("info", "all keys: " + keys);
+			var keys = commentKeys();
 			var resultRemoved = "<ul>";
 			var removedCount = 0;
 			for (var i = 0; i < keys.length; i++) {
 				var key = keys[i];
-				if (key.indexOf(COMPREFIX) > -1) {
-					var comment = doLoadCommentFromGUID(key.substr(COMPREFIX.length));
+				{
+					var comment = doLoadCommentFromGCCode(key.substr(COMV2PREFIX.length));
+					if (!comment) {
+						continue;
+					}
 
 					var isArchived = (comment.archived === ARCHIVED);
 					var archiveSetting = GM_getValue(DELETEALL_FILTER_ARCHIVED);
@@ -1824,7 +1879,7 @@ var mainCode = function(){
 						removedCount++;
 
 						log("info", "deleted: " + key + "(" + GM_getValue(key) + ")");
-						deleteComment(comment.guid, comment.gccode);
+						deleteComment(comment.gccode);
 					}
 				}
 			}
@@ -2066,7 +2121,7 @@ var mainCode = function(){
 								c.state = markFoundState;
 								c.archived = markArchiveState;
 
-								doSaveCommentToGUID(c);
+								doSaveComment(c);
 							}, false);
 
 					var input = document.getElementById('ctl00_ContentBody_LogBookPanel1_ddLogType');
@@ -2119,7 +2174,7 @@ var mainCode = function(){
 								c.state = markFoundState;
 								c.archived = markArchiveState;
 
-								doSaveCommentToGUID(c);
+								doSaveComment(c);
 							}, false);
 
 				}
@@ -2187,7 +2242,7 @@ var mainCode = function(){
 							c.state = markFoundState;
 							c.archived = markArchiveState;
 
-							doSaveCommentToGUID(c);
+							doSaveComment(c);
 							log('info', 'GCComment updated on live log submit');
 						}
 					}
@@ -2210,7 +2265,7 @@ var mainCode = function(){
 
 				var msg = "";
 
-				var oExisting = doLoadCommentFromGUID(data.guid);
+				var oExisting = findExistingComment(data);
 				if (oExisting) {
 					msg = lang.shareImportOverride.replace("%name%", oExisting.name + " (" + oExisting.gccode + ")");
 				}
@@ -2220,7 +2275,7 @@ var mainCode = function(){
 
 				if(confirm(msg)){
 					console.log("Share import confirmed by user");
-					doSaveCommentWTimeToGUID(data);
+					doSaveCommentWithTime(data);
 					$('#btnAddToGcc').removeClass("addButton").addClass("tickButton");
 				}
 				else{
@@ -2428,7 +2483,7 @@ var mainCode = function(){
 			DeleteComment.addEventListener('mouseup', function() {
 				var check = confirm(lang.detail_deleteconfirmation);
 				if (check) {
-					deleteComment(currentComment.guid, currentComment.gccode);
+					deleteComment(currentComment.gccode);
 					currentComment = null;
 
 					$('.customWaypointRow').remove();
@@ -2464,25 +2519,25 @@ var mainCode = function(){
 			currentCacheName = unescapeXML(trim(document.getElementById('ctl00_ContentBody_CacheName').innerHTML));
 
 			// laden des aktuellen comments
-			currentComment = doLoadCommentFromGUID(currentCacheGUID);
+			currentComment = doLoadCommentFromGCCode(currentCacheCode);
 			var orig = retrieveOriginalCoordinates();
 			if (currentComment && orig.length === 2) {
 				if (!currentComment.origlat || !currentComment.origlng) {
 					currentComment.origlat = orig[0];
 					currentComment.origlng = orig[1];
-					doSaveCommentToGUID(currentComment);
+					doSaveComment(currentComment);
 				}
 			}
 
 			var add2Archive = function(){
 				currentComment.archived = ARCHIVED;
-				doSaveCommentToGUID(currentComment);
+				doSaveComment(currentComment);
 				updateArchiveIcon();
 			};
 
 			var removeFromArchive = function(){
 				currentComment.archived = null;
-				doSaveCommentToGUID(currentComment);
+				doSaveComment(currentComment);
 				updateArchiveIcon();
 			};
 
@@ -2790,7 +2845,7 @@ var mainCode = function(){
 									}
 								}
 
-								doSaveCommentToGUID(currentComment);
+								doSaveComment(currentComment);
 								AddComment.style.display = "none";
 								EditComment.style.display = "inline";
 								ArchiveComment.style.display = "inline";
@@ -2813,7 +2868,7 @@ var mainCode = function(){
 								coordinate : "?"
 							};
 							currentComment.waypoints.splice(newWPTindex - 1, 0, gccWPT);
-							doSaveCommentToGUID(currentComment);
+							doSaveComment(currentComment);
 
 							var row = createAdditionalWaypointsRow({
 								imageAlt : "",
@@ -3036,7 +3091,7 @@ var mainCode = function(){
 				if (newName != null) {
 					tdSpan1.innerHTML = newName;
 					updateWaypointInCurrentComment(data.prefix, "name", newName);
-					doSaveCommentToGUID(currentComment);
+					doSaveComment(currentComment);
 				}
 			});
 			wpttd.appendChild(editNameButton);
@@ -3060,7 +3115,7 @@ var mainCode = function(){
 						var cleanCoords = convertDec2DMS(aNewCoords[0], aNewCoords[1]);
 						tdSpan2.innerHTML = cleanCoords;
 						updateWaypointInCurrentComment(data.prefix, "coordinate", cleanCoords);
-						doSaveCommentToGUID(currentComment);
+						doSaveComment(currentComment);
 						break;
 					} else {
 						newCoords = window.prompt("Problem while parsing. Please correct!", newCoords);
@@ -3082,7 +3137,7 @@ var mainCode = function(){
 					if (currentComment.waypoints[k].prefix === data.prefix) {
 						currentComment.waypoints.splice(k, 1);
 						$('#wptrow_' + data.prefix).remove();
-						doSaveCommentToGUID(currentComment);
+						doSaveComment(currentComment);
 
 						// no waypoints from my side. remove the table at all
 						if (currentComment.waypoints.length === 0 && !currentComment.lat && !currentComment.lng) {
@@ -3323,7 +3378,7 @@ var mainCode = function(){
 		var td_savetime;
 		var td_action;
 
-		var keys = GM_listValues();
+		var keys = commentKeys();
 		var commentCountWhite = 0;
 		var commentCountRed = 0;
 		var commentCountGreen = 0;
@@ -3331,11 +3386,9 @@ var mainCode = function(){
 		var commentCountArchive = 0;
 		for (var ind = 0; ind < keys.length; ind++) {
 			var commentKey = keys[ind];
-			if (commentKey.indexOf(COMPREFIX) == -1)
-				continue;
 
 			tr = document.createElement('tr');
-			var comment = doLoadCommentFromGUID(commentKey.substr(COMPREFIX.length));
+			var comment = doLoadCommentFromGCCode(commentKey.substr(COMV2PREFIX.length));
 
             // NEU: Überspringe kaputte oder leere Einträge
 			if (!comment) {
@@ -3393,9 +3446,10 @@ var mainCode = function(){
 				img.src = state_default;
 			td_guid.appendChild(img);
 
-			var guid = commentKey.replace(/gccomment/, '');
+			// Die Aktionslinks tragen seit 105 den GC-Code statt der GUID.
+			var gccode = comment.gccode;
 			var link = document.createElement('a');
-			link.href = 'http://www.geocaching.com/seek/cache_details.aspx?guid=' + guid;
+			link.href = 'https://www.geocaching.com/geocache/' + gccode;
 			link.appendChild(document.createTextNode(comment.name + " (" + comment.gccode + ")"));
 			td_guid.appendChild(link);
 			if ((comment.lat != null) && (comment.lng != null)) {
@@ -3431,7 +3485,7 @@ var mainCode = function(){
 			mdefimg.title = lang.table_markcacheas + " " + lang.type_untyped;
 			action_markdefault.appendChild(mdefimg);
 			action_markdefault.setAttribute('style', 'margin-right:3px');
-			action_markdefault.href = "#" + guid + "=markdefault";
+			action_markdefault.href = "#" + gccode + "=markdefault";
 			action_markdefault.addEventListener('click', changeState, false);
 			td_action.appendChild(action_markdefault);
 
@@ -3441,7 +3495,7 @@ var mainCode = function(){
 			muimg.title = lang.table_markcacheas + " " + lang.type_unsolved;
 			action_markunsolved.appendChild(muimg);
 			action_markunsolved.setAttribute('style', 'margin-right:3px');
-			action_markunsolved.href = "#" + guid + "=markunsolved";
+			action_markunsolved.href = "#" + gccode + "=markunsolved";
 			action_markunsolved.addEventListener('click', changeState, false);
 			td_action.appendChild(action_markunsolved);
 
@@ -3451,7 +3505,7 @@ var mainCode = function(){
 			msimg.title = lang.table_markcacheas + " " + lang.type_solved;
 			action_marksolved.appendChild(msimg);
 			action_marksolved.setAttribute('style', 'margin-right:3px');
-			action_marksolved.href = "#" + guid + "=marksolved";
+			action_marksolved.href = "#" + gccode + "=marksolved";
 			action_marksolved.addEventListener('click', changeState, false);
 			td_action.appendChild(action_marksolved);
 
@@ -3461,7 +3515,7 @@ var mainCode = function(){
 			mfimg.title = lang.table_markcacheas + " " + lang.type_found;
 			action_markfound.appendChild(mfimg);
 			action_markfound.setAttribute('style', 'margin-right:3px');
-			action_markfound.href = "#" + guid + "=markfound";
+			action_markfound.href = "#" + gccode + "=markfound";
 			action_markfound.addEventListener('click', changeState, false);
 			td_action.appendChild(action_markfound);
 
@@ -3471,21 +3525,20 @@ var mainCode = function(){
 			delImg.title = lang.detail_delete;
 			action_del.appendChild(delImg);
 			action_del.setAttribute('style', 'margin-right:3px');
-			action_del.href = "#" + guid + "=del";
+			action_del.href = "#" + gccode + "=del";
 			action_del.addEventListener('click', function(event) {
 				var check = confirm(lang.delete_confirmation_overview);
 				if (check) {
 					var url = "" + this;
-					var guid = url.split("#")[1].split("=")[0];
+					var rowCode = url.split("#")[1].split("=")[0];
 					var action = url.split("#")[1].split("=")[1];
 
 					var row = $(event.target).parents('tr');
 					$('#gccommentoverviewtable').dataTable().fnDeleteRow(row[0]);
 
 					if (action === "del") {
-						var oldcomment = doLoadCommentFromGUID(guid);
-						log('info', 'deleting: ' + oldcomment);
-						deleteComment(oldcomment.guid, oldcomment.gccode);
+						log('info', 'deleting: ' + rowCode);
+						deleteComment(rowCode);
 					}
 					if (GM_getValue(LAZY_TABLE_REFRESH) == 0) {
 						refreshTable(true);
@@ -3501,7 +3554,7 @@ var mainCode = function(){
 			editimg.title = lang.table_editondetail;
 			action_edit.appendChild(editimg);
 			action_edit.setAttribute('style', 'margin-right:3px');
-			action_edit.href = "http://www.geocaching.com/seek/cache_details.aspx?guid=" + guid + "#mycomments";
+			action_edit.href = "https://www.geocaching.com/geocache/" + gccode + "#mycomments";
 			td_action.appendChild(action_edit);
 
 			if (comment.archived === ARCHIVED) {
@@ -3511,7 +3564,7 @@ var mainCode = function(){
 				mdefimg.title = lang.table_removefromarchive;
 				action_removeFromArchive.appendChild(mdefimg);
 				action_removeFromArchive.setAttribute('style', 'margin-right:3px');
-				action_removeFromArchive.href = "#" + guid + "=removeFromArchive";
+				action_removeFromArchive.href = "#" + gccode + "=removeFromArchive";
 				action_removeFromArchive.addEventListener('click', changeState, false);
 				td_action.appendChild(action_removeFromArchive);
 			} else {
@@ -3521,7 +3574,7 @@ var mainCode = function(){
 				mdefimg.title = lang.table_addtoarchive;
 				action_addToArchive.appendChild(mdefimg);
 				action_addToArchive.setAttribute('style', 'margin-right:3px');
-				action_addToArchive.href = "#" + guid + "=addToArchive";
+				action_addToArchive.href = "#" + gccode + "=addToArchive";
 				action_addToArchive.addEventListener('click', changeState, false);
 				td_action.appendChild(action_addToArchive);
 			}
@@ -3757,20 +3810,35 @@ var mainCode = function(){
 		return result;
 	}
 
-	function doSaveCommentV2(comment) {
-		if (!comment || !comment.gccode) {
-			return false;
+	// ***
+	// *** Speicherschicht - Schema 2
+	// ***
+	// Ein Datensatz liegt unter COMV2PREFIX + GC-Code. Die Groundspeak-GUID ist
+	// seit 105 kein Schluessel mehr, sondern nur noch ein Feld im Datensatz: sie
+	// steht auf den neueren Seiten von geocaching.com gar nicht mehr zur
+	// Verfuegung, der GC-Code dagegen ueberall.
+
+	function commentKeys() {
+		var keys = GM_listValues();
+		var result = [];
+		for (var i = 0; i < keys.length; i++) {
+			if (keys[i].indexOf(COMV2PREFIX) === 0) {
+				result.push(keys[i]);
+			}
 		}
-		comment.v = COMSCHEMA;
-		GM_setValue(COMV2PREFIX + comment.gccode, JSON.stringify(comment));
-		return true;
+		return result;
 	}
 
-	function doLoadCommentV2(gcCode) {
+	function doLoadCommentFromGCCode(gcCode) {
+		if (!gcCode) {
+			return null;
+		}
+
 		var raw = GM_getValue(COMV2PREFIX + gcCode);
 		if (!raw) {
 			return null;
 		}
+
 		try {
 			return JSON.parse(raw);
 		} catch (e) {
@@ -3779,13 +3847,39 @@ var mainCode = function(){
 		}
 	}
 
-	function doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, saveTime, state, lat, lng, origlat,
-			origlng, archived) {
-		var comment;
+	// GUID-Zugriff fuer die Stellen, an denen die Seite uns nur die GUID gibt
+	// (Druckseite, GPX-Patch, Logseite) und fuer Importformate, die nach GUID
+	// referenzieren. Statt eines zweiten Index im Speicher wird die Zuordnung
+	// beim ersten Bedarf einmal aufgebaut und fuer den Seitenaufruf behalten.
+	var guidIndexCache = null;
 
-		if (typeof guid === "object") { // we got a JSON object (hopefully)
-			comment = guid;
-		} else {
+	function doLoadCommentFromGUID(guid) {
+		if (!guid) {
+			return null;
+		}
+
+		if (!guidIndexCache) {
+			guidIndexCache = {};
+			var keys = commentKeys();
+			for (var i = 0; i < keys.length; i++) {
+				var comment = doLoadCommentFromGCCode(keys[i].substr(COMV2PREFIX.length));
+				if (comment && comment.guid) {
+					guidIndexCache[comment.guid] = comment.gccode;
+				}
+			}
+			log('debug', 'GUID index built, entries: ' + Object.keys(guidIndexCache).length);
+		}
+
+		var gcCode = guidIndexCache[guid];
+		return gcCode ? doLoadCommentFromGCCode(gcCode) : null;
+	}
+
+	function doSaveCommentWithTime(comment, gccode, name, commentValue, saveTime, state, lat, lng, origlat,
+			origlng, archived) {
+		// Die alte Aufrufform mit Einzelwerten wird weiter bedient, weil sie an
+		// einigen Stellen bequemer ist als ein Objekt zusammenzubauen.
+		if (typeof comment !== "object") {
+			var guid = comment;
 			comment = {
 				guid : guid,
 				gccode : gccode,
@@ -3801,99 +3895,41 @@ var mainCode = function(){
 			if (archived) comment.archived = archived;
 		}
 
-		if (!comment.guid || !comment.gccode) {
-			log('debug', 'Error saving comment. guid=' + comment.guid + ' gccode=' + comment.gccode);
-			return;
+		if (!comment || !comment.gccode) {
+			log('debug', 'Error saving comment: no GC code (guid=' + (comment && comment.guid) + ')');
+			return false;
 		}
 
 		comment.v = COMSCHEMA;
-		var value = JSON.stringify(comment);
+		GM_setValue(COMV2PREFIX + comment.gccode, JSON.stringify(comment));
 
-		// Neuer Schluessel ueber den GC-Code.
-		GM_setValue(COMV2PREFIX + comment.gccode, value);
-
-		// Bis Version 105 zusaetzlich unter dem GUID-Schluessel samt Index: solange
-		// laufen Iteration, GUID-Zugriff und ein moegliches Downgrade unveraendert.
-		GM_setValue(COMPREFIX + comment.guid, value);
-		GM_setValue(COMGCPREFIX + comment.gccode, comment.guid);
-
-		log("info", "saving " + comment.gccode + " (" + comment.guid + ")");
-	}
-
-	function doSaveCommentToGUID(guid, gccode, name, commentValue, state, lat, lng, origlat, origlng, archived) {
-		var now = new Date();
-		if (typeof guid === "object") { // we got a JSON Object (hopefully)
-			guid.saveTime = (now - 0);
-			doSaveCommentWTimeToGUID(guid);
-		} else {
-			doSaveCommentWTimeToGUID(guid, gccode, name, commentValue, (now - 0), state, lat, lng, origlat, origlng,
-					archived);
+		// Der Cache wuerde sonst eine inzwischen geänderte GUID verschweigen.
+		if (guidIndexCache && comment.guid) {
+			guidIndexCache[comment.guid] = comment.gccode;
 		}
+
+		log("info", "saving " + comment.gccode);
+		return true;
 	}
 
-	function doLoadCommentFromGUID(guid) {
-		var c = GM_getValue(COMPREFIX + guid);
-		// log("info", "loaded: " + c);
-
-		var comment;
-
-		if (!c) {
-			// log('debug', 'tried to load ' + guid);
+	// Findet den vorhandenen Datensatz zu einem Import-Eintrag. Der GC-Code ist
+	// der Schluessel; die GUID wird nur noch fuer Altdateien herangezogen, in
+	// denen kein GC-Code steht.
+	function findExistingComment(record) {
+		if (!record) {
 			return null;
 		}
-
-		if (c.charAt(0) === "{") { // we stored a JSON object
-			comment = JSON.parse(c);
-			// log('debug', 'loaded json ' + guid);
-		} else {
-			// log('debug', 'loaded gcc ' + guid);
-			comment = {};
-			var details = c.split(DELIM);
-			comment.guid = guid;
-			comment.gccode = details[0];
-			comment.name = details[1];
-			comment.commentValue = details[2];
-			comment.saveTime = details[3];
-			comment.state = details[4];
-			if ((details[5] != "undefined") && (details[5] != "null") && (details[5] != ""))
-				comment.lat = details[5];
-			if ((details[6] != "undefined") && (details[6] != "null") && (details[6] != ""))
-				comment.lng = details[6];
-			if ((details[7] != "undefined") && (details[7] != "null") && (details[7] != ""))
-				comment.origlat = details[7];
-			if ((details[8] != "undefined") && (details[8] != "null") && (details[8] != ""))
-				comment.origlng = details[8];
-			if ((details[9] != "undefined") && (details[9] != "null") && (details[9] != ""))
-				comment.archived = details[9];
-		}
-		return comment;
+		return doLoadCommentFromGCCode(record.gccode) || doLoadCommentFromGUID(record.guid);
 	}
 
-	function doLoadCommentFromGCCode(gcCode) {
-		var comment = doLoadCommentV2(gcCode);
-		if (comment) {
-			return comment;
+	function doSaveComment(comment, gccode, name, commentValue, state, lat, lng, origlat, origlng, archived) {
+		var now = (new Date() - 0);
+		if (typeof comment === "object" && comment !== null) {
+			comment.saveTime = now;
+			return doSaveCommentWithTime(comment);
 		}
-
-		// Fallback fuer Datensaetze, die die Migration noch nicht erfasst hat:
-		// GC-Code -> GUID -> alter Schluessel.
-		var guid = getGUIDFromGCCode(gcCode);
-		if (!guid) {
-			return null;
-		}
-
-		comment = doLoadCommentFromGUID(guid);
-
-		// Selbstheilung: wir wissen hier bereits, dass der neue Schluessel fehlt,
-		// also kostet das Nachziehen keinen zusaetzlichen Lesezugriff. Faengt alles
-		// ab, was nach dem einmaligen Lauf von Wartung 104 noch unter dem alten
-		// Schluessel auftaucht - etwa aus einem zurueckgespielten Backup.
-		if (comment && comment.gccode) {
-			log('debug', 'Repairing missing GC code key for ' + comment.gccode);
-			doSaveCommentV2(comment);
-		}
-
-		return comment;
+		return doSaveCommentWithTime(comment, gccode, name, commentValue, now, state, lat, lng, origlat, origlng,
+				archived);
 	}
 
 	function editComment() {
@@ -4031,7 +4067,7 @@ var mainCode = function(){
 				currentComment.state = detailFinalCacheState.options[detailFinalCacheState.options.selectedIndex].value;
 				currentComment.lat = null;
 				currentComment.lng = null;
-				doSaveCommentToGUID(currentComment);
+				doSaveComment(currentComment);
 			} else { // save new
 				currentComment = {
 					guid : currentCacheGUID,
@@ -4045,9 +4081,9 @@ var mainCode = function(){
 					origlng : orig[1],
 					archived : null
 				};
-				doSaveCommentToGUID(currentComment);
+				doSaveComment(currentComment);
 			}
-			currentComment = doLoadCommentFromGUID(currentCacheGUID);
+			currentComment = doLoadCommentFromGCCode(currentCacheCode);
 			detailCommentInputLatLng.value = DEFAULTCOORDS;
 			detailFinalInputLatLng.value = DEFAULTCOORDS;
 			// log('info', 'deleted final coords');
@@ -4064,9 +4100,9 @@ var mainCode = function(){
 					currentComment.lng = fin[1];
 					currentComment.origlat = orig[0];
 					currentComment.origlng = orig[1];
-					doSaveCommentToGUID(currentComment);
+					doSaveComment(currentComment);
 				}
-				currentComment = doLoadCommentFromGUID(currentCacheGUID);
+				currentComment = doLoadCommentFromGCCode(currentCacheCode);
 				var clean = convertDec2DMS(currentComment.lat, currentComment.lng);
 				detailCommentInputLatLng.value = clean;
 				detailFinalInputLatLng.value = clean;
@@ -4141,10 +4177,20 @@ var mainCode = function(){
 		}
 	}
 
-	function deleteComment(guid, gccode) {
-		GM_deleteValue(COMPREFIX + guid);
-		GM_deleteValue(COMGCPREFIX + gccode);
+	function deleteComment(gccode) {
+		if (!gccode) {
+			log('debug', 'deleteComment called without a GC code');
+			return;
+		}
 		GM_deleteValue(COMV2PREFIX + gccode);
+
+		if (guidIndexCache) {
+			for (var guid in guidIndexCache) {
+				if (guidIndexCache[guid] === gccode) {
+					delete guidIndexCache[guid];
+				}
+			}
+		}
 	}
 
 	function saveComment() {
@@ -4195,7 +4241,7 @@ var mainCode = function(){
 		currentComment.origlat = orig[0];
 		currentComment.origlng = orig[1];
 
-		doSaveCommentToGUID(currentComment);
+		doSaveComment(currentComment);
 		saveToCacheNote(currentComment);
 
 		var clean = DEFAULTCOORDS;
@@ -4208,11 +4254,11 @@ var mainCode = function(){
 
 	function changeState(event) {
 		var url = "" + this;
-		var guid = url.split("#")[1].split("=")[0];
+		var rowCode = url.split("#")[1].split("=")[0];
 		var action = url.split("#")[1].split("=")[1];
 		var targetState = "";
 
-		var comment = doLoadCommentFromGUID(guid);
+		var comment = doLoadCommentFromGCCode(rowCode);
 
 		if (!comment)
 			return;
@@ -4237,7 +4283,7 @@ var mainCode = function(){
 			targetState = comment.state;
 		}
 
-		doSaveCommentToGUID(comment);
+		doSaveComment(comment);
 
 		if (!GM_getValue(LAZY_TABLE_REFRESH)) {
 			refreshTable(true);
@@ -4502,12 +4548,11 @@ var mainCode = function(){
 
 		removeMarkers("all");
 
-		var keys = GM_listValues();
+		var keys = commentKeys();
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
-			if (key.indexOf(COMPREFIX) > -1) {
-				var guid = key.substring(COMPREFIX.length, key.length);
-				var comment = doLoadCommentFromGUID(guid);
+			{
+				var comment = doLoadCommentFromGCCode(key.substr(COMV2PREFIX.length));
 
                 // NEU: Überspringe kaputte oder leere Einträge
 				if (!comment) {
@@ -4603,7 +4648,7 @@ var mainCode = function(){
 			var comment = filteredComments[i];
 			result = result + "<comment>";
 			result = result + "<gcid>";
-			result = result + comment.guid;
+			result = result + (comment.guid || "");
 			result = result + "</gcid>";
 			result = result + "<gccode>";
 			result = result + comment.gccode;
@@ -4661,7 +4706,7 @@ var mainCode = function(){
 		var result = "";
 		result = result + "<comment>";
 		result = result + "<gcid>";
-		result = result + comment.guid;
+		result = result + (comment.guid || "");
 		result = result + "</gcid>";
 		result = result + "<gccode>";
 		result = result + comment.gccode;
@@ -4715,13 +4760,10 @@ var mainCode = function(){
 
 	function getComments(filtered) {
 		var filteredComments = new Array();
-		var commentKeys = GM_listValues();
-		for (var i = 0; i < commentKeys.length; i++) {
-			if (commentKeys[i].indexOf(COMPREFIX) > -1) {
-				// log('debug', 'key: ' + commentKeys[i]);
-				var guid = commentKeys[i].substr(COMPREFIX.length);
-				// log('debug', 'guid: ' + guid);
-				var comment = doLoadCommentFromGUID(guid);
+		var keys = commentKeys();
+		for (var i = 0; i < keys.length; i++) {
+			{
+				var comment = doLoadCommentFromGCCode(keys[i].substr(COMV2PREFIX.length));
 
                 // NEU: Überspringe leere/korrupte Einträge
 				if (!comment) {
@@ -4815,7 +4857,7 @@ var mainCode = function(){
 						+ isoTime(comment.saveTime) + "</time>\n" + "    <name>" + comment.gccode + "</name>\n"
 						+ "    <cmt>GCComment: " + escapeXML(comment.commentValue) + "</cmt>\n" + "    <desc>"
 						+ escapeXML(comment.name) + "</desc>\n"
-						+ "    <url>http://www.geocaching.com/seek/cache_details.aspx?guid=" + comment.guid + "</url>\n"
+						+ "    <url>https://www.geocaching.com/geocache/" + comment.gccode + "</url>\n"
 						+ "    <urlname>GCComment Final</urlname>\n" + "    <sym>Final Location</sym>\n"
 						// alternativ
 						// <sym>Flag,
@@ -4954,7 +4996,7 @@ var mainCode = function(){
 		for (var i = 0; i < filteredComments.length; i++) {
 			var comment = filteredComments[i];
 			result = result + linestart;
-			result = result + pre + comment.guid + post;
+			result = result + pre + (comment.guid || "") + post;
 			result = result + pre + comment.gccode + post;
 			result = result + pre + comment.name + post;
 			result = result + pre + convertDec2DMS(comment.lat, comment.lng) + post;
@@ -4982,7 +5024,7 @@ var mainCode = function(){
 			var aOverwrite = [];
 			var aNew = [];
 			aJSON.forEach(function(element, index) {
-				var oExisting = doLoadCommentFromGUID(element.guid);
+				var oExisting = findExistingComment(element);
 				if (oExisting) {
 					if ((oExisting.saveTime != null) && (oExisting.saveTime >= element.saveTime)) {
 						aExisted.push(element);
@@ -5002,11 +5044,11 @@ var mainCode = function(){
 
 				aOverwrite.forEach(function(element) {
 					var importTooltip = createCachePrintout(element);
-					var oldTooltip = createCachePrintout(doLoadCommentFromGUID(element.guid));
+					var oldTooltip = createCachePrintout(findExistingComment(element));
 					sHTML += "<tr><td><a target='blank' href='http://www."
 							+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name + " ("
 							+ element.gccode + ")</a></td><td>" + importTooltip + "</td><td>" + oldTooltip + "</td></tr>";
-					doSaveCommentWTimeToGUID(element);
+					doSaveCommentWithTime(element);
 				});
 
 				aNew.forEach(function(element) {
@@ -5014,7 +5056,7 @@ var mainCode = function(){
 					sHTML += "<tr><td><a target='blank' href='http://www."
 							+ "geocaching.com/seek/cache_details.aspx?guid=" + element.guid + "'>" + element.name + " ("
 							+ element.gccode + ")</a></td><td>" + importTooltip + "</td><td></td></tr>";
-					doSaveCommentWTimeToGUID(element);
+					doSaveCommentWithTime(element);
 				});
 
 				sHTML += "</table>";
@@ -5114,7 +5156,7 @@ var mainCode = function(){
 			// + imLng + ":" + imOriglat + ":" + imOriglng + ":" + imArchived + ":" +
 			// imWaypoints);
 
-			var existing = doLoadCommentFromGUID(imID);
+			var existing = findExistingComment({ gccode : imCode, guid : imID });
 			if (existing != null) {
 				if ((existing.saveTime != null) && (existing.saveTime >= imSave)) {
 					// newer or equal old comment exists, do not import
@@ -5146,7 +5188,7 @@ var mainCode = function(){
 							+ imID + "'>" + imName + " (" + imCode + ")</a></td><td>" + importTooltip + "</td><td>"
 							+ oldTooltip + "</td></tr>";
 					importedCount++;
-					doSaveCommentWTimeToGUID(comment);
+					doSaveCommentWithTime(comment);
 				}
 			} else {
 				// no comment yet, so import it
@@ -5164,7 +5206,7 @@ var mainCode = function(){
 					archived : imArchived,
 					waypoints : imWaypoints
 				};
-				doSaveCommentWTimeToGUID(comment);
+				doSaveCommentWithTime(comment);
 				var importTooltip = createCachePrintout(comment);
 				resultImported = resultImported
 						+ "<tr><td><a target='blank' href='http://www.geocaching.com/seek/cache_details.aspx?guid=" + imID
@@ -5504,14 +5546,7 @@ var mainCode = function(){
 	}
 
 	function getNumberOfComments() {
-		var keys = GM_listValues();
-		var counter = 0;
-		for (var ind = 0; ind < keys.length; ind++) {
-			var commentKey = keys[ind];
-			if (commentKey.indexOf(COMPREFIX) > -1)
-				counter++;
-		}
-		return counter;
+		return commentKeys().length;
 	}
 
 	function log(level, text) {
@@ -5519,14 +5554,6 @@ var mainCode = function(){
           case 'info': console.log(level + ": " + text); break
           case 'debug': console.log(level + ": " + text); break
 		}
-	}
-
-	function getGUIDFromGCCode(gcCode) {
-		var value = GM_getValue(COMGCPREFIX + gcCode);
-		if (value)
-			return value;
-		// else
-		// log('info', 'no GUID for GCCode ' + gcCode + ' saved. ');
 	}
 
 	function convertDec2DMS(lt, lg) {

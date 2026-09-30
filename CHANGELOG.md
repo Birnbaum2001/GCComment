@@ -4,11 +4,70 @@ All notable changes to GCComment are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [v104] 2026-09-19
+## [105] 2026-09-30
 
-Revival work after roughly eight years without maintenance. The script header
-still declares `@version 103`; bump it together with `src/version.json` before
-publishing, otherwise the update check will not offer these changes.
+Second half of the storage rework. Version 104 wrote every record under both the
+old and the new key; 105 drops the old one and moves the rest of the script onto
+the new key space.
+
+### Storage
+
+- **The GC code is the key.** A record lives at `gccv2-<GCCODE>` and nowhere
+  else. The Groundspeak GUID is now a field inside the record: it is absent from
+  the newer geocaching.com surfaces, while the GC code is on all of them.
+- **Dual write is gone.** One save writes one key instead of three.
+- **GUID lookups go through a lazily built map.** Four places get only a GUID
+  from the page — the print page, the log page, the GPX patch and the fallback
+  for comment bubbles. Rather than replacing the `gccode-` index with a reverse
+  one, the mapping is built on first use and kept for the page view. The cache
+  detail page no longer needs it at all: the GC code sits right next to the GUID
+  there, so the script reads that.
+- **Maintenance steps 46 and 77 removed.** Both only maintained the `gccode-`
+  index. Step 104 reads legacy records directly and never needed it, so even an
+  installation coming from a very old version migrates cleanly.
+- **Maintenance step 104 kept**, so a jump straight from 103 or earlier still
+  works. It now reads through `readLegacyRecord`, which understands both old
+  formats — the JSON one and the `#gccom#` delimited one. That branch is
+  therefore gone from normal operation and exists only for the migration.
+- **Maintenance step 105** removes the old keys and the `gccode-` index, but
+  only where the same record demonstrably exists under its GC code. Anything
+  that cannot be mapped stays and is reported. Where two GUIDs claimed the same
+  GC code, step 104 keeps the newer record — step 105 then leaves the loser in
+  place rather than deleting a second, different comment text.
+
+### Changed
+
+- `doSaveCommentToGUID` and `doSaveCommentWTimeToGUID` are now `doSaveComment`
+  and `doSaveCommentWithTime`. They had not saved anything under a GUID since
+  104, and the names actively misled.
+- `deleteComment(gccode)` takes one argument instead of two.
+- **Overview table works on GC codes.** The action links carried the GUID in
+  their fragment and `refreshTable` cut it out of the storage key with
+  `commentKey.replace(/gccomment/, '')` — that would have broken silently.
+  Cache links now point at `/geocache/<GCCODE>` instead of
+  `cache_details.aspx?guid=`.
+- **Import matches on the GC code.** `findExistingComment()` tries the GC code
+  first and falls back to the GUID only for old files that have none.
+- Exports write an empty field instead of `undefined` when a record has no GUID.
+
+### Repository
+
+- Removed the retired Manifest V2 Chrome extension (`chrome/`) and its build
+  artifacts (`dist/`). Chrome no longer loads MV2 extensions. Both remain in the
+  first commit of this repository and in the previous one.
+- Removed a stale mid-revival copy of the script (`src/script.js`), the
+  libraries dropped in 104 (`jquery.qrcode`, `nyroModal`), the vendored
+  DataTables copies now loaded from a CDN, an orphaned `src/style.css` whose
+  images were never in the repository, and `src/version.xml`, superseded by
+  `version.json`.
+- `src/version.json` had `latestVersion: 104` but no entry for 104, so the
+  update banner would have appeared with an empty changelog. Entries for 104 and
+  105 added.
+- Tests moved into `test/`, README rewritten, `.gitignore` added.
+
+## [104] 2026-09-19
+
+Revival work after roughly eight years without maintenance.
 
 ### Removed
 

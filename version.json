@@ -1,0 +1,17 @@
+{
+    "latestVersion": 105,
+    "changes": [
+        {
+            "version": 105,
+            "change": "Comments are now stored under their GC code. The GUID keys and the gccode- index are removed automatically on first run."
+        },
+        {
+            "version": 105,
+            "change": "Updates are pulled from the new repository."
+        },
+        {
+            "version": 104,
+            "change": "Cache page minimap works again; Dropbox uses OAuth with PKCE; sharing via Gist export and IDResolver removed."
+        }
+    ]
+}
