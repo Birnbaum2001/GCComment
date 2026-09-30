@@ -78,8 +78,7 @@ counts as a downgrade and is never fetched.
 
 Started in 2010 by Birnbaum2001, with lukeIam and ramirez contributing since.
 The earlier repository at
-[Birnbaum2001/GCComment](https://github.com/Birnbaum2001/GCComment) holds the
-history up to version 103 and the retired Chrome extension.
+
 
 Discussion thread (German):
 [Geoclub](https://geoclub.de/forum/viewtopic.php?f=117&t=44631)
